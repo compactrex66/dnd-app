@@ -5,10 +5,11 @@
         if($_GET['action'] == 'adjustHealth') {
             $characterId = $_GET['characterId'];
             $health = (int)mysqli_fetch_row(mysqli_query($conn, "SELECT health FROM current_fight WHERE id = $characterId"))[0] + (int)$_GET['healthNumber'];
-            echo $health;
             mysqli_query($conn, "UPDATE current_fight set health = $health WHERE id = $characterId");
-        } elseif(!empty($_GET['initiative']) && !empty($_GET['characterId'])) {
-
+        } elseif($_GET['action'] == 'changeInitiative') {
+            $characterId = $_GET['characterId'];
+            $initiative = $_GET['initiative'];
+            mysqli_query($conn, "UPDATE current_fight SET initiative = $initiative WHERE id = $characterId");
         } elseif($_GET['action'] == 'delete') {
             $characterId = $_GET['characterId'];
             mysqli_query($conn, "DELETE FROM current_fight WHERE id = $characterId");
@@ -45,7 +46,7 @@
                     echo "<div class='character' data-characterId='".$row['id']."'>";
                     echo "<span class='characterName'>".$row['name']."</span>";
                     echo "<span>Health: ".$row['health']."</span>";
-                    echo "<span>Initiative: </span><input class='no-spinner' type='number' value=".$row['initiative']." id='initiativeInput'></input>";
+                    echo "<span>Initiative: </span><input class='no-spinner' type='number' value=".$row['initiative']." id='modifiedInitiativeInput'></input>";
                     echo "<span>AC: ".$row['AC']."</span>";
                     echo '<button class="redBtn">sub</button><input class="no-spinner" type="number" id="healthInput"></input><button class="greenBtn">add</button>';
                     if($row['isPlayer'] == 1) {

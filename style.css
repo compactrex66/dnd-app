@@ -43,7 +43,7 @@ span {
 .characterName {
     width: 10%;
 }
-#initiativeInput, #healthInput {
+#modifiedInitiativeInput, #healthInput {
     width: 25px;
 }
 .redBtn {

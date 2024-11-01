@@ -3,11 +3,22 @@ let actionForm = document.getElementById("actionForm")
 let actionInput = document.getElementById("actionInput")
 let characterIdInput = document.getElementById("characterIdInput")
 let healthInput = document.getElementById("healthInput")
+let initiativeInput = document.getElementById("initiativeInput")
+let arrOfInitiativeInput = document.querySelectorAll("#modifiedInitiativeInput")
 
 for(let i = 0; i < arrOfDeleteBtns.length; i++) {
     arrOfDeleteBtns[i].addEventListener("click", () => {
         actionInput.value = "delete"
         characterIdInput.value = arrOfDeleteBtns[i].parentNode.getAttribute("data-characterId");
+        actionForm.submit();
+    });
+}
+
+for(let i = 0; i < arrOfInitiativeInput.length; i++) {
+    arrOfInitiativeInput[i].addEventListener("change", () => {
+        actionInput.value = "changeInitiative";
+        characterIdInput.value = arrOfInitiativeInput[i].parentNode.getAttribute("data-characterId");
+        initiativeInput.value = arrOfInitiativeInput[i].value
         actionForm.submit();
     });
 }

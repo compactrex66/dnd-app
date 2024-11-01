@@ -78,3 +78,6 @@ input[type=number] {
     color:rgb(200, 50, 60);
     cursor: pointer;
 }
+.characterHealth {
+    width: 10%;
+}

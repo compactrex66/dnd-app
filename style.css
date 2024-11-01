@@ -53,11 +53,14 @@ span {
     background-color: rgb(43, 86, 43);
 }
 .addEnemy {
+    position: fixed;
     display: flex;
     flex-direction: column;
     width: 15vw;
     justify-content: center;
-    gap: 60px;
+    gap: 30px;
+    left: 80%;
+    top: 30%;
 }
 select, button, input {
     padding: 10px;

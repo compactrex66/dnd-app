@@ -71,7 +71,7 @@
                     for($i = 0; $i < $enemyQuantity; $i++) {
                         $health = rand($min_health, $max_health);
                         $initiative = rand(1, 20) + $initiativeBonus;
-                        $sql = "INSERT INTO current_fight(name, health, initiative, AC) Values('$enemyType".$enemyNumber+$counter."', $health, $initiative, $AC)";
+                        $sql = "INSERT INTO current_fight(name, health, initiative, AC, isPlayer) Values('$enemyType".$enemyNumber+$counter."', $health, $initiative, $AC, 0)";
                         $result = mysqli_query($conn, $sql);
                         $counter++;
                     }
@@ -93,6 +93,7 @@
             </select>
             <input type="number" name="enemyQuantity" value="1">
             <button>Add Enemy</button>
+            <button>Delete all enemies</button>
         </form>
     </main>
     <script src="script.js"></script>

@@ -25,7 +25,7 @@ main {
 button {
     cursor: pointer;
 }
-#moreInfo {
+#moreInfoMenu {
     position: absolute;
     padding: 20px;
     width: 60vw;
@@ -98,4 +98,17 @@ input[type=number] {
 }
 .characterHealth {
     width: 10%;
+}
+#closeMoreInfo {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    font-size: 25px;
+    color: red;
+    cursor: pointer;
+}
+#statsTable, td, th {
+    border: 1px solid white;
+    border-collapse: collapse;
+    padding: 15px;
 }

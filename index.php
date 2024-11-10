@@ -40,7 +40,7 @@
         <input type="number" name="healthNumber" id="healthInput">
         <input type="number" name="initiative" id="initiativeInput">
     </form>
-    <div id="moreInfo"></div>
+    <div id="moreInfoMenu"><div id="closeMoreInfo">X</div><span id="moreInfo"></span></div>
     <header>Fight</header>
     <main>
         <div class="listOfCharacters" id="listOfCharacters">
@@ -98,7 +98,7 @@
                     $result = mysqli_query($conn, $sql);
                     while($row = mysqli_fetch_assoc($result)) {
                         echo "<option value='".$row['name']."'>";
-                        echo "<span>".$row['name']."</span>";
+                        echo $row['name'];
                         echo "</option>";
                     }
                 ?>

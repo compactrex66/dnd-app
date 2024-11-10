@@ -4,17 +4,6 @@ let characterIdInput = document.getElementById("characterIdInput")
 let healthInput = document.getElementById("healthInput")
 let initiativeInput = document.getElementById("initiativeInput")
 
-function formatMoreInfoString(string) {
-    string = string.replace("STR 	DEX 	CON 	INT 	WIS 	CHA", `<table><tr><th>STR</th><th>DEX</th><th>CON</th><th>INT</th><th>WIS</th><th>CHA</th></tr></table>`);
-    string = string.replace("Skills", "<br>Skills")
-    string = string.replace("Challenge", "<br>Challenge")
-    string = string.replace("Actions", "<br>Actions")
-    string = string.replace("Senses", "<br>Senses")
-    string = string.replace("Languages", "<br>Languages")
-
-    return string;
-}
-
 let arrOfDeleteBtns = document.querySelectorAll(".deleteBtn")
 for(let i = 0; i < arrOfDeleteBtns.length; i++) {
     arrOfDeleteBtns[i].addEventListener("click", () => {
@@ -40,7 +29,7 @@ for(let i = 0; i < arrOfAddHealthBtns.length; i++) {
         actionInput.value = "adjustHealth";
         characterIdInput.value = arrOfAddHealthBtns[i].parentNode.getAttribute("data-characterId");
         healthInput.value = arrOfAddHealthBtns[i].previousElementSibling.value;
-        actionForm.submit();
+        actionForm.submit(); 
     });
 }
 
@@ -61,18 +50,54 @@ deleteEnemiesBtn.addEventListener("click", () => {
         actionForm.submit();
 });
 
+let closeMoreInfoBtn = document.getElementById("closeMoreInfo")
+let moreInfoMenu = document.getElementById("moreInfoMenu")
+closeMoreInfoBtn.addEventListener("click", () => {
+    moreInfoMenu.animate(
+        { opacity: 0 },
+        { fill: "forwards", duration: 125}
+    )
+    moreInfoMenu.style.zIndex = -1;
+});
+
+function formatMoreInfoString(string) {
+    let firstLine = string.slice(0, string.indexOf("\n")+1)
+    string = string.replace(firstLine, "");
+    string = string.replaceAll("\n", "<br>")
+
+    let secondLine = string.slice(0, string.indexOf("<br>")+4)
+    string = string.replace(secondLine, `<table id='statsTable'><tr><th>STR</th><th>DEX</th><th>CON</th><th>INT</th><th>WIS</th><th>CHA</th></tr>`)
+    secondLine = string.slice(0, string.indexOf("</tr>")+5)
+
+    let thirdLine = string.slice(secondLine.length, string.indexOf("<br>"))
+    let modifiedThirdLine = thirdLine
+    let items = modifiedThirdLine.match(/\d+\s+\([\+\-−]?\d+\)/g); 
+    console.log(thirdLine);
+    
+    modifiedThirdLine = `<tr>${items.map(item => `<td>${item}</td>`).join('')}</tr></table>`;
+    
+    string = string.replace(thirdLine, modifiedThirdLine+"<br>"+firstLine)
+
+    return string;
+}
+
 let arrOfCharacterElements = document.querySelectorAll(".character")
 let moreInfoElement = document.getElementById("moreInfo")
 for(let i = 0; i < arrOfCharacterElements.length; i++) {
     arrOfCharacterElements[i].addEventListener("click", () => {
         let moreInfo = arrOfCharacterElements[i].querySelector(".moreInfo").innerText;
         moreInfo = formatMoreInfoString(moreInfo)
-
-        moreInfoElement.innerText = moreInfo
-        moreInfoElement.style.zIndex = 1;
-        moreInfoElement.animate(
+        moreInfoElement.innerHTML = moreInfo
+        moreInfoMenu.style.zIndex = 1;
+        moreInfoMenu.animate(
             { opacity: 1 },
             { fill: "forwards", duration: 125}
         )
     });
 }
+
+document.querySelectorAll(".character > *").forEach(function(child) {
+    child.addEventListener("click", (e) => {
+        e.stopPropagation();
+    });
+})

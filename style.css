@@ -22,6 +22,21 @@ main {
     justify-content: space-between;
     width: 90vw;
 }
+button {
+    cursor: pointer;
+}
+#moreInfo {
+    position: absolute;
+    padding: 20px;
+    width: 60vw;
+    height: 80vh;
+    background-color: var(--secondary);
+    box-shadow: 1px 1px 50px 1px rgb(61, 50, 50);
+    top: 50%;
+    transform: translate(0, -50%);
+    opacity: 0;
+    z-index: -1;
+}
 .listOfCharacters {
     display: flex;
     flex-direction: column;

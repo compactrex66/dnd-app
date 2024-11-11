@@ -43,6 +43,10 @@ for(let i = 0; i < arrOfSubHealthBtns.length; i++) {
     });
 }
 
+document.getElementById("addAnotherEnemyBtn").addEventListener("click", () => {
+    window.location.href = "addEnemy.php"
+});
+
 let deleteEnemiesBtn = document.getElementById("deleteEnemiesBtn")
 deleteEnemiesBtn.addEventListener("click", () => {
     actionInput.value = "deleteAllEnemies";

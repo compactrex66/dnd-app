@@ -36,6 +36,8 @@ button {
     transform: translate(0, -50%);
     opacity: 0;
     z-index: -1;
+    overflow-y: auto;
+    overflow-x: auto;
 }
 .listOfCharacters {
     display: flex;
@@ -75,7 +77,8 @@ span {
     justify-content: center;
     gap: 30px;
     left: 80%;
-    top: 30%;
+    top: 50%;
+    transform: translate(0, -50%);
 }
 select, button, input {
     padding: 10px;
@@ -91,6 +94,7 @@ input[type=number].no-spinner::-webkit-inner-spin-button, input[type=number].no-
 input[type=number] {
     border: 1px solid var(--text);
     -moz-appearance: textfield;
+    appearance: textfield;
 }
 .deleteBtn {
     color:rgb(200, 50, 60);
@@ -111,4 +115,24 @@ input[type=number] {
     border: 1px solid white;
     border-collapse: collapse;
     padding: 15px;
+}
+#addNewEnemyForm {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    gap: 25px;
+}
+#enemyInfo {
+    width: 60vw;
+    height: 70vh;
+    background-color: var(--secondary);
+    color: var(--text);
+    resize: none;
+    padding: 10px;
+    box-sizing: border-box;
+}
+#addNewEnemyForm > button {
+    width: fit-content;
+    align-self: center;
+    background-color: var(--secondary);
 }

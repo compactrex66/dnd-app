@@ -106,6 +106,7 @@
             <input type="number" name="enemyQuantity" value="1">
             <button>Add Enemy</button>
             <button type="button" id="deleteEnemiesBtn">Delete all enemies</button>
+            <button type="button" id="addAnotherEnemyBtn">Add another enemy</button>
         </form>
     </main>
     <script src="script.js"></script>

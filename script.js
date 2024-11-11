@@ -72,7 +72,6 @@ function formatMoreInfoString(string) {
     let thirdLine = string.slice(secondLine.length, string.indexOf("<br>"))
     let modifiedThirdLine = thirdLine
     let items = modifiedThirdLine.match(/\d+\s+\([\+\-−]?\d+\)/g); 
-    console.log(thirdLine);
     
     modifiedThirdLine = `<tr>${items.map(item => `<td>${item}</td>`).join('')}</tr></table>`;
     

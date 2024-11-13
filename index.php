@@ -103,7 +103,7 @@
                     }
                 ?>
             </select>
-            <input type="number" name="enemyQuantity" value="1">
+            <input type="number" name="enemyQuantity" value="1" max="100">
             <button>Add Enemy</button>
             <button type="button" id="deleteEnemiesBtn">Delete all enemies</button>
             <button type="button" id="addAnotherEnemyBtn">Add another enemy</button>

@@ -65,21 +65,25 @@ closeMoreInfoBtn.addEventListener("click", () => {
 });
 
 function formatMoreInfoString(string) {
+    string = string.replaceAll("\n\n", "\n")
     let firstLine = string.slice(0, string.indexOf("\n")+1)
     string = string.replace(firstLine, "");
     string = string.replaceAll("\n", "<br>")
-
+    
+    firstLine = firstLine.includes("<br>") ? firstLine : firstLine + "<br>";
+    
     let secondLine = string.slice(0, string.indexOf("<br>")+4)
     string = string.replace(secondLine, `<table id='statsTable'><tr><th>STR</th><th>DEX</th><th>CON</th><th>INT</th><th>WIS</th><th>CHA</th></tr>`)
     secondLine = string.slice(0, string.indexOf("</tr>")+5)
 
-    let thirdLine = string.slice(secondLine.length, string.indexOf("<br>"))
+    let thirdLine = string.slice(secondLine.length, string.indexOf("<br>"))    
     let modifiedThirdLine = thirdLine
     let items = modifiedThirdLine.match(/\d+\s+\([\+\-−]?\d+\)/g); 
-    
+    string = string.replaceAll("<br>", "<br><br>")
     modifiedThirdLine = `<tr>${items.map(item => `<td>${item}</td>`).join('')}</tr></table>`;
     
     string = string.replace(thirdLine, modifiedThirdLine+"<br>"+firstLine)
+    string = string.replaceAll("<br><br><br>", "<br><br>")
 
     return string;
 }

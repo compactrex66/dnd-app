@@ -54,6 +54,7 @@
                     $min_health = $result['min_health'];
                     $max_health = $result['max_health'];
                     $initiativeBonus = $result['initiative_bonus'];
+                    $isSurprised = isset($_GET['isSurprised']);
                     $AC = $result['AC'];
                     $enemyId = $result['id'];
                     $counter = 0;
@@ -61,6 +62,12 @@
                     for($i = 0; $i < $enemyQuantity; $i++) {
                         $health = rand($min_health, $max_health);
                         $initiative = rand(1, 20) + $initiativeBonus;
+                        if($isSurprised) {
+                            $secondInititative = rand(1, 20) + $initiativeBonus;
+                            if($secondInititative < $initiative) {
+                                $initiative = $secondInititative;
+                            }
+                        }
                         $sql = "INSERT INTO current_fight(name, health, initiative, AC, is_player, enemy_id) Values('$enemyType".$enemyNumber+$counter."', $health, $initiative, $AC, 0, $enemyId)";
                         $result = mysqli_query($conn, $sql);
                         $counter++;
@@ -82,9 +89,7 @@
                     echo "<span>Initiative: </span><input class='no-spinner' type='number' value=".$row['initiative']." id='modifiedInitiativeInput'></input>";
                     echo "<span>AC: ".$row['AC']."</span>";
                     echo '<button class="redBtn">sub</button><input class="no-spinner" type="number" id="healthInput"></input><button class="greenBtn">add</button>';
-                    if($row['is_player'] == 1) {
-                        echo "<span style='color: var(--secondary)'>X</span>";
-                    } else {
+                    if($row['is_player'] != 1) {
                         echo "<span class='deleteBtn'>X</span>";
                     }
                     echo "</div>";
@@ -104,6 +109,7 @@
                 ?>
             </select>
             <input type="number" name="enemyQuantity" value="1" max="100">
+            <div class="checkboxInput">Suprised: <input type="checkbox" name="isSurprised"></div>
             <button>Add Enemy</button>
             <button type="button" id="deleteEnemiesBtn">Delete all enemies</button>
             <button type="button" id="addAnotherEnemyBtn">Add another enemy</button>

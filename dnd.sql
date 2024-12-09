@@ -1,5 +1,5 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.0
+-- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
@@ -24,7 +24,7 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Table structure for table `current_fight`
+-- Struktura tabeli dla tabeli `current_fight`
 --
 
 CREATE TABLE `current_fight` (
@@ -50,7 +50,7 @@ INSERT INTO `current_fight` (`id`, `name`, `health`, `AC`, `initiative`, `is_pla
 -- --------------------------------------------------------
 
 --
--- Table structure for table `enemies`
+-- Struktura tabeli dla tabeli `enemies`
 --
 
 CREATE TABLE `enemies` (
@@ -79,7 +79,7 @@ INSERT INTO `enemies` (`id`, `name`, `min_health`, `max_health`, `AC`, `initiati
 -- --------------------------------------------------------
 
 --
--- Table structure for table `players`
+-- Struktura tabeli dla tabeli `players`
 --
 
 CREATE TABLE `players` (
@@ -98,23 +98,23 @@ INSERT INTO `players` (`id`, `name`, `AC`) VALUES
 (3, 'Dwarlock', 14);
 
 --
--- Indexes for dumped tables
+-- Indeksy dla zrzutów tabel
 --
 
 --
--- Indexes for table `current_fight`
+-- Indeksy dla tabeli `current_fight`
 --
 ALTER TABLE `current_fight`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `enemies`
+-- Indeksy dla tabeli `enemies`
 --
 ALTER TABLE `enemies`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `players`
+-- Indeksy dla tabeli `players`
 --
 ALTER TABLE `players`
   ADD PRIMARY KEY (`id`);

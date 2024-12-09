@@ -60,6 +60,7 @@
                     $max_health = $result['max_health'];
                     $initiativeBonus = $result['initiative_bonus'];
                     $isSurprised = isset($_GET['isSurprised']);
+                    $isSurprised = isset($_GET['isSurprised']);
                     $AC = $result['AC'];
                     $enemyId = $result['id'];
                     $counter = 0;
@@ -67,6 +68,12 @@
                     for($i = 0; $i < $enemyQuantity; $i++) {
                         $health = rand($min_health, $max_health);
                         $initiative = rand(1, 20) + $initiativeBonus;
+                        if($isSurprised) {
+                            $secondInititative = rand(1, 20) + $initiativeBonus;
+                            if($secondInititative < $initiative) {
+                                $initiative = $secondInititative;
+                            }
+                        }
                         if($isSurprised) {
                             $secondInititative = rand(1, 20) + $initiativeBonus;
                             if($secondInititative < $initiative) {

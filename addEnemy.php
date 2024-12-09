@@ -8,8 +8,8 @@
        $moreInfo = $_GET['moreInfo'];
 
        $conn = mysqli_connect("localhost", "root", "", "dnd");
-       mysqli_query($conn, "INSERT INTO enemies(name, min_health, max_health, AC, initiative_bonus, more_info) values('$name', $minHealth, $maxHealth, $armorClass, $initiativeBonus, '$moreInfo')");
-       header("Location: index.php");
+       mysqli_query($conn, 'INSERT INTO enemies(name, min_health, max_health, AC, initiative_bonus, more_info) values("'.$name.'", '.$minHealth.', '.$maxHealth.', '.$armorClass.', '.$initiativeBonus.', "'.$moreInfo.'")');
+       header("Location: addEnemy.php");
     }
 ?>
 <!DOCTYPE html>

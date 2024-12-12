@@ -1,4 +1,7 @@
 <?php
+    include "Parsedown.php";
+    include "ParsedownExtra.php";
+
     $conn = mysqli_connect("localhost", "root", "", "dnd");
 
     if(isset($_GET['action'])) {
@@ -45,7 +48,7 @@
         <input type="number" name="initiative" id="initiativeInput">
         <input type="number" name="AC" id="ACInput">
     </form>
-    <div id="moreInfoMenu"><div class="closeBtnWrapper"><div id="closeMoreInfo">X</div></div><span id="moreInfo"></span></div>
+    <div id="moreInfoMenu"><div class="closeBtnWrapper"><div id="closeMoreInfo">X</div></div><span id="moreInfo" markdown="1"></span></div>
     <header>Fight</header>
     <main>
         <div class="listOfCharacters" id="listOfCharacters">
@@ -60,20 +63,15 @@
                     $max_health = $result['max_health'];
                     $initiativeBonus = $result['initiative_bonus'];
                     $isSurprised = isset($_GET['isSurprised']);
-                    $isSurprised = isset($_GET['isSurprised']);
                     $AC = $result['AC'];
                     $enemyId = $result['id'];
                     $counter = 0;
 
+
+
                     for($i = 0; $i < $enemyQuantity; $i++) {
                         $health = rand($min_health, $max_health);
                         $initiative = rand(1, 20) + $initiativeBonus;
-                        if($isSurprised) {
-                            $secondInititative = rand(1, 20) + $initiativeBonus;
-                            if($secondInititative < $initiative) {
-                                $initiative = $secondInititative;
-                            }
-                        }
                         if($isSurprised) {
                             $secondInititative = rand(1, 20) + $initiativeBonus;
                             if($secondInititative < $initiative) {
@@ -94,8 +92,12 @@
                     echo "<div class='character' data-characterId='".$row['id']."'>";
                     if($row['enemy_id'] != null) {
                         $moreInfo = mysqli_fetch_assoc(mysqli_query($conn, "SELECT name, more_info FROM enemies WHERE id = ".$row['enemy_id']));
+                        $parsedown = new ParsedownExtra();
                         echo "<span style='display: none;' class='name'><h1>".$moreInfo['name']."</h1></span>";
-                        echo "<div style='display: none;' class='moreInfo'>".$moreInfo['more_info']."</div>";
+                        $moreInfo['more_info'] = str_replace("___", "", $moreInfo['more_info']);
+                        $moreInfo = $parsedown->text($moreInfo['more_info']);
+                        $moreInfo = str_replace("<hr>", "", $moreInfo);
+                        echo "<div style='display: none;' class='moreInfo'>".$moreInfo."</div>";
                     }
                     echo "<span class='characterName'>".$row['name']."</span>";
                     echo "<span class='characterHealth'>Health: ".$row['health']."</span>";
@@ -130,6 +132,7 @@
             <button type="button" id="addAnotherEnemyBtn">Add another enemy</button>
         </form>
     </main>
+    <script src="https://cdn.jsdelivr.net/npm/markdown-it@14.1.0/dist/markdown-it.min.js" integrity="sha256-OMcKHnypGrQOLZ5uYBKYUacX7Rx9Ssu91Bv5UDeRz2g=" crossorigin="anonymous"></script>
     <script src="script.js"></script>
 </body>
 </html>

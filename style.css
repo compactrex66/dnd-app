@@ -29,6 +29,12 @@ button {
 h2 {
     margin: 0px;
 }
+ul {
+    padding-left: 20px;
+}
+li {
+    margin: 10px 0;
+}
 .row {
     display: flex;
     flex-direction: row;
@@ -98,6 +104,9 @@ span {
 .characterName {
     width: 10%;
 }
+.characterHealth {
+    width: 10%;
+}
 .btnsSurroundingInput {
     display: flex;
     flex-direction: row;
@@ -120,7 +129,6 @@ span {
     top: 50%;
     transform: translate(0, -50%);
 }
-select, button, input, .checkboxInput {
 select, button, input, .checkboxInput {
     padding: 10px;
     background-color: var(--secondary);   
@@ -170,7 +178,7 @@ input[type=number] {
     cursor: pointer;
     top: 10px;
 }
-#statsTable, td, th {
+table, td, th {
     border: 1px solid white;
     border-collapse: collapse;
     padding: 15px;

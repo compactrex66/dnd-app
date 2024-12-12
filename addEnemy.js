@@ -10,13 +10,14 @@ let enemyInfo, armorClass, healthValues, minHealth, maxHealth, firstLine, initia
 
 addEnemyBtn.addEventListener("click", () => {
     enemyInfo = document.getElementById("enemyInfo").value
-    let healthValues = enemyInfo.match(/\d+[d]\d+\s[+]\s\d+|\d+[d]\d+/g)[0]
+    let healthValues = enemyInfo.match(/\d+\s[(]\d+[d]\d+\s[+]\s\d+/gm)[0]
     healthValues = healthValues.match(/\d+/g)
     
-    minHealth = healthValues.length == 3 ? parseInt(healthValues[0]) + parseInt(healthValues[2]) : parseInt(healthValues[0])
-    maxHealth = healthValues.length == 3 ? parseInt(healthValues[0]) * parseInt(healthValues[1]) + parseInt(healthValues[2]) : parseInt(healthValues[0]) * parseInt(healthValues[1])
-    armorClass = enemyInfo.match(/(AC)\s\d+/g)[0].match(/\d+/)[0]
-    initiativeBonus = parseInt(enemyInfo.match(/(Initiative )[+,-]\d+/)[0].match(/[+,-]\d+/)[0])    
+    minHealth = healthValues.length == 4 ? parseInt(healthValues[1]) + parseInt(healthValues[3]) : parseInt(healthValues[1])
+    maxHealth = healthValues.length == 4 ? parseInt(healthValues[1]) * parseInt(healthValues[2]) + parseInt(healthValues[3]) : parseInt(healthValues[1]) * parseInt(healthValues[2])
+    
+    armorClass = enemyInfo.match(/[s]{2}[*]{2}\s\d+/gm)[0].match(/\d+/)[0]
+    initiativeBonus = parseInt(enemyInfo.match(/\d+\s[(].\d+[)]/gm)[1].match(/[+,-]\d+/)[0])    
     providedName = document.getElementById("providedNameInput").value
     
     nameInput.value = providedName

@@ -74,7 +74,6 @@ closeMoreInfoBtn.addEventListener("click", () => {
 function formatMoreInfoString(string) {
     let name = string.match(/[a-zA-Z <>\d\/]+$/g)[0]
     string = string.replace(/[a-zA-Z <>\d\/]+$/g, "")
-    console.log(name);
     
     string = string.replace("Temporary Statblock. This statblock is a placeholder.", "")
     string = string.replaceAll("mod", "")
@@ -123,7 +122,7 @@ let moreInfoElement = document.getElementById("moreInfo")
 for(let i = 0; i < arrOfCharacterElements.length; i++) {
     arrOfCharacterElements[i].addEventListener("click", () => {
         let moreInfo = arrOfCharacterElements[i].querySelector(".moreInfo").innerHTML;
-        moreInfo = formatMoreInfoString(moreInfo + arrOfCharacterElements[i].querySelector(".name").innerHTML)
+        // moreInfo = formatMoreInfoString(moreInfo + arrOfCharacterElements[i].querySelector(".name").innerHTML)        
         moreInfoElement.innerHTML = moreInfo
         moreInfoMenu.style.zIndex = 1;
         moreInfoMenu.animate(

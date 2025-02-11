@@ -1,8 +1,7 @@
 <?php
-    include "Parsedown.php";
-    include "ParsedownExtra.php";
-
-    $conn = mysqli_connect("localhost", "root", "", "dnd");
+    include "parsedown/Parsedown.php";
+    include "parsedown/ParsedownExtra.php";
+    include "dbConnection.php";
 
     if(isset($_GET['action'])) {
         $action = $_GET['action'];

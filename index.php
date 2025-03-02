@@ -48,7 +48,7 @@
             mysqli_query($conn, "UPDATE current_fight SET initiative = $initiative WHERE id = $characterId");
         } elseif($action == 'delete' && isset($_GET['characterId'])) {
             $characterId = $_GET['characterId'];
-            mysqli_query($conn, "DELETE FROM current_fight WHERE id = $characterId");
+            mysqli_query($conn, "DELETE FROM `current_fight` WHERE `id` = ".$characterId);
         } elseif($action == 'deleteAllEnemies') {
             mysqli_query($conn, "DELETE FROM current_fight WHERE is_player = 0");
         } elseif($action == 'changeAC' && isset($_GET['characterId'])) {
@@ -59,11 +59,16 @@
             passTime($conn, 2);
         } elseif($action == 'longRest') {
             passTime($conn, 8);
+        } elseif($action == 'setCurrent') {
+            mysqli_query($conn, "UPDATE current_fight SET current=0");
+            if(!empty($_GET['characterId'])) {
+                mysqli_query($conn, "UPDATE current_fight SET current=1 WHERE id = ".$_GET['characterId']);
+            } else {
+                mysqli_query($conn, "UPDATE current_fight SET current=1 WHERE initiative = (SELECT MAX(initiative) FROM current_fight)");
+            }
+        } elseif($action == "passTime") {
+            passTime($conn, $_GET['hoursToPass']);
         }
-        header("Location: index.php");
-    }
-    if(isset($_GET['hoursToPass'])) {
-        passTime($conn, $_GET['hoursToPass']);
         header("Location: index.php");
     }
 ?>
@@ -86,6 +91,7 @@
         <input type="number" name="healthNumber" id="healthInput">
         <input type="number" name="initiative" id="initiativeInput">
         <input type="number" name="AC" id="ACInput">
+        <input type="number" name="hoursToPass" id="hoursinput">
     </form>
     <header>
         <form action="" method="get" class="row-form">
@@ -100,11 +106,12 @@
                     }
                 ?>
             </select>
-            <input style="border: 0;" type="number" name="enemyQuantity" value="1" max="100">
-            <div class="checkboxInput">Supr: <input type="checkbox" name="isSurprised"></div>
+            <input style="border: 0; flex-grow: 0.5;" type="number" name="enemyQuantity" value="1" max="100">
+            <div class="checkboxInput">Suprised: <input type="checkbox" name="isSurprised"></div>
             <button>Add Enemy</button>
             <button type="button" id="deleteEnemiesBtn">Delete all enemies</button>
-            <button type="button" id="addAnotherEnemyBtn">Add another enemy</button>
+            <a href="addEnemy/addEnemy.php"><button type="button">Add another enemy</button></a>
+            <a href="enemySearch/enemySearch.php"><button type="button">Search for enemies</button></a>
         </form>
         <form id="time" class="row-form" method="get">
             <?php
@@ -113,17 +120,21 @@
                $date = $result['date'];
                $hour = $result['hour'];
                $minute = $result['minute'];
-               echo $date." ".($hour < 10 ? '0'.$hour : $hour).":".($minute < 10 ? '0'.$minute : $minute);
+               echo "<span class='big-text'>".($hour < 10 ? '0'.$hour : $hour).":".($minute < 10 ? '0'.$minute : $minute)." | ".$date." <img src='media/calendarIcon.svg'></span>";
             ?>
             <button type="button" id="shortRestBtn">Short Rest</button>
             <button type="button" id="longRestBtn">Long Rest</button>
-            <input type="number" name="hoursToPass" placeholder="Hours" style="border: 0; width: 40px">
-            <button>Pass Time</button>
+            <span class="inline-row">
+                <button class="redBtn" type="button" id="rewindTimeBtn"><img src="media/removeIcon.svg"></button>
+                <input type="number" placeholder="Hours" style="border: 0; width: 60px;" id="hoursToPass">
+                <button class="greenBtn" type="button" id="forwardTimeBtn"><img src="media/addIcon.svg"></button>
+            </span>
         </form>
     </header>
     <main>
         <div class="listOfCharacters" id="listOfCharacters">
             <?php
+                //Adding enemies to current fight
                 if(isset($_GET['enemyType'])) {
                     $enemyType = $_GET['enemyType'];
                     $enemyQuantity = $_GET['enemyQuantity'] != null ? $_GET['enemyQuantity'] : 1;
@@ -155,10 +166,13 @@
                     header("Location: index.php");
                 }
 
+                //Fetching and displaying enemies
                 $sql = "SELECT * FROM current_fight ORDER BY initiative DESC";
                 $result = mysqli_query($conn, $sql);
                 while($row = mysqli_fetch_assoc($result)) {
-                    echo "<div class='character' data-characterId='".$row['id']."'>";
+                    if($row['current'] == 1) $current = 1;
+                    else $current = 0;
+                    echo "<div class='character' data-characterId='".$row['id']."' data-current='".$current."'>";
                     if($row['enemy_id'] != null) {
                         $moreInfo = mysqli_fetch_assoc(mysqli_query($conn, "SELECT name, more_info FROM enemies WHERE id = ".$row['enemy_id']));
                         $parsedown = new ParsedownExtra();
@@ -169,19 +183,18 @@
                         echo "<div style='display: none;' class='moreInfo'>".$moreInfo."</div>";
                     }
                     echo "<span class='characterName'>".$row['name']."</span>";
-                    echo "<span class='characterHealth'>Health: ".$row['health']."/".$row['max_health']."</span>";
-                    echo "<span style='display: flex; gap: 10px; align-items: center;'>Initiative: <input class='no-spinner' type='number' value=".$row['initiative']." id='modifiedInitiativeInput'></input></span>";
-                    echo "<span style='display: flex; gap: 10px; align-items: center;'>AC: <input class='no-spinner' type='number' value=".$row['AC']." id='modifiedACInput'></input></span>";
-                    echo '<span class="btnsSurroundingInput"><button class="redBtn">sub</button><input class="no-spinner" type="number" id="healthInput"></input><button class="greenBtn">add</button>';
+                    echo "<span class='characterHealth inline-row'><img src='media/healthIcon.svg'>".$row['health']."/".$row['max_health']."</span>";
+                    echo "<span style='display: flex; gap: 10px; align-items: center;'><img src='media/initiativeBoltIcon.svg'><input class='no-spinner' type='number' value=".$row['initiative']." id='modifiedInitiativeInput'></input></span>";
+                    echo "<span style='display: flex; gap: 10px; align-items: center;'><img src='media/acIcon.svg'><input class='no-spinner' type='number' value=".$row['AC']." id='modifiedACInput'></input></span>";
+                    echo '<span class="inline-row"><button class="redBtn substractHealthBtn"><img src="media/removeIcon.svg"></button><input class="no-spinner" type="number" id="healthInput"></input><button class="greenBtn addHealthBtn"><img src="media/addIcon.svg"></button></span>';
                     if($row['is_player'] != 1) {
-                        echo "<span class='deleteBtn'>X</span>";
+                        echo '<span class="deleteBtn"><img src="media/closeIcon.svg"></span>';
                     }
                     echo "</div>";
                 }
             ?>
         </div>
         <div id="moreInfoPanel">
-            
         </div>
     </main>
     <script src="https://cdn.jsdelivr.net/npm/markdown-it@14.1.0/dist/markdown-it.min.js" integrity="sha256-OMcKHnypGrQOLZ5uYBKYUacX7Rx9Ssu91Bv5UDeRz2g=" crossorigin="anonymous"></script>

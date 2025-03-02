@@ -22,13 +22,13 @@ header {
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    gap: 20px;
 }
 .row-form {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    width: 48vw;
+    align-items: stretch;
+    gap: 20px;
 }
 main {
     display: flex;
@@ -58,11 +58,13 @@ li {
     font-style: italic;
 }
 .listOfCharacters {
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
     gap: 20px;
     height: 88vh;
     overflow-y: auto;
+    overflow-x: hidden;
     width: 48vw;
 }
 .character {
@@ -81,15 +83,22 @@ span {
     display: inline;
 }
 .characterName {
-    width: 10%;
+    width: 17%;
 }
 .characterHealth {
-    width: 10%;
+    width: 12%;
 }
-.btnsSurroundingInput {
+.inline-row {
     display: flex;
     flex-direction: row;
-    gap: 20px;
+    gap: 10px;
+}
+.big-text {
+    align-self: center;
+    background-color: var(--secondary);
+    padding: 5px;
+    box-sizing: border-box;
+    font-size: 32px;
 }
 .redBtn {
     background-color: rgb(152, 40, 40);
@@ -121,12 +130,8 @@ input[type=number] {
 }
 .deleteBtn {
     position: absolute;
-    position: absolute;
     color:rgb(200, 50, 60);
     cursor: pointer;
-    padding: 10px;
-    scale: 1.7;
-    right: 10px;
     padding: 10px;
     scale: 1.7;
     right: 10px;
@@ -147,4 +152,11 @@ table, td, th {
 }
 #moreInfoPanel blockquote {
     margin: 0;
+}
+a {
+    display: flex;
+    align-items: center;
+}
+a * {
+    height: 100%;
 }

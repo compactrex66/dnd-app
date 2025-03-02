@@ -1,0 +1,13 @@
+body {
+    display: flex;
+    justify-content: left;
+}
+header {
+    justify-content: center;
+    gap: 20px;
+}
+#monsterResult {
+    background-color: var(--secondary);
+    height: 80vh;
+    width: 50vw;
+}

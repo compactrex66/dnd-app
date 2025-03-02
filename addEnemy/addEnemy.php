@@ -10,6 +10,7 @@
        include "../dbConnection.php";
 
        mysqli_query($conn, 'INSERT INTO enemies(name, min_health, max_health, AC, initiative_bonus, more_info) values("'.$name.'", '.$minHealth.', '.$maxHealth.', '.$armorClass.', '.$initiativeBonus.', "'.$moreInfo.'")');
+       mysqli_close($conn);
        header("Location: addEnemy.php");
     }
 ?>
@@ -19,6 +20,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="style.css">
     <script src="https://kit.fontawesome.com/791dbbf45c.js" crossorigin="anonymous"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -38,13 +40,9 @@
     <form action="" id="addNewEnemyForm">
         <textarea name="enemyInfo" id="enemyInfo" required></textarea>
         <span style="display: flex; width: 100%; gap: 20px; justify-content:center; ">
-            <input type="text" name="enemyName" id="providedNameInput" placeholder="Enemy Name" required>
             <button type="button" id="addEnemyBtn">Add New Enemy</button>
         </span>
     </form>
     <script src="addEnemy.js"></script>
 </body>
 </html>
-<?php
-    mysqli_close($conn);
-?>

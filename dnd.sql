@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 09, 2024 at 02:51 PM
--- Server version: 10.4.27-MariaDB
--- PHP Version: 8.1.12
+-- Generation Time: Mar 02, 2025 at 02:55 PM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -24,33 +24,39 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Struktura tabeli dla tabeli `current_fight`
+-- Table structure for table `current_fight`
 --
 
 CREATE TABLE `current_fight` (
   `id` int(11) NOT NULL,
   `name` text NOT NULL,
   `health` int(11) NOT NULL,
+  `max_health` int(11) NOT NULL,
   `AC` int(11) NOT NULL,
   `initiative` int(11) NOT NULL,
   `is_player` tinyint(1) NOT NULL,
-  `enemy_id` int(11) DEFAULT NULL
+  `enemy_id` int(11) DEFAULT NULL,
+  `current` tinyint(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `current_fight`
 --
 
-INSERT INTO `current_fight` (`id`, `name`, `health`, `AC`, `initiative`, `is_player`, `enemy_id`) VALUES
-(1, 'Voxel Pixel', 0, 17, 6, 1, NULL),
-(2, 'Krasnalio', 31, 21, 7, 1, NULL),
-(3, 'Dwarlock', 1, 14, 10, 1, NULL),
-(600, 'Trelan Mongbery1', 24, 15, 10, 0, 36);
+INSERT INTO `current_fight` (`id`, `name`, `health`, `max_health`, `AC`, `initiative`, `is_player`, `enemy_id`, `current`) VALUES
+(1, 'Voxel Pixel', 50, 50, 17, 6, 1, NULL, 0),
+(2, 'Krasnalio', 50, 50, 21, 7, 1, NULL, 0),
+(3, 'Dwarlock', 50, 50, 14, 10, 1, NULL, 0),
+(619, 'Gnoll Demoniac1', 111, 111, 16, 8, 0, 44, 0),
+(620, 'Gnoll Fang of Yeenoghu2', 44, 44, 14, 16, 0, 45, 0),
+(621, 'Gnoll Fang of Yeenoghu3', 83, 83, 14, 3, 0, 45, 0),
+(622, 'Gnoll Fang of Yeenoghu4', 92, 92, 14, 18, 0, 45, 0),
+(623, 'Gnoll Pack Lord5', 71, 71, 15, 18, 0, 46, 0);
 
 -- --------------------------------------------------------
 
 --
--- Struktura tabeli dla tabeli `enemies`
+-- Table structure for table `enemies`
 --
 
 CREATE TABLE `enemies` (
@@ -68,56 +74,51 @@ CREATE TABLE `enemies` (
 --
 
 INSERT INTO `enemies` (`id`, `name`, `min_health`, `max_health`, `AC`, `initiative_bonus`, `more_info`) VALUES
-(36, 'Trelan Mongbery', 16, 72, 15, 2, 'Medium Humanoid, Any Alignment\r\nAC 15 (chain shirt)\r\nInitiative +2 (12)\r\nHP 44 (8d8 + 8)\r\nSpeed 30 ft.\r\n	\r\n	\r\nmod\r\n	\r\nsave\r\n	\r\n	\r\n	\r\nmod\r\n	\r\nsave\r\n	\r\n	\r\n	\r\nmod\r\n	\r\nsave\r\nStr\r\n	\r\n11\r\n	\r\n+0\r\n	\r\n+0\r\n	\r\nDex\r\n	\r\n14\r\n	\r\n+2\r\n	\r\n+4\r\n	\r\nCon\r\n	\r\n12\r\n	\r\n+1\r\n	\r\n+1\r\nInt\r\n	\r\n10\r\n	\r\n+0\r\n	\r\n+0\r\n	\r\nWis\r\n	\r\n13\r\n	\r\n+1\r\n	\r\n+3\r\n	\r\nCha\r\n	\r\n14\r\n	\r\n+2\r\n	\r\n+2\r\nSkills Acrobatics +4, Perception +5, Performance +6\r\nGear Shortbow, Shortsword\r\nSenses Passive Perception 15\r\nLanguages Any two languages\r\nCR 2 (XP 450; PB +2\r\n\r\nTraits\r\n\r\nSong of Rest. The bard can perform a song while taking a short rest. Any ally who hears the song regains an extra 1d6 hit points if it spends any Hit Dice to regain hit points at the end of that rest. The bard can confer this benefit on itself as well.\r\nSpellcasting. The bard is a 4th-level spellcaster. Its spellcasting ability is Charisma (spell save DC 12, +5 to hit with spell attacks). It has the following bard spells prepared:\r\n\r\n    Cantrips (at will): friends, mage hand, vicious mockery\r\n\r\n\r\n    1st level (4 slots): charm person, healing word, heroism, sleep, thunderwave\r\n\r\n\r\n    2nd level (3 slots): invisibility, shatter\r\n\r\nTaunt (2/Day). The bard can use a bonus action on its turn to target one creature within 30 feet of it. If the target can hear the bard, the target must succeed on a DC 12 Charisma saving throw or have disadvantage on ability checks, attack rolls, and saving throws until the start of the bard&#039;s next turn.\r\n\r\nActions\r\n\r\nShortsword. Melee Weapon Attack: +5 to hit, reach 5 ft., one target. Hit: 11 (3d6+2) piercing damage.\r\n\r\nShortbow. Ranged Weapon Attack: +5 to hit, range 80/320 ft., one target. Hit: 11 (3d6+2) piercing damage.'),
-(37, 'Sahuagin Warrior', 8, 36, 12, 0, 'Medium Humanoid (Sahuagin), Lawful Evil\r\nAC 12 (natural armor)\r\nInitiative +0 (10)\r\nHP 22 (4d8 + 4)\r\nSpeed 30 ft., Swim 40 ft.\r\n	\r\n	\r\nmod\r\n	\r\nsave\r\n	\r\n	\r\n	\r\nmod\r\n	\r\nsave\r\n	\r\n	\r\n	\r\nmod\r\n	\r\nsave\r\nStr\r\n	\r\n13\r\n	\r\n+1\r\n	\r\n+1\r\n	\r\nDex\r\n	\r\n11\r\n	\r\n+0\r\n	\r\n+0\r\n	\r\nCon\r\n	\r\n12\r\n	\r\n+1\r\n	\r\n+1\r\nInt\r\n	\r\n12\r\n	\r\n+1\r\n	\r\n+1\r\n	\r\nWis\r\n	\r\n13\r\n	\r\n+1\r\n	\r\n+1\r\n	\r\nCha\r\n	\r\n9\r\n	\r\n-1\r\n	\r\n-1\r\nSkills Perception +5\r\nGear Spear\r\nSenses Darkvision 120 ft., Passive Perception 15\r\nLanguages Sahuagin\r\nCR 1/2 (XP 100; PB +2)\r\nTraits\r\n\r\nTemporary Statblock. This statblock is a placeholder.\r\n\r\nBlood Frenzy. The sahuagin has advantage on melee attack rolls against any creature that doesn\'t have all its hit points.\r\n\r\nLimited Amphibiousness. The sahuagin can breathe air and water, but it needs to be submerged at least once every 4 hours to avoid suffocating.\r\n\r\nShark Telepathy. The sahuagin can magically command any shark within 120 feet of it, using a limited telepathy.\r\nActions\r\n\r\nMultiattack. The sahuagin makes two melee attacks: one with its bite and one with its claws or spear.\r\n\r\nBite. Melee Weapon Attack: +3 to hit, reach 5 ft., one target. Hit: 3 (1d4 + 1) piercing damage.\r\n\r\nClaws. Melee Weapon Attack: +3 to hit, reach 5 ft., one target. Hit: 3 (1d4 + 1) slashing damage.\r\n\r\nSpear. Melee or Ranged Weapon Attack: +3 to hit, reach 5 ft. or range 20/60 ft., one target. Hit: 4 (1d6 + 1) piercing damage, or 5 (1d8 + 1) piercing damage if used with two hands to make a melee attack.'),
-(38, 'Sahuagin Priest', 12, 54, 12, 0, 'Medium Humanoid (Sahuagin), Lawful Evil\r\nAC 12 (natural armor)\r\nInitiative +0 (10)\r\nHP 33 (6d8 + 6)\r\nSpeed 30 ft., Swim 40 ft.\r\n	\r\n	\r\nmod\r\n	\r\nsave\r\n	\r\n	\r\n	\r\nmod\r\n	\r\nsave\r\n	\r\n	\r\n	\r\nmod\r\n	\r\nsave\r\nStr\r\n	\r\n13\r\n	\r\n+1\r\n	\r\n+1\r\n	\r\nDex\r\n	\r\n11\r\n	\r\n+0\r\n	\r\n+0\r\n	\r\nCon\r\n	\r\n12\r\n	\r\n+1\r\n	\r\n+1\r\nInt\r\n	\r\n12\r\n	\r\n+1\r\n	\r\n+1\r\n	\r\nWis\r\n	\r\n14\r\n	\r\n+2\r\n	\r\n+2\r\n	\r\nCha\r\n	\r\n13\r\n	\r\n+1\r\n	\r\n+1\r\nSkills Perception +6, Religion +3\r\nSenses Darkvision 120 ft., Passive Perception 16\r\nLanguages Sahuagin\r\nCR 2 (XP 450; PB +2)\r\nTraits\r\n\r\nTemporary Statblock. This statblock is a placeholder.\r\n\r\nBlood Frenzy. The sahuagin has advantage on melee attack rolls against any creature that doesn\'t have all its hit points.\r\n\r\nLimited Amphibiousness. The sahuagin can breathe air and water, but it needs to be submerged at least once every 4 hours to avoid suffocating.\r\n\r\nShark Telepathy. The sahuagin can magically command any shark within 120 feet of it, using a limited telepathy.\r\n\r\nSpellcasting. The sahuagin is a 6th-level spellcaster. Her spellcasting ability is Wisdom (spell save DC 12, +4 to hit with spell attacks). She has the following cleric spells prepared:\r\n\r\n    Cantrips (at will): guidance, thaumaturgy\r\n\r\n    1st level (4 slots): bless, detect magic, guiding bolt\r\n\r\n    2nd level (3 slots): hold person, spiritual weapon (trident)\r\n\r\n    3rd level (3 slots): mass healing word, tongues\r\n\r\nActions\r\n\r\nMultiattack. The sahuagin makes two melee attacks: one with her bite and one with her claws.\r\n\r\nBite. Melee Weapon Attack: +3 to hit, reach 5 ft., one target. Hit: 3 (1d4 + 1) piercing damage.\r\n\r\nClaws. Melee Weapon Attack: +3 to hit, reach 5 ft., one target. Hit: 3 (1d4 + 1) slashing damage.'),
-(39, 'Sahuagin Baron', 36, 117, 16, 2, 'Large Humanoid (Sahuagin), Lawful Evil\r\nAC 16 (breastplate)\r\nInitiative +2 (12)\r\nHP 76 (9d10 + 27)\r\nSpeed 30 ft., Swim 50 ft.\r\n	\r\n	\r\nmod\r\n	\r\nsave\r\n	\r\n	\r\n	\r\nmod\r\n	\r\nsave\r\n	\r\n	\r\n	\r\nmod\r\n	\r\nsave\r\nStr\r\n	\r\n19\r\n	\r\n+4\r\n	\r\n+4\r\n	\r\nDex\r\n	\r\n15\r\n	\r\n+2\r\n	\r\n+5\r\n	\r\nCon\r\n	\r\n16\r\n	\r\n+3\r\n	\r\n+6\r\nInt\r\n	\r\n14\r\n	\r\n+2\r\n	\r\n+5\r\n	\r\nWis\r\n	\r\n13\r\n	\r\n+1\r\n	\r\n+4\r\n	\r\nCha\r\n	\r\n17\r\n	\r\n+3\r\n	\r\n+3\r\nSkills Perception +7\r\nGear Trident\r\nSenses Darkvision 120 ft., Passive Perception 17\r\nLanguages Sahuagin\r\nCR 5 (XP 1,800; PB +3)\r\nTraits\r\n\r\nBlood Frenzy. The sahuagin has advantage on melee attack rolls against any creature that doesn\'t have all its hit points.\r\n\r\nLimited Amphibiousness. The sahuagin can breathe air and water, but it needs to be submerged at least once every 4 hours to avoid suffocating.\r\n\r\nShark Telepathy. The sahuagin can magically command any shark within 120 feet of it, using a limited telepathy.\r\nActions\r\n\r\nMultiattack. The sahuagin makes three attacks: one with his bite and two with his claws or trident.\r\n\r\nBite. Melee Weapon Attack: +7 to hit, reach 5 ft., one target. Hit: 9 (2d4 + 4) piercing damage.\r\n\r\nClaws. Melee Weapon Attack: +7 to hit, reach 5 ft., one target. Hit: 11 (2d6 + 4) slashing damage.\r\n\r\nTrident. Melee or Ranged Weapon Attack: +7 to hit, reach 5 ft. or range 20/60 ft., one target. Hit: 11 (2d6 + 4) piercing damage, or 13 (2d8 + 4) piercing damage if used with two hands to make a melee attack.\r\nEnvironment: Coastal, Underwater'),
-(40, 'Basilisk', 24, 80, 15, -1, 'Medium Monstrosity, Unaligned\r\nAC 15 (natural armor)\r\nInitiative -1 (9)\r\nHP 52 (8d8 + 16)\r\nSpeed 20 ft.\r\n	\r\n	\r\nmod\r\n	\r\nsave\r\n	\r\n	\r\n	\r\nmod\r\n	\r\nsave\r\n	\r\n	\r\n	\r\nmod\r\n	\r\nsave\r\nStr\r\n	\r\n16\r\n	\r\n+3\r\n	\r\n+3\r\n	\r\nDex\r\n	\r\n8\r\n	\r\n-1\r\n	\r\n-1\r\n	\r\nCon\r\n	\r\n15\r\n	\r\n+2\r\n	\r\n+2\r\nInt\r\n	\r\n2\r\n	\r\n-4\r\n	\r\n-4\r\n	\r\nWis\r\n	\r\n8\r\n	\r\n-1\r\n	\r\n-1\r\n	\r\nCha\r\n	\r\n7\r\n	\r\n-2\r\n	\r\n-2\r\nSenses Darkvision 60 ft., Passive Perception 9\r\nLanguages —\r\nCR 3 (XP 700; PB +2)\r\nTraits\r\n\r\nPetrifying Gaze. If a creature starts its turn within 30 feet of the basilisk and the two of them can see each other, the basilisk can force the creature to make a DC 12 Constitution saving throw if the basilisk isn\'t incapacitated. On a failed save, the creature magically begins to turn to stone and is restrained. It must repeat the saving throw at the end of its next turn. On a success, the effect ends. On a failure, the creature is petrified until freed by the greater restoration spell or other magic.\r\n\r\nA creature that isn\'t surprised can avert its eyes to avoid the saving throw at the start of its turn. If it does so, it can\'t see the basilisk until the start of its next turn, when it can avert its eyes again. If it looks at the basilisk in the meantime, it must immediately make the save.\r\n\r\nIf the basilisk sees its reflection within 30 feet of it in bright light, it mistakes itself for a rival and targets itself with its gaze.\r\nActions\r\n\r\nBite. Melee Weapon Attack: +5 to hit, reach 5 ft., one target. Hit: 10 (2d6 + 3) piercing damage plus 7 (2d6) poison damage.\r\nEnvironment: Mountain'),
-(41, 'Knight', 24, 80, 18, 0, 'Small or Medium Humanoid, Any Alignment\r\nAC 18\r\nInitiative +0 (10)\r\nHP 52 (8d8 + 16)\r\nSpeed 30 ft.\r\n	\r\n	\r\nmod\r\n	\r\nsave\r\n	\r\n	\r\n	\r\nmod\r\n	\r\nsave\r\n	\r\n	\r\n	\r\nmod\r\n	\r\nsave\r\nStr\r\n	\r\n16\r\n	\r\n+3\r\n	\r\n+3\r\n	\r\nDex\r\n	\r\n11\r\n	\r\n+0\r\n	\r\n+0\r\n	\r\nCon\r\n	\r\n14\r\n	\r\n+2\r\n	\r\n+2\r\nInt\r\n	\r\n11\r\n	\r\n+0\r\n	\r\n+0\r\n	\r\nWis\r\n	\r\n11\r\n	\r\n+0\r\n	\r\n+2\r\n	\r\nCha\r\n	\r\n15\r\n	\r\n+2\r\n	\r\n+2\r\nGear Greatsword, Heavy Crossbow, Plate Armor\r\nSenses Passive Perception 10\r\nLanguages Common plus one other language\r\nCR 3 (XP 700; PB +2)\r\nActions\r\n\r\nMultiattack. The knight makes two attacks, using Greatsword or Heavy Crossbow in any combination.\r\n\r\nGreatsword. Melee Attack Roll: +5, reach 5 ft. Hit: 10 (2d6 + 3) Slashing damage plus 4 (1d8) Radiant damage.\r\n\r\nHeavy Crossbow. Ranged Attack Roll: +2, range 100/400 ft. Hit: 11 (2d10) Piercing damage plus 4 (1d8) Radiant damage.\r\nReactions\r\n\r\nParry. Trigger: The knight is hit by a melee attack roll while holding a weapon. Response: The knight adds 2 to its AC against that attack, possibly causing it to miss.'),
-(43, 'Mage', 18, 144, 15, 2, 'Small or Medium Humanoid, Any Alignment\r\nAC 15\r\nInitiative +2 (12)\r\nHP 81 (18d8)\r\nSpeed 30 ft.\r\n	\r\n	\r\nmod\r\n	\r\nsave\r\n	\r\n	\r\n	\r\nmod\r\n	\r\nsave\r\n	\r\n	\r\n	\r\nmod\r\n	\r\nsave\r\nStr\r\n	\r\n9\r\n	\r\n-1\r\n	\r\n-1\r\n	\r\nDex\r\n	\r\n14\r\n	\r\n+2\r\n	\r\n+2\r\n	\r\nCon\r\n	\r\n11\r\n	\r\n+0\r\n	\r\n+0\r\nInt\r\n	\r\n17\r\n	\r\n+3\r\n	\r\n+6\r\n	\r\nWis\r\n	\r\n12\r\n	\r\n+1\r\n	\r\n+4\r\n	\r\nCha\r\n	\r\n11\r\n	\r\n+0\r\n	\r\n+0\r\nSkills Arcana +6, History +6\r\nSenses Passive Perception 11\r\nLanguages Common and any three languages\r\nCR 6 (XP 2,300; PB +3)\r\nActions\r\n\r\nMultiattack. The mage makes three Arcane Burst attacks.\r\n\r\nArcane Burst. Melee or Ranged Attack Roll: +6, reach 5 ft. or range 120 ft. Hit: 16 (3d10) Force damage.\r\n\r\nSpellcasting. The mage casts one of the following spells using Intelligence as the spellcasting ability (spell save DC 14):\r\n\r\n    At will: Detect Magic, Light, Mage Armor (included above), Mage Hand, Prestidigitation\r\n\r\n    2/day each: Fireball, Fly, Suggestion\r\n\r\n    1/day: Cone of Cold\r\n\r\nReactions\r\n\r\nCounterspell (1/Day). The mage casts Counterspell in response to that spell\'s trigger, using the same spellcasting ability in Spellcasting.\r\n\r\nShield (2/Day). The mage casts Shield in response to that spell\'s trigger, using the same spellcasting ability in Spellcasting.');
+(44, 'Gnoll Demoniac', 72, 198, 16, 1, '___\r\n>## Gnoll Demoniac\r\n>*Medium Fiend, chaotic evil*\r\n>___\r\n>- **Armor Class** 16\r\n>- **Hit Points** 135 (18d8 + 54)\r\n>- **Speed** 30 ft.\r\n>___\r\n>|STR|DEX|CON|INT|WIS|CHA|\r\n>|:---:|:---:|:---:|:---:|:---:|:---:|\r\n>|16 (+3)|12 (+1)|17 (+3)|14 (+2)|15 (+2)|17 (+3)|\r\n>___\r\n>- **Saving Throws** Str +6, Con +6, Wis +5, Cha +6\r\n>- **Skills** Perception +5\r\n>- **Senses** Darkvision 60 ft., passive Perception 15\r\n>- **Languages** Abyssal, Common, Gnoll\r\n>- **Challenge** 8 (XP 3,900; PB +3)\r\n>- **Proficiency Bonus** +3\r\n>___\r\n>### Actions\r\n>***Multiattack.*** The gnoll makes two Abyssal Strike attacks.  \r\n>\r\n>***Abyssal Strike.*** *Melee  or Ranged Attack Roll:*  +6, reach 5 ft. or range 60 ft. *Hit:* 20 (5d6 + 3) Poison damage.  \r\n>\r\n>***Hunger of Yeenoghu (Recharge 5–6).*** The gnoll conjures a 30-foot Cube of magical Darkness originating from a point it can see within 60 feet, which lasts for 1 minute or until the gnoll\'s Concentration ends on it. This area is Difficult Terrain. *Dexterity Saving Throw:* DC 14, any creature that starts its turn in this area or enters it for the first time on a turn. *Failure:* 28 (8d6) Necrotic damage, and the gnoll or a creature of its choice it can see gains 10 Temporary Hit Points. *Success:* Half damage only.  \r\n>\r\n>### Bonus Actions\r\n>***Rampage (2/Day).*** Immediately after dealing damage to a creature that is already Bloodied, the gnoll moves up to half its Speed, and it makes one Abyssal Strike attack.'),
+(45, 'Gnoll Fang of Yeenoghu', 33, 110, 14, 2, '___\r\n>## Gnoll Fang of Yeenoghu\r\n>*Medium Fiend, chaotic evil*\r\n>___\r\n>- **Armor Class** 14\r\n>- **Hit Points** 71 (11d8 + 22)\r\n>- **Speed** 30 ft.\r\n>___\r\n>|STR|DEX|CON|INT|WIS|CHA|\r\n>|:---:|:---:|:---:|:---:|:---:|:---:|\r\n>|17 (+3)|15 (+2)|15 (+2)|10 (+0)|11 (+0)|13 (+1)|\r\n>___\r\n>- **Saving Throws** Con +4, Wis +2, Cha +3\r\n>- **Senses** Darkvision 60 ft., passive Perception 10\r\n>- **Languages** Abyssal, Gnoll\r\n>- **Challenge** 4 (XP 1,100; PB +2)\r\n>- **Proficiency Bonus** +2\r\n>___\r\n>### Actions\r\n>***Multiattack.*** The gnoll makes one Bite attack and two Bone Flail attacks.  \r\n>\r\n>***Bite.*** *Melee Attack Roll:*  +5, reach 5 ft. *Hit:* 6 (1d6 + 3) Piercing damage plus 7 (2d6) Poison damage, and the target has the Poisoned condition until the start of the gnoll\'s next turn.  \r\n>\r\n>***Bone Flail.*** *Melee Attack Roll:*  +5, reach 10 ft. *Hit:* 7 (1d8 + 3) Piercing damage.  \r\n>\r\n>### Bonus Actions\r\n>***Rampage (2/Day).*** Immediately after dealing damage to a creature that is already Bloodied, the gnoll moves up to half its Speed, and it makes one Bite attack.'),
+(46, 'Gnoll Pack Lord', 18, 81, 15, 2, '___\r\n>## Gnoll Pack Lord\r\n>*Medium Fiend, chaotic evil*\r\n>___\r\n>- **Armor Class** 15\r\n>- **Hit Points** 49 (9d8 + 9)\r\n>- **Speed** 30 ft.\r\n>___\r\n>|STR|DEX|CON|INT|WIS|CHA|\r\n>|:---:|:---:|:---:|:---:|:---:|:---:|\r\n>|16 (+3)|14 (+2)|13 (+1)|8 (-1)|11 (+0)|9 (-1)|\r\n>___\r\n>- **Senses** Darkvision 60 ft., passive Perception 10\r\n>- **Languages** Gnoll\r\n>- **Challenge** 2 (XP 450; PB +2)\r\n>- **Proficiency Bonus** +2\r\n>___\r\n>### Actions\r\n>***Multiattack.*** The gnoll makes two attacks, using Bone Whip or Bone Javelin in any combination, and it uses Incite Rampage if available.  \r\n>\r\n>***Bone Whip.*** *Melee Attack Roll:*  +5, reach 10 ft. *Hit:* 8 (2d4 + 3) Slashing damage.  \r\n>\r\n>***Bone Javelin.*** *Ranged Attack Roll:*  +5, range 30/120 ft. *Hit:* 7 (1d8 + 3) Piercing damage.  \r\n>\r\n>***Incite Rampage (Recharge 5–6).*** The gnoll targets another creature it can see within 60 feet of itself that has the Rampage Bonus Action. The target can take a Reaction to make one melee attack.  \r\n>\r\n>### Bonus Actions\r\n>***Rampage (2/Day).*** Immediately after dealing damage to a creature that is already Bloodied, the gnoll moves up to half its Speed, and it makes one Bone Whip attack.');
 
 -- --------------------------------------------------------
 
 --
--- Struktura tabeli dla tabeli `players`
+-- Table structure for table `time`
 --
 
-CREATE TABLE `players` (
-  `id` int(11) NOT NULL,
-  `name` varchar(50) NOT NULL,
-  `AC` int(11) DEFAULT NULL
+CREATE TABLE `time` (
+  `time_id` int(11) NOT NULL,
+  `date` date NOT NULL,
+  `hour` int(11) NOT NULL,
+  `minute` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Dumping data for table `players`
+-- Dumping data for table `time`
 --
 
-INSERT INTO `players` (`id`, `name`, `AC`) VALUES
-(1, 'Voxel Pixel', 15),
-(2, 'Krasnalio', 19),
-(3, 'Dwarlock', 14);
+INSERT INTO `time` (`time_id`, `date`, `hour`, `minute`) VALUES
+(1, '1571-08-14', 14, 0);
 
 --
--- Indeksy dla zrzutów tabel
+-- Indexes for dumped tables
 --
 
 --
--- Indeksy dla tabeli `current_fight`
+-- Indexes for table `current_fight`
 --
 ALTER TABLE `current_fight`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indeksy dla tabeli `enemies`
+-- Indexes for table `enemies`
 --
 ALTER TABLE `enemies`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indeksy dla tabeli `players`
+-- Indexes for table `time`
 --
-ALTER TABLE `players`
-  ADD PRIMARY KEY (`id`);
+ALTER TABLE `time`
+  ADD PRIMARY KEY (`time_id`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -127,19 +128,19 @@ ALTER TABLE `players`
 -- AUTO_INCREMENT for table `current_fight`
 --
 ALTER TABLE `current_fight`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=611;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=624;
 
 --
 -- AUTO_INCREMENT for table `enemies`
 --
 ALTER TABLE `enemies`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
 
 --
--- AUTO_INCREMENT for table `players`
+-- AUTO_INCREMENT for table `time`
 --
-ALTER TABLE `players`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+ALTER TABLE `time`
+  MODIFY `time_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

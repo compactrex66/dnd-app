@@ -45,3 +45,6 @@
     <script src="addEnemy.js"></script>
 </body>
 </html>
+<?php
+    mysqli_close($conn);
+?>

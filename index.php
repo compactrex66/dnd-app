@@ -77,6 +77,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="media/favicon.png" type="image/x-icon">
     <link rel="stylesheet" href="style.css">
     <script src="https://kit.fontawesome.com/791dbbf45c.js" crossorigin="anonymous"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -112,6 +113,12 @@
             <button type="button" id="deleteEnemiesBtn">Delete all enemies</button>
             <a href="addEnemy/addEnemy.php"><button type="button">Add enemy</button></a>
             <a href="enemySearch/enemySearch.php"><button type="button">Search enemies</button></a>
+            <div class="vl"></div>
+            <button type="button" id="shortRestBtn">Short Rest</button>
+            <button type="button" id="longRestBtn">Long Rest</button>
+            <button class="redBtn" type="button" id="rewindTimeBtn"><img src="media/removeIcon.svg"></button>
+            <input type="number" placeholder="Hours" style="border: 0; width: 40px;" id="hoursToPass">
+            <button class="greenBtn" type="button" id="forwardTimeBtn"><img src="media/addIcon.svg"></button>
             <?php
                $sql = "SELECT * FROM `time` WHERE time_id = 1";
                $result = mysqli_fetch_assoc(mysqli_query($conn, $sql));
@@ -120,11 +127,6 @@
                $minute = $result['minute'];
                echo "<span class='big-text'>".($hour < 10 ? '0'.$hour : $hour).":".($minute < 10 ? '0'.$minute : $minute)." | ".$date." <img src='media/calendarIcon.svg'></span>";
             ?>
-            <button type="button" id="shortRestBtn">Short Rest</button>
-            <button type="button" id="longRestBtn">Long Rest</button>
-            <button class="redBtn" type="button" id="rewindTimeBtn"><img src="media/removeIcon.svg"></button>
-            <input type="number" placeholder="Hours" style="border: 0; width: 40px;" id="hoursToPass">
-            <button class="greenBtn" type="button" id="forwardTimeBtn"><img src="media/addIcon.svg"></button>
         </form>
     </header>
     <main>

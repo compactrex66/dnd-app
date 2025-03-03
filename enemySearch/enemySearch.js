@@ -111,10 +111,12 @@ data.special_abilities.forEach(element => {
     markdown += `>***${element.name}.*** ${element.desc.replaceAll('\n', '\r>')}\r>\r`;
 });
 
-markdown += `>###Actions`
-data.actions.forEach(element => {
-    markdown += `\r>***${element.name}.*** ${element.desc}\r>`;
-});
+if(data.actions.length > 0) {
+    markdown += `>###Actions`
+    data.actions.forEach(element => {
+        markdown += `\r>***${element.name}.*** ${element.desc}\r>`;
+    });
+}
 
 if(data.legendary_actions.length > 0) {
     markdown += `

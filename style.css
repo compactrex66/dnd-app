@@ -29,6 +29,7 @@ header {
     justify-content: space-between;
     align-items: stretch;
     gap: 20px;
+    align-self: stretch;
 }
 main {
     display: flex;
@@ -117,6 +118,7 @@ select, button, input, .checkboxInput {
     display: flex;
     justify-content: space-between;
     width: fit-content;
+    align-items: center;
 }
 input[type=number].no-spinner::-webkit-inner-spin-button, input[type=number].no-spinner::-webkit-outer-spin-button {
     -webkit-appearance: none;

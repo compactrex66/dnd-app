@@ -12,12 +12,27 @@
     <title>Adding enemy</title>
 </head>
 <body>
+    <form action="" method="post" id="parseMarkdown">
+        <textarea name="info" id="info"></textarea>
+    </form>
     <header>
         <span>Monster Search</span>
         <input type="text" id="monsterInput" placeholder="Enter a monster name" />
         <button id="searchButton">Search</button>
     </header>
-    <div id="monsterResult" class="monster-result"></div>
+    <pre id="monsterResult" class="monster-result">
+        <?php
+            include "../parsedown/Parsedown.php";
+            include "../parsedown/ParsedownExtra.php";
+
+            if(!empty($_POST['info'])) {
+                $moreInfo = $_POST['info'];
+                $parsedown = new ParsedownExtra();
+                $moreInfo = $parsedown->text($moreInfo);
+                echo $moreInfo;
+            }
+        ?>
+    </pre>
     <script src="enemySearch.js"></script>
 </body>
 </html>

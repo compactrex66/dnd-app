@@ -106,14 +106,12 @@
                     }
                 ?>
             </select>
-            <input style="border: 0; flex-grow: 0.5;" type="number" name="enemyQuantity" value="1" max="100">
+            <input style="border: 0;" type="number" name="enemyQuantity" value="1" max="100">
             <div class="checkboxInput">Suprised: <input type="checkbox" name="isSurprised"></div>
             <button>Add Enemy</button>
             <button type="button" id="deleteEnemiesBtn">Delete all enemies</button>
-            <a href="addEnemy/addEnemy.php"><button type="button">Add another enemy</button></a>
-            <a href="enemySearch/enemySearch.php"><button type="button">Search for enemies</button></a>
-        </form>
-        <form id="time" class="row-form" method="get">
+            <a href="addEnemy/addEnemy.php"><button type="button">Add enemy</button></a>
+            <a href="enemySearch/enemySearch.php"><button type="button">Search enemies</button></a>
             <?php
                $sql = "SELECT * FROM `time` WHERE time_id = 1";
                $result = mysqli_fetch_assoc(mysqli_query($conn, $sql));
@@ -124,11 +122,9 @@
             ?>
             <button type="button" id="shortRestBtn">Short Rest</button>
             <button type="button" id="longRestBtn">Long Rest</button>
-            <span class="inline-row">
-                <button class="redBtn" type="button" id="rewindTimeBtn"><img src="media/removeIcon.svg"></button>
-                <input type="number" placeholder="Hours" style="border: 0; width: 60px;" id="hoursToPass">
-                <button class="greenBtn" type="button" id="forwardTimeBtn"><img src="media/addIcon.svg"></button>
-            </span>
+            <button class="redBtn" type="button" id="rewindTimeBtn"><img src="media/removeIcon.svg"></button>
+            <input type="number" placeholder="Hours" style="border: 0; width: 40px;" id="hoursToPass">
+            <button class="greenBtn" type="button" id="forwardTimeBtn"><img src="media/addIcon.svg"></button>
         </form>
     </header>
     <main>

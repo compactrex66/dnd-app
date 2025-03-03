@@ -1,3 +1,23 @@
+<?php
+    if(isset($_POST['action'])) {
+        include '../dbConnection.php';
+        $action = $_POST['action'];
+        if($action == 'addEnemy') {
+            $name = $_POST['name'];
+            $minHealth = $_POST['minHealth'];
+            $maxHealth = $_POST['maxHealth'];
+            $armorClass = $_POST['armorClass'];
+            $initiativeBonus = $_POST['initiativeBonus'];
+            $moreInfo = $_POST['info'];
+
+            include "../dbConnection.php";
+
+            mysqli_query($conn, 'INSERT INTO enemies(name, min_health, max_health, AC, initiative_bonus, more_info) values("'.$name.'", '.$minHealth.', '.$maxHealth.', '.$armorClass.', '.$initiativeBonus.', "'.$moreInfo.'")');
+            mysqli_close($conn);
+            header("Location: enemySearch.php");
+        }
+    } 
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,27 +32,41 @@
     <title>Adding enemy</title>
 </head>
 <body>
-    <form action="" method="post" id="parseMarkdown">
+    <form action="" method="post" id="parseMarkdown" style="display: none;">
+        <input type="text" name="name" id="nameInput">
+        <input type="number" name="minHealth" id="minHealthInput">
+        <input type="number" name="maxHealth" id="maxHealthInput">
+        <input type="number" name="armorClass" id="armorClassInput">
+        <input type="number" name="initiativeBonus" id="initiativeBonusInput">
+        <input type="text" name="monsterName" id="monsterNameElement">
+        <input type="text" name="action" id="actionInput">
         <textarea name="info" id="info"></textarea>
     </form>
+    <div id="monsterName" style="display: none;"><?php echo !empty($_POST['monsterName']) ? $_POST['monsterName'] : ''?></div>
     <header>
         <span>Monster Search</span>
         <input type="text" id="monsterInput" placeholder="Enter a monster name" />
         <button id="searchButton">Search</button>
     </header>
-    <pre id="monsterResult" class="monster-result">
-        <?php
-            include "../parsedown/Parsedown.php";
-            include "../parsedown/ParsedownExtra.php";
-
-            if(!empty($_POST['info'])) {
-                $moreInfo = $_POST['info'];
-                $parsedown = new ParsedownExtra();
-                $moreInfo = $parsedown->text($moreInfo);
-                echo $moreInfo;
-            }
-        ?>
-    </pre>
+    <main>
+        <div id="matchList"></div>
+        <div id="monsterResult" class="monster-result moreInfoPanel">
+            <pre id="markdownResult" style="display: none;"><?php echo $_POST['info'] ?? '' ?></pre>
+            <button id="addEnemyBtn" class="corner-btn"><img src="../media/addIcon.svg" alt=""></button>
+            <?php
+                include "../parsedown/Parsedown.php";
+                include "../parsedown/ParsedownExtra.php";
+                if(!empty($_POST['info'])) {
+                    $moreInfo = $_POST['info'];
+                    $parsedown = new ParsedownExtra();
+                    $moreInfo = str_replace("___", "", $moreInfo);
+                    $moreInfo = $parsedown->text($moreInfo);
+                    $moreInfo = str_replace("<hr>", "", $moreInfo);
+                    echo $moreInfo;
+                }
+            ?>
+        </div>
+    </main>
     <script src="enemySearch.js"></script>
 </body>
 </html>

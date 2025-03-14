@@ -2,71 +2,38 @@
     include "parsedown/Parsedown.php";
     include "parsedown/ParsedownExtra.php";
     include "dbConnection.php";
-
-    function passTime($conn, $hours) {
-        if($hours > 0) {
-            $currentHour = mysqli_fetch_array(mysqli_query($conn, "SELECT `hour` FROM `time` WHERE time_id=1"))[0];
-            $overflowHour = 0;
-            $daysToPass = floor(($currentHour + $hours) / 24);
-            // echo $currentHour." ".$hours." ".($daysToPass);
-            if($currentHour + $hours >= 24 || $currentHour + $hours < 0) {
-                $overflowHour = $currentHour + $hours - (24*$daysToPass);
-                mysqli_query($conn, "UPDATE `time` SET `hour` = ".$overflowHour);
-                mysqli_query($conn, "UPDATE `time` SET `date`=date(date_add(date, INTERVAL $daysToPass DAY))");
-            } else {
-                mysqli_query($conn, "UPDATE `time` SET `hour` = ".$currentHour+$hours);
-            }
-        } else {
-            $currentHour = mysqli_fetch_array(mysqli_query($conn, "SELECT `hour` FROM `time` WHERE time_id=1"))[0];
-            $overflowHour = 0;
-            $daysToPass = floor(($currentHour + $hours) / 24);
-            if($currentHour + $hours >= 24 || $currentHour + $hours < 0) {
-                $overflowHour = (24*($daysToPass*-1)) + ($currentHour + $hours);
-                mysqli_query($conn, "UPDATE `time` SET `hour` = ".$overflowHour);
-                mysqli_query($conn, "UPDATE `time` SET `date`=date(date_add(date, INTERVAL $daysToPass DAY))");
-            } else {
-                mysqli_query($conn, "UPDATE `time` SET `hour` = ".$currentHour+$hours);
-            }
-        }
-    }
+    include "functions.php";
 
     if(isset($_GET['action'])) {
         $action = $_GET['action'];
-        if($action == 'adjustHealth' && isset($_GET['characterId'])) {
+        if(isset($_GET['characterId'])) {
             $characterId = $_GET['characterId'];
-            $currentHealth = (int)mysqli_fetch_row(mysqli_query($conn, "SELECT health FROM current_fight WHERE id = $characterId"))[0];
-            $maxHealth = (int)mysqli_fetch_row(mysqli_query($conn, "SELECT max_health FROM current_fight WHERE id = $characterId"))[0];
-            $healthChange = $_GET['healthNumber'];
-            if($currentHealth + $healthChange > $maxHealth) {
-                $healthChange = $maxHealth - $currentHealth;
+            if($action == 'adjustHealth') {
+                changeHealth($conn, $_GET['healthNumber'], $characterId);
             }
-            $health = $currentHealth + $healthChange;
-            mysqli_query($conn, "UPDATE current_fight set health = $health WHERE id = $characterId");
-        } elseif($action == 'changeInitiative' && isset($_GET['characterId'])) {
-            $characterId = $_GET['characterId'];
-            $initiative = $_GET['initiative'];
-            mysqli_query($conn, "UPDATE current_fight SET initiative = $initiative WHERE id = $characterId");
-        } elseif($action == 'delete' && isset($_GET['characterId'])) {
-            $characterId = $_GET['characterId'];
-            mysqli_query($conn, "DELETE FROM `current_fight` WHERE `id` = ".$characterId);
-        } elseif($action == 'deleteAllEnemies') {
-            mysqli_query($conn, "DELETE FROM current_fight WHERE is_player = 0");
-        } elseif($action == 'changeAC' && isset($_GET['characterId'])) {
-            $characterId = $_GET['characterId'];
-            $AC = $_GET['AC'];
-            mysqli_query($conn, "UPDATE current_fight SET AC = $AC WHERE id = $characterId");
-        } elseif($action == 'shortRest') {
-            passTime($conn, 2);
-        } elseif($action == 'longRest') {
-            passTime($conn, 8);
-        } elseif($action == 'setCurrent') {
-            mysqli_query($conn, "UPDATE current_fight SET current=0");
-            if(!empty($_GET['characterId'])) {
-                mysqli_query($conn, "UPDATE current_fight SET current=1 WHERE id = ".$_GET['characterId']);
-            } else {
-                mysqli_query($conn, "UPDATE current_fight SET current=1 WHERE initiative = (SELECT MAX(initiative) FROM current_fight)");
+            if($action == 'changeInitiative') {
+                setInitiative($conn, $_GET['initiative'], $characterId);
             }
-        } elseif($action == "passTime") {
+            if($action == 'delete') {
+                deleteCharacter($conn, $characterId);
+            }
+            if($action == 'changeAC') {
+                setAC($conn, $_GET['AC'], $characterId);
+            } 
+        }
+        if($action == 'shortRest') {
+            shortRest($conn);
+        }
+        if($action == 'deleteAllEnemies') {
+            deleteAllEnemies($conn);
+        }
+        if($action == 'longRest') {
+            longRest($conn);
+        }
+        if($action == 'setCurrent') {
+            setCurrent($conn, $characterId);
+        }
+        if($action == "passTime") {
             passTime($conn, $_GET['hoursToPass']);
         }
         header("Location: index.php");
@@ -83,7 +50,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap" rel="stylesheet">
-    <title>DnD App</title>
+    <title>DnD App | Main page</title>
 </head>
 <body>
     <form action="" method="get" id="actionForm" style="display: none;">
@@ -111,13 +78,13 @@
             <div class="checkboxInput">Suprised: <input type="checkbox" name="isSurprised"></div>
             <button>Add Enemy</button>
             <button type="button" id="deleteEnemiesBtn">Delete all enemies</button>
-            <a href="addEnemy/addEnemy.php"><button type="button">Add enemy</button></a>
+            <a href="addEnemy/addEnemy.php"><button type="button">Add new enemy</button></a>
             <a href="enemySearch/enemySearch.php"><button type="button">Search enemies</button></a>
             <div class="vl"></div>
             <button type="button" id="shortRestBtn">Short Rest</button>
             <button type="button" id="longRestBtn">Long Rest</button>
             <button class="redBtn" type="button" id="rewindTimeBtn"><img src="media/removeIcon.svg"></button>
-            <input type="number" placeholder="Hours" style="border: 0; width: 40px;" id="hoursToPass">
+            <input type="number" placeholder="Hours" style="border: 0; width: 55px;" id="hoursToPass">
             <button class="greenBtn" type="button" id="forwardTimeBtn"><img src="media/addIcon.svg"></button>
             <?php
                $sql = "SELECT * FROM `time` WHERE time_id = 1";
@@ -132,7 +99,7 @@
     <main>
         <div class="listOfCharacters" id="listOfCharacters">
             <?php
-                //Adding enemies to current fight
+                //Adding enemies to the database
                 if(isset($_GET['enemyType'])) {
                     $enemyType = $_GET['enemyType'];
                     $enemyQuantity = $_GET['enemyQuantity'] != null ? $_GET['enemyQuantity'] : 1;

@@ -1,4 +1,5 @@
 const actionForm = document.getElementById("actionForm");
+const moreInfoPanel = document.getElementById("moreInfoPanel")
 let actionInput = document.getElementById("actionInput");
 let characterIdInput = document.getElementById("characterIdInput");
 let healthInput = document.getElementById("healthInput");
@@ -6,22 +7,39 @@ let initiativeInput = document.getElementById("initiativeInput");
 let ACInput = document.getElementById("ACInput");
 let hoursInput = document.getElementById("hoursinput");
 
-function getCurrentCharacter(charactersArr) {
-    for(const character of charactersArr) {
+function getCurrentCharacter() {
+    const arrOfCharacterElements = Array.from(document.querySelectorAll(".character"))
+    for(const character of arrOfCharacterElements) {
         if(character.getAttribute("data-current") == 1) {
             return character;
         }
     }
-    actionInput.value = "setCurrent";
-    actionForm.submit();
+    let request = new XMLHttpRequest();
+    request.open('GET', "index.php?action=setCurrent", true);
+    request.send();
+    return arrOfCharacterElements[0];
 }
 
+function setCurrentCharacter(character) {
+    let currentCharacter = getCurrentCharacter();
+    currentCharacter.setAttribute("data-current", "0");
+    character.setAttribute("data-current", "1");
+    currentCharacter.style.border = "none";
+    character.style.border = "1px solid white";
+    moreInfoPanel.innerHTML = character.querySelector(".moreInfo")?.innerHTML ?? "Player character";
+    let request = new XMLHttpRequest();
+    request.open("GET", `index.php?action=setCurrent&characterId=${character.getAttribute("data-characterid")}`, true);
+    request.send();
+}
+
+//Delete character from combat
 const arrOfDeleteBtns = document.querySelectorAll(".deleteBtn")
 for(let i = 0; i < arrOfDeleteBtns.length; i++) {
     arrOfDeleteBtns[i].addEventListener("click", () => {
-        actionInput.value = "delete";
-        characterIdInput.value = arrOfDeleteBtns[i].parentNode.getAttribute("data-characterId");
-        actionForm.submit();
+        let request = new XMLHttpRequest();
+        request.open("GET", `index.php?action=delete&characterId=${arrOfDeleteBtns[i].parentNode.getAttribute("data-characterId")}`, true);
+        request.send();
+        arrOfDeleteBtns[i].parentNode.remove();
     });
 }
 
@@ -72,13 +90,12 @@ deleteEnemiesBtn.addEventListener("click", () => {
         actionForm.submit();
 });
 
-const moreInfoPanel = document.getElementById("moreInfoPanel")
 const arrOfCharacterElements = Array.from(document.querySelectorAll(".character"))
 for(let i = 0; i < arrOfCharacterElements.length; i++) {
     arrOfCharacterElements[i].addEventListener("dblclick", () => {
-        actionInput.value = "setCurrent";
-        characterIdInput.value = arrOfCharacterElements[i].getAttribute("data-characterid");
-        actionForm.submit();
+        let request = new XMLHttpRequest();
+        request.open("GET", `index.php?action=setCurrent&characterId=${arrOfCharacterElements[i].getAttribute("data-characterid")}`, true);
+        request.send();
     })
     arrOfCharacterElements[i].addEventListener("click", () => {
         let moreInfo = arrOfCharacterElements[i].querySelector(".moreInfo").innerHTML;
@@ -86,9 +103,10 @@ for(let i = 0; i < arrOfCharacterElements.length; i++) {
     });
 }
 
-let currentCharacter = getCurrentCharacter(arrOfCharacterElements) ?? arrOfCharacterElements[0];
-currentCharacter.style.border = "1px solid white";
-moreInfoPanel.innerHTML = currentCharacter.querySelector(".moreInfo")?.innerHTML ?? "Player character";
+let currentCharacter = getCurrentCharacter() ?? arrOfCharacterElements[0];
+console.log(currentCharacter);
+
+setCurrentCharacter(currentCharacter);
 window.addEventListener("keydown", function(e) {
     if(e.key == " ") {
         if(arrOfCharacterElements.indexOf(currentCharacter) + 1 >= arrOfCharacterElements.length) {
@@ -96,9 +114,7 @@ window.addEventListener("keydown", function(e) {
         } else {
             currentCharacter = arrOfCharacterElements[arrOfCharacterElements.indexOf(currentCharacter) + 1];
         }
-        actionInput.value = "setCurrent";
-        characterIdInput.value = currentCharacter.getAttribute("data-characterid");
-        actionForm.submit();
+        setCurrentCharacter(currentCharacter)
     }
 });
 

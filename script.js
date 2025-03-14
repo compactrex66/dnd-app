@@ -1,5 +1,15 @@
 const actionForm = document.getElementById("actionForm");
 const moreInfoPanel = document.getElementById("moreInfoPanel")
+const arrOfCharacterElements = Array.from(document.querySelectorAll(".character"))
+const deleteEnemiesBtn = document.getElementById("deleteEnemiesBtn")
+const arrOfDeleteBtns = document.querySelectorAll(".deleteBtn")
+const arrOfInitiativeInput = document.querySelectorAll("#modifiedInitiativeInput")
+const arrOfACInput = document.querySelectorAll("#modifiedACInput")
+const arrOfAddHealthBtns = document.querySelectorAll(".addHealthBtn")
+const arrOfSubHealthBtns = document.querySelectorAll(".substractHealthBtn")
+const hoursToPassInput = document.getElementById("hoursToPass");
+
+let currentCharacter;
 let actionInput = document.getElementById("actionInput");
 let characterIdInput = document.getElementById("characterIdInput");
 let healthInput = document.getElementById("healthInput");
@@ -17,11 +27,13 @@ function getCurrentCharacter() {
     let request = new XMLHttpRequest();
     request.open('GET', "index.php?action=setCurrent", true);
     request.send();
-    return arrOfCharacterElements[0];
+    return null;
 }
 
 function setCurrentCharacter(character) {
-    let currentCharacter = getCurrentCharacter();
+    console.log(character);
+    console.log(currentCharacter);
+    
     currentCharacter.setAttribute("data-current", "0");
     character.setAttribute("data-current", "1");
     currentCharacter.style.border = "none";
@@ -30,40 +42,49 @@ function setCurrentCharacter(character) {
     let request = new XMLHttpRequest();
     request.open("GET", `index.php?action=setCurrent&characterId=${character.getAttribute("data-characterid")}`, true);
     request.send();
+    currentCharacter = character;
 }
 
+function initCurrentCharacter() {
+    currentCharacter = getCurrentCharacter() ?? arrOfCharacterElements[0];
+    setCurrentCharacter(currentCharacter);
+}
+initCurrentCharacter();
+
 //Delete character from combat
-const arrOfDeleteBtns = document.querySelectorAll(".deleteBtn")
 for(let i = 0; i < arrOfDeleteBtns.length; i++) {
     arrOfDeleteBtns[i].addEventListener("click", () => {
         let request = new XMLHttpRequest();
         request.open("GET", `index.php?action=delete&characterId=${arrOfDeleteBtns[i].parentNode.getAttribute("data-characterId")}`, true);
         request.send();
+        if(arrOfDeleteBtns[i].parentNode.getAttribute("data-current") == 1) {
+            setCurrentCharacter(arrOfCharacterElements[arrOfCharacterElements.indexOf(arrOfDeleteBtns[i].parentNode) + 1] ?? arrOfCharacterElements[0]);
+        }
         arrOfDeleteBtns[i].parentNode.remove();
     });
 }
 
-const arrOfInitiativeInput = document.querySelectorAll("#modifiedInitiativeInput")
+//Modify initiative 
 for(let i = 0; i < arrOfInitiativeInput.length; i++) {
     arrOfInitiativeInput[i].addEventListener("change", () => {
-        actionInput.value = "changeInitiative";
-        characterIdInput.value = arrOfInitiativeInput[i].parentNode.parentNode.getAttribute("data-characterId");
-        initiativeInput.value = arrOfInitiativeInput[i].value;
-        actionForm.submit();
+        let request = new XMLHttpRequest();
+        request.onload = function() { location.reload() };
+        request.open("GET", `index.php?action=changeInitiative&initiative=${arrOfInitiativeInput[i].value}&characterId=${arrOfInitiativeInput[i].parentNode.parentNode.getAttribute("data-characterId")}`, true);
+        request.send();
     });
 }
 
-const arrOfACInput = document.querySelectorAll("#modifiedACInput")
+//Change AC
 for(let i = 0; i < arrOfACInput.length; i++) {
     arrOfACInput[i].addEventListener("change", () => {
-        actionInput.value = "changeAC";
-        characterIdInput.value = arrOfACInput[i].parentNode.parentNode.getAttribute("data-characterId");
-        ACInput.value = arrOfACInput[i].value;
-        actionForm.submit();
+        let request = new XMLHttpRequest();
+        request.onload = function() { location.reload() };
+        request.open("GET", `index.php?action=changeAC&AC=${arrOfACInput[i].value}&characterId=${arrOfACInput[i].parentNode.parentNode.getAttribute("data-characterId")}`);
+        request.send();
     });
 }
 
-const arrOfAddHealthBtns = document.querySelectorAll(".addHealthBtn")
+//Add Health
 for(let i = 0; i < arrOfAddHealthBtns.length; i++) {
     arrOfAddHealthBtns[i].addEventListener("click", () => {
         actionInput.value = "adjustHealth";
@@ -73,7 +94,7 @@ for(let i = 0; i < arrOfAddHealthBtns.length; i++) {
     });
 }
 
-const arrOfSubHealthBtns = document.querySelectorAll(".substractHealthBtn")
+//Substract health
 for(let i = 0; i < arrOfSubHealthBtns.length; i++) {
     arrOfSubHealthBtns[i].addEventListener("click", () => {
         actionInput.value = "adjustHealth";
@@ -83,65 +104,65 @@ for(let i = 0; i < arrOfSubHealthBtns.length; i++) {
     });
 }
 
-const deleteEnemiesBtn = document.getElementById("deleteEnemiesBtn")
+//Change current character to double clicked one | show more info from clicked character
+for(let i = 0; i < arrOfCharacterElements.length; i++) {
+    arrOfCharacterElements[i].addEventListener("dblclick", () => {
+        setCurrentCharacter(arrOfCharacterElements[i]);
+    })
+    arrOfCharacterElements[i].addEventListener("click", () => {
+        let moreInfo = arrOfCharacterElements[i].querySelector(".moreInfo");
+        moreInfoPanel.innerHTML = moreInfo == null ? "Player Character" : moreInfo.innerHTML;
+    });
+}
+
+//Next turn on space click
+window.addEventListener("keydown", function(e) {
+    if(e.key == " ") {
+        let nextCharacter;
+        if(arrOfCharacterElements.indexOf(currentCharacter) + 1 >= arrOfCharacterElements.length) {
+            nextCharacter = arrOfCharacterElements[0];
+        } else {
+            nextCharacter = arrOfCharacterElements[arrOfCharacterElements.indexOf(currentCharacter) + 1];
+        }
+        setCurrentCharacter(nextCharacter)
+    }
+});
+
+//Delete all enemies
 deleteEnemiesBtn.addEventListener("click", () => {
     actionInput.value = "deleteAllEnemies";
     if(confirm('Are you sure you want delete all enemies ?'))
         actionForm.submit();
 });
 
-const arrOfCharacterElements = Array.from(document.querySelectorAll(".character"))
-for(let i = 0; i < arrOfCharacterElements.length; i++) {
-    arrOfCharacterElements[i].addEventListener("dblclick", () => {
-        let request = new XMLHttpRequest();
-        request.open("GET", `index.php?action=setCurrent&characterId=${arrOfCharacterElements[i].getAttribute("data-characterid")}`, true);
-        request.send();
-    })
-    arrOfCharacterElements[i].addEventListener("click", () => {
-        let moreInfo = arrOfCharacterElements[i].querySelector(".moreInfo").innerHTML;
-        moreInfoPanel.innerHTML = moreInfo
-    });
-}
-
-let currentCharacter = getCurrentCharacter() ?? arrOfCharacterElements[0];
-console.log(currentCharacter);
-
-setCurrentCharacter(currentCharacter);
-window.addEventListener("keydown", function(e) {
-    if(e.key == " ") {
-        if(arrOfCharacterElements.indexOf(currentCharacter) + 1 >= arrOfCharacterElements.length) {
-            currentCharacter = arrOfCharacterElements[0];
-        } else {
-            currentCharacter = arrOfCharacterElements[arrOfCharacterElements.indexOf(currentCharacter) + 1];
-        }
-        setCurrentCharacter(currentCharacter)
-    }
-});
-
-let hoursToPassInput = document.getElementById("hoursToPass");
+//Rewind time
 document.getElementById("rewindTimeBtn").addEventListener("click", () => {
     hoursInput.value = hoursToPassInput.value*-1;
     actionInput.value = "passTime";
     actionForm.submit();
 });
+
+//Pass time
 document.getElementById("forwardTimeBtn").addEventListener("click", () => {
     hoursInput.value = hoursToPassInput.value;
     actionInput.value = "passTime";
     actionForm.submit();
 });
 
-
+//Stop propagation
 document.querySelectorAll(".character > *").forEach(function(child) {
     child.addEventListener("click", (e) => {
         e.stopPropagation();
     });
 })
 
+//Pass time by 2 hours
 document.getElementById("shortRestBtn").addEventListener("click", () => {
     actionInput.value = 'shortRest';
     actionForm.submit();
 });
 
+//Pass time by 8 hours
 document.getElementById("longRestBtn").addEventListener("click", () => {
     actionInput.value = 'longRest';
     actionForm.submit();

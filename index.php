@@ -75,9 +75,9 @@
                 ?>
             </select>
             <input style="border: 0;" type="number" name="enemyQuantity" value="1" max="100">
-            <div class="checkboxInput">Suprised: <input type="checkbox" name="isSurprised"></div>
             <button>Add Enemy</button>
             <button type="button" id="deleteEnemiesBtn">Delete all enemies</button>
+            <div class="vl"></div>
             <a href="addEnemy/addEnemy.php"><button type="button">Add new enemy</button></a>
             <a href="enemySearch/enemySearch.php"><button type="button">Search enemies</button></a>
             <div class="vl"></div>

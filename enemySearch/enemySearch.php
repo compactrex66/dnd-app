@@ -1,23 +1,3 @@
-<?php
-    if(isset($_POST['action'])) {
-        include '../dbConnection.php';
-        $action = $_POST['action'];
-        if($action == 'addEnemy') {
-            $name = $_POST['name'];
-            $minHealth = $_POST['minHealth'];
-            $maxHealth = $_POST['maxHealth'];
-            $armorClass = $_POST['armorClass'];
-            $initiativeBonus = $_POST['initiativeBonus'];
-            $moreInfo = $_POST['info'];
-
-            include "../dbConnection.php";
-
-            mysqli_query($conn, 'INSERT INTO enemies(name, min_health, max_health, AC, initiative_bonus, more_info) values("'.$name.'", '.$minHealth.', '.$maxHealth.', '.$armorClass.', '.$initiativeBonus.', "'.$moreInfo.'")');
-            mysqli_close($conn);
-            header("Location: enemySearch.php");
-        }
-    } 
-?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -43,7 +23,6 @@
         <input type="text" name="action" id="actionInput">
         <textarea name="info" id="info"></textarea>
     </form>
-    <div id="monsterName" style="display: none;"><?php echo !empty($_POST['monsterName']) ? $_POST['monsterName'] : ''?></div>
     <header>
         <a href="../index.php" style="justify-self: left;"><button>Fight</button></a>
         <span>Monster Search</span>
@@ -52,9 +31,17 @@
     </header>
     <main>
         <div id="matchList"></div>
-        <div id="monsterResult" class="monster-result moreInfoPanel">
+        <div class="monster-result moreInfoPanel">
             <pre id="markdownResult" style="display: none;"><?php echo $_POST['info'] ?? '' ?></pre>
+            <span style="display: none;">
+                <div id="monsterName"></div>
+                <div id="minHealth"></div>
+                <div id="maxHealth"></div>
+                <div id="armorClass"></div>
+                <div id="initiativeBonus"></div>
+            </span>
             <button id="addEnemyBtn" class="corner-btn"><img src="../media/addIcon.svg" alt=""></button>
+            <span id="monsterInfo">
             <?php
                 include "../parsedown/Parsedown.php";
                 include "../parsedown/ParsedownExtra.php";
@@ -67,6 +54,7 @@
                     echo $moreInfo;
                 }
             ?>
+            </span>
         </div>
     </main>
     <script src="enemySearch.js"></script>

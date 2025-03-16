@@ -1,60 +1,60 @@
 const monsterInput = document.getElementById("monsterInput");
 const searchButton = document.getElementById("searchButton");
-const monsterResult = document.getElementById("monsterResult");
-const matchList = document.getElementById("matchList")
+const monsterInfo = document.getElementById("monsterInfo");
+const matchList = document.getElementById("matchList");
 const parseMarkdownForm = document.getElementById("parseMarkdown");
-const addMonsterBtn = document.getElementById("addEnemyBtn")
-const actionInput = document.getElementById("actionInput")
+const addMonsterBtn = document.getElementById("addEnemyBtn");
+const actionInput = document.getElementById("actionInput");
+const monsterNameElement = document.getElementById("monsterName");
+const minHealth = document.getElementById("minHealth");
+const maxHealth = document.getElementById("maxHealth");
+const armorClass = document.getElementById("armorClass");
+const initiativeBonus = document.getElementById("initiativeBonus");
 
-let nameInput = document.getElementById("nameInput")
-let minHealthInput = document.getElementById("minHealthInput")
-let maxHealthInput = document.getElementById("maxHealthInput")
-let armorClassInput = document.getElementById("armorClassInput")
-let initiativeBonusInput = document.getElementById("initiativeBonusInput")
-
-let markdownResult = document.getElementById("markdownResult")
-let monsterNameElement = document.getElementById("monsterNameElement")
-let serverMonsterName = document.getElementById("monsterName")
-let infoElement = document.getElementById("info");
-let enemyInfo, armorClass, healthValues, minHealth, maxHealth, firstLine, initiativeBonus, providedName
+let markdownResult = document.getElementById("markdownResult");
+let serverMonsterName = document.getElementById("monsterName");
+let enemyInfo, monsterName;
 
 searchButton.addEventListener("click", () => {
-    const monsterName = monsterInput.value.toLowerCase();
+    monsterName = monsterInput.value.toLowerCase();
     if (monsterName) {
         matchList.innerHTML = '';
         searchMonster(monsterName);
     } else {
-        monsterResult.innerHTML = "Please enter a monster name.";
+        monsterInfo.innerHTML = "Please enter a monster name.";
     }
 });
 
 addMonsterBtn.addEventListener("click", () => {
-    infoElement.value = markdownResult.innerHTML;
-    infoElement.value = infoElement.value.replaceAll("&gt;", ">");
-    actionInput.value = 'addEnemy';
+    let formData = new FormData();
+    formData.append("action", "checkIfExists");
+    formData.append("monsterName", monsterNameElement.innerText)
+    let request = new XMLHttpRequest();
+    request.onload = () => {
+        if(request.responseText == true) {
+            alert("Such enemy already exists");
+        } else {
+            enemyInfo = markdownResult.innerHTML;
+            
+            formData.append("action", "addEnemy");
+            formData.append("name", monsterNameElement.innerText);
+            formData.append("minHealth", minHealth.innerText);
+            formData.append("maxHealth", maxHealth.innerText);
+            formData.append("armorClass", armorClass.innerText);
+            formData.append("initiativeBonus", initiativeBonus.innerText);
+            formData.append("info", markdownResult.innerHTML.replaceAll("&gt;", ">"));
 
-    enemyInfo = infoElement.value
-    let healthValues = enemyInfo.match(/\d+\s[(]\d+[d]\d+\s[+]\s\d+/gm)[0]
-    healthValues = healthValues.match(/\d+/g)
-    
-    minHealth = healthValues.length == 4 ? parseInt(healthValues[1]) + parseInt(healthValues[3]) : parseInt(healthValues[1])
-    maxHealth = healthValues.length == 4 ? parseInt(healthValues[1]) * parseInt(healthValues[2]) + parseInt(healthValues[3]) : parseInt(healthValues[1]) * parseInt(healthValues[2])
-    
-    armorClass = enemyInfo.match(/[s]{2}[*]{2}\s\d+/gm)[0].match(/\d+/)[0]
-    initiativeBonus = parseInt(enemyInfo.match(/\d+\s[(].\d+[)]/gm)[1].match(/[+,-]\d+/)[0])    
-    
-    nameInput.value = enemyInfo.match(/\n(>## ).+/gm)[0].match(/[a-zA-Z ]+/)[0];
-    minHealthInput.value = minHealth
-    maxHealthInput.value = maxHealth
-    armorClassInput.value = armorClass
-    initiativeBonusInput.value = initiativeBonus
-
-    parseMarkdownForm.submit();
+            request = new XMLHttpRequest();
+            request.onload = () => {
+                alert("Enemy has been added to the database");
+            }
+            request.open("post", `enemySearchScript.php`, true);
+            request.send(formData);
+        }
+    }
+    request.open("post", "enemySearchScript.php", true);
+    request.send(formData);
 });
-
-if(serverMonsterName.innerText.replace('\r', '') != '') {
-    searchMonster(serverMonsterName.innerText.trim())
-}
 
 function searchMonster(monsterName) {
     fetch("https://www.dnd5eapi.co/api/monsters")
@@ -72,10 +72,23 @@ function searchMonster(monsterName) {
                     monsterElement.classList.add("monster");
                     monsterElement.innerHTML = element.name + `<pre class="moreMonsterInfo">${markdown}</pre>`
                     monsterElement.addEventListener("click", () => {
-                        infoElement.value = monsterElement.querySelector(".moreMonsterInfo").innerHTML;
-                        infoElement.value = infoElement.value.replaceAll("&gt;", ">");
-                        monsterNameElement.value = monsterName;
-                        parseMarkdownForm.submit();
+                        let formData = new FormData();
+                        formData.append("markdown", markdown);
+                        let request = new XMLHttpRequest();
+                        markdownResult.innerHTML = markdown;
+                        monsterNameElement.innerText = data.name;
+                        let healthValues = data.hit_points_roll.match(/[0-9]+/gm);
+                        for(let i = 0; i < healthValues.length; i++) healthValues[i] = parseInt(healthValues[i]);
+                        if(healthValues.length < 3) healthValues[2] = 0;
+                        minHealth.innerText = healthValues[0] + healthValues[2];
+                        maxHealth.innerText = healthValues[0] * healthValues[1] + healthValues[2];
+                        armorClass.innerText = data.armor_class[0].value;
+                        initiativeBonus.innerText = modifier(data.dexterity);
+                        request.onload = () => {
+                            monsterInfo.innerHTML = request.responseText;
+                        }
+                        request.open("post", "parseMarkdown.php", true);
+                        request.send(formData);
                     })
                     matchList.appendChild(monsterElement);
                 })
@@ -83,7 +96,7 @@ function searchMonster(monsterName) {
             }
             
             if (!matchedMonsters) {
-                monsterResult.innerHTML = "Monster not found.";
+                monsterInfo.innerHTML = "Monster not found.";
                 return;
             }
         })
@@ -111,10 +124,15 @@ data.special_abilities.forEach(element => {
     markdown += `>***${element.name}.*** ${element.desc.replaceAll('\n', '\r>')}\r>\r`;
 });
 
-if(data.actions.length > 0) {
-    markdown += `>###Actions`
-    data.actions.forEach(element => {
-        markdown += `\r>***${element.name}.*** ${element.desc}\r>`;
+markdown += `>###Actions`
+data.actions.forEach(element => {
+    markdown += `\r>***${element.name}.*** ${element.desc}\r>`;
+});
+
+if(data.reactions) {
+    markdown += `>### Reactions`;
+    data.reactions.forEach(element => {
+        markdown += `\r>**${element.name}.** ${element.desc}`;
     });
 }
 
@@ -123,7 +141,7 @@ if(data.legendary_actions.length > 0) {
 >### Legendary Actions
 >*Legendary Action Uses: 3. Immediately after another creature's turn, The ${data.name} can expend a use to take one of the following actions. The ${data.name} regains all expended uses at the start of each of its turns.*\r>`
     data.legendary_actions.forEach(element => {
-        markdown += `\r>- **${element.name}.** ${element.desc}`;
+        markdown += `\r>**${element.name}.** ${element.desc}`;
     });
 }
 return markdown

@@ -15,7 +15,6 @@ body {
 }
 header {
     box-sizing: border-box;
-    font-size: 30px;
     padding: 20px;
     width: 100%;
     display: flex;
@@ -112,7 +111,6 @@ select, button, input, .checkboxInput {
     padding: 10px;
     background-color: var(--secondary);   
     color: var(--text);
-    font-size: 15px;
     border: 0;
 }
 .checkboxInput {

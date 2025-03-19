@@ -1,0 +1,170 @@
+:root {
+    --primary: black;
+    --secondary: rgb(32, 32, 32);
+    --text: white;
+}
+body {
+    position: relative;
+    margin: 0;
+    background-color: var(--primary);
+    display: flex;
+    flex-direction: column;
+    color: var(--text);
+    align-items: center;
+    font-family: "Ubuntu";
+}
+header {
+    box-sizing: border-box;
+    padding: 20px;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+.row-form {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: stretch;
+    gap: 10px;
+    align-self: stretch;
+    width: 100%;
+}
+main {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+button {
+    cursor: pointer;
+}
+ul {
+    padding-left: 20px;
+}
+li {
+    margin: 10px 0;
+}
+.row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 5px;
+}
+.specialText {
+    font-weight:bold;
+    font-style: italic;
+}
+.listOfCharacters {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    height: 88vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    width: 48vw;
+}
+.character {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 20px;
+    background-color: var(--secondary);
+    box-sizing: border-box;
+}
+span {
+    display: inline;
+}
+.characterName {
+    width: 17%;
+}
+.characterHealth {
+    width: 12%;
+}
+.inline-row {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
+.big-text {
+    align-self: center;
+    background-color: var(--secondary);
+    padding: 5px;
+    box-sizing: border-box;
+    font-size: 32px;
+}
+.redBtn {
+    background-color: rgb(152, 40, 40);
+}
+.greenBtn {
+    background-color: rgb(43, 86, 43);
+}
+select, button, input, .checkboxInput {
+    padding: 10px;
+    background-color: var(--secondary);   
+    color: var(--text);
+    border: 0;
+}
+.checkboxInput {
+    display: flex;
+    justify-content: space-between;
+    width: fit-content;
+    align-items: center;
+}
+input[type=number].no-spinner::-webkit-inner-spin-button, input[type=number].no-spinner::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+input[type=number] {
+    width: 25px;
+    border: 1px solid var(--text);
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+.deleteBtn, .inActivedeleteBtn {
+    color:rgb(200, 50, 60);
+    cursor: pointer;
+    padding: 10px;
+    scale: 1.7;
+}
+.inActivedeleteBtn {
+    cursor: default;
+    filter: brightness(0.25);
+}
+table, td, th {
+    border: 1px solid white;
+    border-collapse: collapse;
+    padding: 15px;
+    text-align: center;
+}
+#moreInfoPanel {
+    box-sizing: border-box;
+    width: 48vw;
+    height: 88vh;
+    overflow-y: auto;
+    background-color: var(--secondary);
+    padding: 20px;
+}
+#moreInfoPanel blockquote {
+    margin: 0;
+}
+a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+}
+a * {
+    height: 100%;
+}
+.vl {
+    height: 100%;
+    width: 2px;
+    background-color: white;
+}

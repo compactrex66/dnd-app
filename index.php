@@ -6,6 +6,7 @@
 
     if(isset($_GET['action'])) {
         $action = $_GET['action'];
+        echo "akcja";
         if(isset($_GET['characterId'])) {
             $characterId = $_GET['characterId'];
             if($action == 'adjustHealth') {
@@ -46,7 +47,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="media/favicon.png" type="image/x-icon">
     <link rel="stylesheet" href="style.css">
-    <script src="https://kit.fontawesome.com/791dbbf45c.js" crossorigin="anonymous"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap" rel="stylesheet">

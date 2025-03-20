@@ -67,6 +67,8 @@ function initListeners() {
     arrOfAddHealthBtns = document.querySelectorAll(".addHealthBtn")
     arrOfSubHealthBtns = document.querySelectorAll(".substractHealthBtn")
 
+
+
     //Delete character from combat
     for(let i = 0; i < arrOfDeleteBtns.length; i++) {
         arrOfDeleteBtns[i].addEventListener("click", () => {
@@ -105,20 +107,20 @@ function initListeners() {
     //Add Health
     for(let i = 0; i < arrOfAddHealthBtns.length; i++) {
         arrOfAddHealthBtns[i].addEventListener("click", () => {
-            actionInput.value = "adjustHealth";
-            characterIdInput.value = arrOfAddHealthBtns[i].parentNode.parentNode.getAttribute("data-characterId");
-            healthInput.value = arrOfAddHealthBtns[i].previousElementSibling.value;
-            actionForm.submit(); 
+            let request = new XMLHttpRequest();
+            request.onload = function() { updateCharactersList() };
+            request.open("GET", `index.php?action=adjustHealth&characterId=${arrOfAddHealthBtns[i].parentNode.parentNode.getAttribute("data-characterId")}&healthNumber=${arrOfAddHealthBtns[i].previousElementSibling.value}`);
+            request.send();
         });
     }
 
     //Substract health
     for(let i = 0; i < arrOfSubHealthBtns.length; i++) {
         arrOfSubHealthBtns[i].addEventListener("click", () => {
-            actionInput.value = "adjustHealth";
-            characterIdInput.value = arrOfSubHealthBtns[i].parentNode.parentNode.getAttribute("data-characterId");
-            healthInput.value = arrOfSubHealthBtns[i].nextElementSibling.value * (-1);
-            actionForm.submit();
+            let request = new XMLHttpRequest();
+            request.onload = function() { updateCharactersList(); console.log(this.responseText); };
+            request.open("GET", `index.php?action=adjustHealth&characterId=${arrOfSubHealthBtns[i].parentNode.parentNode.getAttribute("data-characterId")}&healthNumber=${arrOfSubHealthBtns[i].nextElementSibling.value}`);
+            request.send();
         });
     }
 
@@ -175,7 +177,7 @@ function initListeners() {
 }
 initCurrentCharacter();
 initListeners();
-
+updateCharactersList();
 
 //Next turn on space click
 window.addEventListener("keydown", function(e) {

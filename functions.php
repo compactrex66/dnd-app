@@ -63,8 +63,8 @@ function longRest($conn) {
 
 function setCurrent($conn, $characterId = null) {
     mysqli_query($conn, "UPDATE current_fight SET current=0");
-    if(!empty($_GET['characterId'])) {
-        mysqli_query($conn, "UPDATE current_fight SET current=1 WHERE id = ".$_GET['characterId']);
+    if($characterId != null) {
+        mysqli_query($conn, "UPDATE current_fight SET current=1 WHERE id = ".$characterId);
     } else {
         mysqli_query($conn, "UPDATE current_fight SET current = 1 WHERE initiative = (SELECT characterId FROM current_fight WHERE initiative = (SELECT MAX(initiative) FROM current_fight) LIMIT 1)");
     }

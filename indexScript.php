@@ -1,10 +1,27 @@
 <?php
     include "parsedown/Parsedown.php";
     include "parsedown/ParsedownExtra.php";
+    include "functions.php";
     include "dbConnection.php";
+    
     if(isset($_POST['action'])) {
         $action = $_POST['action'];
-        if($action == "getCharacters") {
+        if(isset($_POST['characterId'])) {
+            $characterId = $_POST['characterId'];
+            if($action == 'adjustHealth') {
+                changeHealth($conn, $_POST['healthNumber'], $characterId);
+            }
+            if($action == 'changeInitiative') {
+                setInitiative($conn, $_POST['initiative'], $characterId);
+            }
+            if($action == 'delete') {
+                deleteCharacter($conn, $characterId);
+            }
+            if($action == 'changeAC') {
+                setAC($conn, $_POST['AC'], $characterId);
+            } 
+        }
+        if($action == 'getCharacters') {
             $sql = "SELECT * FROM current_fight ORDER BY initiative DESC";
             $result = mysqli_query($conn, $sql);
             while($row = mysqli_fetch_assoc($result)) {
@@ -30,6 +47,29 @@
                 }
                 echo "</div>";
             }
+        }
+        if($action == 'getDate') {
+            $sql = "SELECT * FROM `time` WHERE time_id = 1";
+            $result = mysqli_fetch_assoc(mysqli_query($conn, $sql));
+            $date = $result['date'];
+            $hour = $result['hour'];
+            $minute = $result['minute'];
+            echo ($hour < 10 ? '0'.$hour : $hour).":".($minute < 10 ? '0'.$minute : $minute)." | ".$date." <img src='media/calendarIcon.svg'>";
+        }
+        if($action == 'shortRest') {
+            shortRest($conn);
+        }
+        if($action == 'deleteAllEnemies') {
+            deleteAllEnemies($conn);
+        }
+        if($action == 'longRest') {
+            longRest($conn);
+        }
+        if($action == 'setCurrent') {
+            setCurrent($conn, $characterId);
+        }
+        if($action == "passTime") {
+            passTime($conn, $_POST['hoursToPass']);
         }
     }
     mysqli_close($conn);

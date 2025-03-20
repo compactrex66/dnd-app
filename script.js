@@ -1,23 +1,18 @@
-let arrOfCharacterElements = Array.from(document.querySelectorAll(".character"))
-let deleteEnemiesBtn = document.getElementById("deleteEnemiesBtn")
-let arrOfDeleteBtns = document.querySelectorAll(".deleteBtn")
-let arrOfInitiativeInput = document.querySelectorAll("#modifiedInitiativeInput")
-let arrOfACInput = document.querySelectorAll("#modifiedACInput")
-let arrOfAddHealthBtns = document.querySelectorAll(".addHealthBtn")
-let arrOfSubHealthBtns = document.querySelectorAll(".substractHealthBtn")
-
 const actionForm = document.getElementById("actionForm");
-const moreInfoPanel = document.getElementById("moreInfoPanel")
+const moreInfoPanel = document.getElementById("moreInfoPanel");
 const hoursToPassInput = document.getElementById("hoursToPass");
+const timeElement = document.getElementById("time");
+const listOfCharacters = document.getElementById("listOfCharacters");
+const hoursInput = document.getElementById("hoursInput");
 
+let arrOfCharacterElements = Array.from(document.querySelectorAll(".character"));
+let deleteEnemiesBtn = document.getElementById("deleteEnemiesBtn");
+let arrOfDeleteBtns = document.querySelectorAll(".deleteBtn");
+let arrOfInitiativeInput = document.querySelectorAll("#modifiedInitiativeInput");
+let arrOfACInput = document.querySelectorAll("#modifiedACInput");
+let arrOfAddHealthBtns = document.querySelectorAll(".addHealthBtn");
+let arrOfSubHealthBtns = document.querySelectorAll(".substractHealthBtn");
 let currentCharacter;
-let listOfCharacters = document.getElementById("listOfCharacters");
-let actionInput = document.getElementById("actionInput");
-let characterIdInput = document.getElementById("characterIdInput");
-let healthInput = document.getElementById("healthInput");
-let initiativeInput = document.getElementById("initiativeInput");
-let ACInput = document.getElementById("ACInput");
-let hoursInput = document.getElementById("hoursinput");
 
 function updateCharactersList() {
     let request = new XMLHttpRequest();
@@ -31,6 +26,14 @@ function updateCharactersList() {
     formData.append("action", "getCharacters");
     request.send(formData);
 }
+function updateTime() {
+    let request = new XMLHttpRequest();
+    request.onload = function() { timeElement.innerHTML = this.responseText };
+    request.open("post", "indexScript.php");
+    let data = new FormData();
+    data.append("action", "getDate");
+    request.send(data);
+}
 function getCurrentCharacter() {
     const arrOfCharacterElements = Array.from(document.querySelectorAll(".character"))
     for(const character of arrOfCharacterElements) {
@@ -39,8 +42,10 @@ function getCurrentCharacter() {
         }
     }
     let request = new XMLHttpRequest();
-    request.open('GET', "index.php?action=setCurrent", true);
-    request.send();
+    request.open('post', "indexScript.php", true);
+    let data = new FormData();
+    data.append("action", "setCurrent");
+    request.send(data);
     return null;
 }
 function setCurrentCharacter(character) {
@@ -50,8 +55,11 @@ function setCurrentCharacter(character) {
     character.style.border = "1px solid white";
     moreInfoPanel.innerHTML = character.querySelector(".moreInfo")?.innerHTML ?? "Player character";
     let request = new XMLHttpRequest();
-    request.open("GET", `index.php?action=setCurrent&characterId=${character.getAttribute("data-characterid")}`, true);
-    request.send();
+    request.open("post", `indexScript.php`, true);
+    let data = new FormData();
+    data.append("action", "setCurrent");
+    data.append("characterId", character.getAttribute("data-characterid"));
+    request.send(data);
     currentCharacter = character;
 }
 function initCurrentCharacter() {
@@ -67,20 +75,20 @@ function initListeners() {
     arrOfAddHealthBtns = document.querySelectorAll(".addHealthBtn")
     arrOfSubHealthBtns = document.querySelectorAll(".substractHealthBtn")
 
-
-
     //Delete character from combat
     for(let i = 0; i < arrOfDeleteBtns.length; i++) {
         arrOfDeleteBtns[i].addEventListener("click", () => {
             let request = new XMLHttpRequest();
-            request.onload = () => {
-                updateCharactersList();
-            }
-            request.open("GET", `index.php?action=delete&characterId=${arrOfDeleteBtns[i].parentNode.getAttribute("data-characterId")}`, true);
-            request.send();
+            request.onload = function() { updateCharactersList(); }
+            request.open("post", `indexScript.php`, true);
+            let data = new FormData();
+            data.append("action", "delete");
+            data.append("characterId", arrOfDeleteBtns[i].parentNode.getAttribute("data-characterId"));
+            request.send(data);
             if(arrOfDeleteBtns[i].parentNode.getAttribute("data-current") == 1) {
                 setCurrentCharacter(arrOfCharacterElements[arrOfCharacterElements.indexOf(arrOfDeleteBtns[i].parentNode) + 1] ?? arrOfCharacterElements[0]);
             }
+            arrOfDeleteBtns[i].parentNode.remove();
         });
     }
 
@@ -89,8 +97,12 @@ function initListeners() {
         arrOfInitiativeInput[i].addEventListener("change", () => {
             let request = new XMLHttpRequest();
             request.onload = function() { updateCharactersList(); };
-            request.open("GET", `index.php?action=changeInitiative&initiative=${arrOfInitiativeInput[i].value}&characterId=${arrOfInitiativeInput[i].parentNode.parentNode.getAttribute("data-characterId")}`, true);
-            request.send();
+            request.open("post", `indexScript.php`, true);
+            let data = new FormData();
+            data.append("action", "changeInitiative");
+            data.append("initiative", arrOfInitiativeInput[i].value);
+            data.append("characterId", arrOfInitiativeInput[i].parentNode.parentNode.getAttribute("data-characterId"));
+            request.send(data);
         });
     }
 
@@ -99,8 +111,12 @@ function initListeners() {
         arrOfACInput[i].addEventListener("change", () => {
             let request = new XMLHttpRequest();
             request.onload = function() { updateCharactersList(); };
-            request.open("GET", `index.php?action=changeAC&AC=${arrOfACInput[i].value}&characterId=${arrOfACInput[i].parentNode.parentNode.getAttribute("data-characterId")}`);
-            request.send();
+            request.open("post", `indexScript.php`);
+            let data = new FormData();
+            data.append("action", "changeAC")
+            data.append("AC", arrOfACInput[i].value)
+            data.append("characterId", arrOfACInput[i].parentNode.parentNode.getAttribute("data-characterId"))
+            request.send(data);
         });
     }
 
@@ -109,8 +125,12 @@ function initListeners() {
         arrOfAddHealthBtns[i].addEventListener("click", () => {
             let request = new XMLHttpRequest();
             request.onload = function() { updateCharactersList() };
-            request.open("GET", `index.php?action=adjustHealth&characterId=${arrOfAddHealthBtns[i].parentNode.parentNode.getAttribute("data-characterId")}&healthNumber=${arrOfAddHealthBtns[i].previousElementSibling.value}`);
-            request.send();
+            request.open("post", `indexScript.php`, true);
+            let data = new FormData();
+            data.append("action", "adjustHealth");
+            data.append("characterId", arrOfAddHealthBtns[i].parentNode.parentNode.getAttribute("data-characterId"));
+            data.append("healthNumber", arrOfAddHealthBtns[i].previousSibling.value);
+            request.send(data);
         });
     }
 
@@ -118,9 +138,13 @@ function initListeners() {
     for(let i = 0; i < arrOfSubHealthBtns.length; i++) {
         arrOfSubHealthBtns[i].addEventListener("click", () => {
             let request = new XMLHttpRequest();
-            request.onload = function() { updateCharactersList(); console.log(this.responseText); };
-            request.open("GET", `index.php?action=adjustHealth&characterId=${arrOfSubHealthBtns[i].parentNode.parentNode.getAttribute("data-characterId")}&healthNumber=${arrOfSubHealthBtns[i].nextElementSibling.value}`);
-            request.send();
+            request.onload = function() { updateCharactersList(); };
+            request.open("post", `indexScript.php`, true);
+            let data = new FormData();
+            data.append("action", "adjustHealth");
+            data.append("characterId", arrOfSubHealthBtns[i].parentNode.parentNode.getAttribute("data-characterId"));
+            data.append("healthNumber", arrOfSubHealthBtns[i].nextSibling.value * -1);            
+            request.send(data);
         });
     }
 
@@ -137,23 +161,56 @@ function initListeners() {
 
     //Delete all enemies
     deleteEnemiesBtn.addEventListener("click", () => {
-        actionInput.value = "deleteAllEnemies";
-        if(confirm('Are you sure you want delete all enemies ?'))
-            actionForm.submit();
+        if(confirm('Are you sure you want delete all enemies ?')) {
+            let request = new XMLHttpRequest();
+            request.onload = function() { updateCharactersList(); setCurrentCharacter(); };
+            request.open("post", "indexScript.php");
+            let data = new FormData();
+            data.append("action", "deleteAllEnemies");
+            request.send(data);
+        }
     });
 
     //Rewind time
     document.getElementById("rewindTimeBtn").addEventListener("click", () => {
-        hoursInput.value = hoursToPassInput.value*-1;
-        actionInput.value = "passTime";
-        actionForm.submit();
+        let request = new XMLHttpRequest();
+        request.onload = function() { updateTime(); console.log(this.responseText) };
+        request.open("post", "indexScript.php");
+        let data = new FormData();
+        data.append("action", "passTime");
+        data.append("hoursToPass", hoursInput.value*-1);
+        request.send(data);
     });
 
     //Pass time
     document.getElementById("forwardTimeBtn").addEventListener("click", () => {
-        hoursInput.value = hoursToPassInput.value;
-        actionInput.value = "passTime";
-        actionForm.submit();
+        let request = new XMLHttpRequest();
+        request.onload = function() { updateTime(); console.log(this.responseText) };
+        request.open("post", "indexScript.php");
+        let data = new FormData();
+        data.append("action", "passTime");
+        data.append("hoursToPass", hoursInput.value);
+        request.send(data);
+    });
+
+    //Pass time by 2 hours
+    document.getElementById("shortRestBtn").addEventListener("click", () => {
+        let request = new XMLHttpRequest();
+        request.onload = function() { updateTime(); console.log(this.responseText) };
+        request.open("post", "indexScript.php");
+        let data = new FormData();
+        data.append("action", "shortRest");
+        request.send(data);
+    });
+
+    //Pass time by 8 hours
+    document.getElementById("longRestBtn").addEventListener("click", () => {
+        let request = new XMLHttpRequest();
+        request.onload = function() { updateTime(); };
+        request.open("post", "indexScript.php");
+        let data = new FormData();
+        data.append("action", "longRest");
+        request.send(data);
     });
 
     //Stop propagation
@@ -162,18 +219,6 @@ function initListeners() {
             e.stopPropagation();
         });
     })
-
-    //Pass time by 2 hours
-    document.getElementById("shortRestBtn").addEventListener("click", () => {
-        actionInput.value = 'shortRest';
-        actionForm.submit();
-    });
-
-    //Pass time by 8 hours
-    document.getElementById("longRestBtn").addEventListener("click", () => {
-        actionInput.value = 'longRest';
-        actionForm.submit();
-    });
 }
 initCurrentCharacter();
 initListeners();

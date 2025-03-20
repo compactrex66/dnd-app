@@ -2,43 +2,6 @@
     include "parsedown/Parsedown.php";
     include "parsedown/ParsedownExtra.php";
     include "dbConnection.php";
-    include "functions.php";
-
-    if(isset($_GET['action'])) {
-        $action = $_GET['action'];
-        echo "akcja";
-        if(isset($_GET['characterId'])) {
-            $characterId = $_GET['characterId'];
-            if($action == 'adjustHealth') {
-                changeHealth($conn, $_GET['healthNumber'], $characterId);
-            }
-            if($action == 'changeInitiative') {
-                setInitiative($conn, $_GET['initiative'], $characterId);
-            }
-            if($action == 'delete') {
-                deleteCharacter($conn, $characterId);
-            }
-            if($action == 'changeAC') {
-                setAC($conn, $_GET['AC'], $characterId);
-            } 
-        }
-        if($action == 'shortRest') {
-            shortRest($conn);
-        }
-        if($action == 'deleteAllEnemies') {
-            deleteAllEnemies($conn);
-        }
-        if($action == 'longRest') {
-            longRest($conn);
-        }
-        if($action == 'setCurrent') {
-            setCurrent($conn, $characterId);
-        }
-        if($action == "passTime") {
-            passTime($conn, $_GET['hoursToPass']);
-        }
-        header("Location: index.php");
-    }
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -53,14 +16,6 @@
     <title>DnD App | Main page</title>
 </head>
 <body>
-    <form action="" method="get" id="actionForm" style="display: none;">
-        <input type="text" name="action" id="actionInput">
-        <input type="number" name="characterId" id="characterIdInput">
-        <input type="number" name="healthNumber" id="healthInput">
-        <input type="number" name="initiative" id="initiativeInput">
-        <input type="number" name="AC" id="ACInput">
-        <input type="number" name="hoursToPass" id="hoursinput">
-    </form>
     <header>
         <form action="" method="get" class="row-form">
             <select id="enemySelect" name="enemyType">
@@ -84,7 +39,7 @@
             <button type="button" id="shortRestBtn">Short Rest</button>
             <button type="button" id="longRestBtn">Long Rest</button>
             <button class="redBtn" type="button" id="rewindTimeBtn"><img src="media/removeIcon.svg"></button>
-            <input type="number" placeholder="Hours" style="border: 0; width: 55px;" id="hoursToPass">
+            <input type="number" placeholder="Hours" style="border: 0; width: 55px;" id="hoursInput">
             <button class="greenBtn" type="button" id="forwardTimeBtn"><img src="media/addIcon.svg"></button>
             <?php
                $sql = "SELECT * FROM `time` WHERE time_id = 1";
@@ -92,7 +47,7 @@
                $date = $result['date'];
                $hour = $result['hour'];
                $minute = $result['minute'];
-               echo "<span class='big-text'>".($hour < 10 ? '0'.$hour : $hour).":".($minute < 10 ? '0'.$minute : $minute)." | ".$date." <img src='media/calendarIcon.svg'></span>";
+               echo "<span class='big-text' id='time'>".($hour < 10 ? '0'.$hour : $hour).":".($minute < 10 ? '0'.$minute : $minute)." | ".$date." <img src='media/calendarIcon.svg'></span>";
             ?>
         </form>
     </header>

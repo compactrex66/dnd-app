@@ -159,7 +159,7 @@ addEnemyBtn.addEventListener("click", () => {
     data.append("enemyType", enemySelect.value);
     data.append("enemyQuantity", enemyQuantity.value);
     let request = new XMLHttpRequest();
-    request.onload = updateCharactersList();
+    request.onload = function() { updateCharactersList(); };
     request.open("post", "indexScript.php", true);
     request.send(data);
 });

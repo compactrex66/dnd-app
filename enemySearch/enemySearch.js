@@ -2,17 +2,10 @@ const monsterInput = document.getElementById("monsterInput");
 const searchButton = document.getElementById("searchButton");
 const monsterInfo = document.getElementById("monsterInfo");
 const matchList = document.getElementById("matchList");
-const parseMarkdownForm = document.getElementById("parseMarkdown");
 const addMonsterBtn = document.getElementById("addEnemyBtn");
-const actionInput = document.getElementById("actionInput");
 const monsterNameElement = document.getElementById("monsterName");
-const minHealth = document.getElementById("minHealth");
-const maxHealth = document.getElementById("maxHealth");
-const armorClass = document.getElementById("armorClass");
-const initiativeBonus = document.getElementById("initiativeBonus");
 
 let markdownResult = document.getElementById("markdownResult");
-let serverMonsterName = document.getElementById("monsterName");
 let enemyInfo, monsterName;
 
 searchButton.addEventListener("click", () => {

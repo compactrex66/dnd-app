@@ -24,10 +24,10 @@
         <textarea name="info" id="info"></textarea>
     </form>
     <header>
-        <a href="../index.php" style="justify-self: left;"><button>Fight</button></a>
         <span>Monster Search</span>
         <input type="text" id="monsterInput" placeholder="Enter a monster name" />
         <button id="searchButton">Search</button>
+        <a href="../index.php" style="justify-self: left;"><button>Fight</button></a>
     </header>
     <main>
         <div id="matchList"></div>

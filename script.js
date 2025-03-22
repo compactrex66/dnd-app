@@ -62,7 +62,6 @@ function setCurrentCharacter(character) {
 
 listOfCharacters.addEventListener("click", (e) => {
     const target = e.target;
-    console.log(target);
 
     // Delete button
     if (target.classList.contains("deleteBtn")) {

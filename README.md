@@ -1,4 +1,4 @@
-A dnd campaign managment system.
+A dnd campaign managment system.\n
 Current features include:
 - An character initiative tracker
 - Add character by markdown

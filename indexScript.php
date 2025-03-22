@@ -11,13 +11,13 @@
             if($action == 'adjustHealth') {
                 changeHealth($conn, $_POST['healthNumber'], $characterId);
             }
-            if($action == 'changeInitiative') {
+            elseif($action == 'changeInitiative') {
                 setInitiative($conn, $_POST['initiative'], $characterId);
             }
-            if($action == 'delete') {
+            elseif($action == 'delete') {
                 deleteCharacter($conn, $characterId);
             }
-            if($action == 'changeAC') {
+            elseif($action == 'changeAC') {
                 setAC($conn, $_POST['AC'], $characterId);
             } 
         }
@@ -43,7 +43,9 @@
                 echo "<span style='display: flex; gap: 10px; align-items: center;'><img src='media/acIcon.svg'><input class='no-spinner' type='number' value=".$row['AC']." id='modifiedACInput'></input></span>";
                 echo '<span class="inline-row"><button class="redBtn substractHealthBtn"><img src="media/removeIcon.svg"></button><input class="no-spinner" type="number" id="healthInput"></input><button class="greenBtn addHealthBtn"><img src="media/addIcon.svg"></button></span>';
                 if($row['is_player'] != 1) {
-                    echo '<span class="deleteBtn"><img src="media/closeIcon.svg"></span>';
+                    echo '<button class="deleteBtn"><img src="media/closeIcon.svg"></button>';
+                } else {
+                    echo '<button class="inactiveDeleteBtn"><img src="media/closeIcon.svg"></button>';
                 }
                 echo "</div>";
             }
@@ -56,21 +58,49 @@
             $minute = $result['minute'];
             echo ($hour < 10 ? '0'.$hour : $hour).":".($minute < 10 ? '0'.$minute : $minute)." | ".$date." <img src='media/calendarIcon.svg'>";
         }
-        if($action == 'shortRest') {
+        elseif($action == 'shortRest') {
             shortRest($conn);
         }
-        if($action == 'deleteAllEnemies') {
+        elseif($action == 'deleteAllEnemies') {
             deleteAllEnemies($conn);
         }
-        if($action == 'longRest') {
+        elseif($action == 'longRest') {
             longRest($conn);
         }
-        if($action == 'setCurrent') {
+        elseif($action == 'setCurrent') {
             setCurrent($conn, $characterId);
         }
-        if($action == "passTime") {
+        elseif($action == "passTime") {
             passTime($conn, $_POST['hoursToPass']);
             echo "passtime";
+        }
+        elseif($action == "addEnemy") {
+            $enemyType = $_POST['enemyType'];
+            $enemyQuantity = $_POST['enemyQuantity'] != null ? $_POST['enemyQuantity'] : 1;
+            $sql = "SELECT * FROM enemies WHERE name = '$enemyType'";
+            $result = mysqli_fetch_assoc(mysqli_query($conn, $sql));
+            $enemyNumber = mysqli_fetch_array(mysqli_query($conn, "SELECT count(*) FROM current_fight"))[0] - 2;
+            $min_health = $result['min_health'];
+            $max_health = $result['max_health'];
+            $initiativeBonus = $result['initiative_bonus'];
+            $isSurprised = isset($_POST['isSurprised']);
+            $AC = $result['AC'];
+            $enemyId = $result['id'];
+            $counter = 0;
+
+            for($i = 0; $i < $enemyQuantity; $i++) {
+                $health = rand($min_health, $max_health);
+                $initiative = rand(1, 20) + $initiativeBonus;
+                if($isSurprised) {
+                    $secondInititative = rand(1, 20) + $initiativeBonus;
+                    if($secondInititative < $initiative) {
+                        $initiative = $secondInititative;
+                    }
+                }
+                $sql = "INSERT INTO current_fight(name, health, max_health, initiative, AC, is_player, enemy_id) Values('$enemyType".$enemyNumber+$counter."', $health, $health, $initiative, $AC, 0, $enemyId)";
+                $result = mysqli_query($conn, $sql);
+                $counter++;
+            }
         }
     }
     mysqli_close($conn);

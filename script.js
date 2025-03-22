@@ -4,27 +4,25 @@ const hoursToPassInput = document.getElementById("hoursToPass");
 const timeElement = document.getElementById("time");
 const listOfCharacters = document.getElementById("listOfCharacters");
 const hoursInput = document.getElementById("hoursInput");
+const deleteEnemiesBtn = document.getElementById("deleteEnemiesBtn");
+const addEnemyBtn = document.getElementById("addEnemyBtn");
+const enemySelect = document.getElementById("enemySelect");
+const enemyQuantity = document.getElementById("enemyQuantity");
 
 let arrOfCharacterElements = Array.from(document.querySelectorAll(".character"));
-let deleteEnemiesBtn = document.getElementById("deleteEnemiesBtn");
-let arrOfDeleteBtns = document.querySelectorAll(".deleteBtn");
-let arrOfInitiativeInput = document.querySelectorAll("#modifiedInitiativeInput");
-let arrOfACInput = document.querySelectorAll("#modifiedACInput");
-let arrOfAddHealthBtns = document.querySelectorAll(".addHealthBtn");
-let arrOfSubHealthBtns = document.querySelectorAll(".substractHealthBtn");
 let currentCharacter;
 
 function updateCharactersList() {
     let request = new XMLHttpRequest();
     request.onload = () => {        
         listOfCharacters.innerHTML = request.responseText;
-        initCurrentCharacter();
-        initListeners();
+        arrOfCharacterElements = Array.from(document.querySelectorAll(".character"));
+        setCurrentCharacter();
     };
     request.open("post", "indexScript.php", true);
     let formData = new FormData();
     formData.append("action", "getCharacters");
-    request.send(formData);
+    request.send(formData);    
 }
 function updateTime() {
     let request = new XMLHttpRequest();
@@ -41,19 +39,18 @@ function getCurrentCharacter() {
             return character;
         }
     }
-    let request = new XMLHttpRequest();
-    request.open('post', "indexScript.php", true);
-    let data = new FormData();
-    data.append("action", "setCurrent");
-    request.send(data);
     return null;
 }
 function setCurrentCharacter(character) {
+    currentCharacter = getCurrentCharacter() ?? arrOfCharacterElements[0];
     currentCharacter.setAttribute("data-current", "0");
+    if(character == undefined) {
+        character = currentCharacter;
+    }
     character.setAttribute("data-current", "1");
     currentCharacter.style.border = "none";
     character.style.border = "1px solid white";
-    moreInfoPanel.innerHTML = character.querySelector(".moreInfo")?.innerHTML ?? "Player character";
+    moreInfoPanel.innerHTML = character.querySelector(".moreInfo")?.innerHTML ?? `<div class="container"><h1>Player Character</h1></div>`;
     let request = new XMLHttpRequest();
     request.open("post", `indexScript.php`, true);
     let data = new FormData();
@@ -62,167 +59,152 @@ function setCurrentCharacter(character) {
     request.send(data);
     currentCharacter = character;
 }
-function initCurrentCharacter() {
-    currentCharacter = getCurrentCharacter() ?? arrOfCharacterElements[0];
-    setCurrentCharacter(currentCharacter);
-}
-function initListeners() {
-    arrOfCharacterElements = Array.from(document.querySelectorAll(".character"))
-    deleteEnemiesBtn = document.getElementById("deleteEnemiesBtn")
-    arrOfDeleteBtns = document.querySelectorAll(".deleteBtn")
-    arrOfInitiativeInput = document.querySelectorAll("#modifiedInitiativeInput")
-    arrOfACInput = document.querySelectorAll("#modifiedACInput")
-    arrOfAddHealthBtns = document.querySelectorAll(".addHealthBtn")
-    arrOfSubHealthBtns = document.querySelectorAll(".substractHealthBtn")
 
-    //Delete character from combat
-    for(let i = 0; i < arrOfDeleteBtns.length; i++) {
-        arrOfDeleteBtns[i].addEventListener("click", () => {
-            let request = new XMLHttpRequest();
-            request.onload = function() { updateCharactersList(); }
-            request.open("post", `indexScript.php`, true);
-            let data = new FormData();
-            data.append("action", "delete");
-            data.append("characterId", arrOfDeleteBtns[i].parentNode.getAttribute("data-characterId"));
-            request.send(data);
-            if(arrOfDeleteBtns[i].parentNode.getAttribute("data-current") == 1) {
-                setCurrentCharacter(arrOfCharacterElements[arrOfCharacterElements.indexOf(arrOfDeleteBtns[i].parentNode) + 1] ?? arrOfCharacterElements[0]);
-            }
-            arrOfDeleteBtns[i].parentNode.remove();
-        });
-    }
+listOfCharacters.addEventListener("click", (e) => {
+    const target = e.target;
+    console.log(target);
 
-    //Modify initiative 
-    for(let i = 0; i < arrOfInitiativeInput.length; i++) {
-        arrOfInitiativeInput[i].addEventListener("change", () => {
-            let request = new XMLHttpRequest();
-            request.onload = function() { updateCharactersList(); };
-            request.open("post", `indexScript.php`, true);
-            let data = new FormData();
-            data.append("action", "changeInitiative");
-            data.append("initiative", arrOfInitiativeInput[i].value);
-            data.append("characterId", arrOfInitiativeInput[i].parentNode.parentNode.getAttribute("data-characterId"));
-            request.send(data);
-        });
-    }
-
-    //Change AC
-    for(let i = 0; i < arrOfACInput.length; i++) {
-        arrOfACInput[i].addEventListener("change", () => {
-            let request = new XMLHttpRequest();
-            request.onload = function() { updateCharactersList(); };
-            request.open("post", `indexScript.php`);
-            let data = new FormData();
-            data.append("action", "changeAC")
-            data.append("AC", arrOfACInput[i].value)
-            data.append("characterId", arrOfACInput[i].parentNode.parentNode.getAttribute("data-characterId"))
-            request.send(data);
-        });
-    }
-
-    //Add Health
-    for(let i = 0; i < arrOfAddHealthBtns.length; i++) {
-        arrOfAddHealthBtns[i].addEventListener("click", () => {
-            let request = new XMLHttpRequest();
-            request.onload = function() { updateCharactersList() };
-            request.open("post", `indexScript.php`, true);
-            let data = new FormData();
-            data.append("action", "adjustHealth");
-            data.append("characterId", arrOfAddHealthBtns[i].parentNode.parentNode.getAttribute("data-characterId"));
-            data.append("healthNumber", arrOfAddHealthBtns[i].previousSibling.value);
-            request.send(data);
-        });
-    }
-
-    //Substract health
-    for(let i = 0; i < arrOfSubHealthBtns.length; i++) {
-        arrOfSubHealthBtns[i].addEventListener("click", () => {
-            let request = new XMLHttpRequest();
-            request.onload = function() { updateCharactersList(); };
-            request.open("post", `indexScript.php`, true);
-            let data = new FormData();
-            data.append("action", "adjustHealth");
-            data.append("characterId", arrOfSubHealthBtns[i].parentNode.parentNode.getAttribute("data-characterId"));
-            data.append("healthNumber", arrOfSubHealthBtns[i].nextSibling.value * -1);            
-            request.send(data);
-        });
-    }
-
-    //Change current character to double clicked one | show more info from clicked character
-    for(let i = 0; i < arrOfCharacterElements.length; i++) {
-        arrOfCharacterElements[i].addEventListener("dblclick", () => {
-            setCurrentCharacter(arrOfCharacterElements[i]);
-        })
-        arrOfCharacterElements[i].addEventListener("click", () => {
-            let moreInfo = arrOfCharacterElements[i].querySelector(".moreInfo");
-            moreInfoPanel.innerHTML = moreInfo == null ? "Player Character" : moreInfo.innerHTML;
-        });
-    }
-
-    //Delete all enemies
-    deleteEnemiesBtn.addEventListener("click", () => {
-        if(confirm('Are you sure you want delete all enemies ?')) {
-            let request = new XMLHttpRequest();
-            request.onload = function() { updateCharactersList(); setCurrentCharacter(); };
-            request.open("post", "indexScript.php");
-            let data = new FormData();
-            data.append("action", "deleteAllEnemies");
-            request.send(data);
-        }
-    });
-
-    //Rewind time
-    document.getElementById("rewindTimeBtn").addEventListener("click", () => {
+    // Delete button
+    if (target.classList.contains("deleteBtn")) {
         let request = new XMLHttpRequest();
-        request.onload = function() { updateTime(); console.log(this.responseText) };
+        request.onload = function() { updateCharactersList(); };
+        request.open("post", "indexScript.php", true);
+        let data = new FormData();
+        data.append("action", "delete");
+        data.append("characterId", target.parentNode.getAttribute("data-characterId"));
+        request.send(data);
+    }
+
+    // Add health button
+    if (target.classList.contains("addHealthBtn")) {
+        let request = new XMLHttpRequest();
+        request.onload = function() { updateCharactersList(); };
+        request.open("post", "indexScript.php", true);
+        let data = new FormData();
+        data.append("action", "adjustHealth");
+        data.append("characterId", target.parentNode.parentNode.getAttribute("data-characterId"));
+        data.append("healthNumber", target.previousSibling.value);
+        request.send(data);
+    }
+
+    //Substract health button
+    if(target.classList.contains("substractHealthBtn")) {
+        let request = new XMLHttpRequest();
+        request.onload = function() { updateCharactersList(); };
+        request.open("post", `indexScript.php`, true);
+        let data = new FormData();
+        data.append("action", "adjustHealth");
+        data.append("characterId", target.parentNode.parentNode.getAttribute("data-characterId"));
+        data.append("healthNumber", target.nextSibling.value * -1);            
+        request.send(data);
+    }
+
+    //change more info in the panel
+    if(target.classList.contains("character")) {
+        let moreInfo = target.querySelector(".moreInfo");
+        moreInfoPanel.innerHTML = moreInfo == null ? "Player Character" : moreInfo.innerHTML;
+    }
+});
+
+// Handle input changes
+listOfCharacters.addEventListener("change", (e) => {
+    const target = e.target;
+
+    //initaitive
+    if (target.id === "modifiedInitiativeInput") {
+        let request = new XMLHttpRequest();
+        request.onload = function() { updateCharactersList(); };
+        request.open("post", "indexScript.php", true);
+        let data = new FormData();
+        data.append("action", "changeInitiative");
+        data.append("initiative", target.value);
+        data.append("characterId", target.parentNode.parentNode.getAttribute("data-characterId"));
+        request.send(data);
+    }
+
+    //armor class
+    if(target.id == "modifiedACInput") {
+        let request = new XMLHttpRequest();
+        request.onload = function() { updateCharactersList(); };
+        request.open("post", `indexScript.php`);
+        let data = new FormData();
+        data.append("action", "changeAC")
+        data.append("AC", target.value)
+        data.append("characterId", target.parentNode.parentNode.getAttribute("data-characterId"))
+        request.send(data);
+    }
+});
+
+listOfCharacters.addEventListener("dblclick", (e) => {
+    if(e.target.classList.contains("character")) {
+        setCurrentCharacter(e.target);
+    }
+})
+
+deleteEnemiesBtn.addEventListener("click", () => {
+    if(confirm('Are you sure you want delete all enemies ?')) {
+        let request = new XMLHttpRequest();
+        request.onload = function() { updateCharactersList(); };
         request.open("post", "indexScript.php");
         let data = new FormData();
-        data.append("action", "passTime");
-        data.append("hoursToPass", hoursInput.value*-1);
+        data.append("action", "deleteAllEnemies");
         request.send(data);
-    });
+    }
+});
 
-    //Pass time
-    document.getElementById("forwardTimeBtn").addEventListener("click", () => {
-        let request = new XMLHttpRequest();
-        request.onload = function() { updateTime(); console.log(this.responseText) };
-        request.open("post", "indexScript.php");
-        let data = new FormData();
-        data.append("action", "passTime");
-        data.append("hoursToPass", hoursInput.value);
-        request.send(data);
-    });
+//Add enemy
+addEnemyBtn.addEventListener("click", () => {
+    let data = new FormData();
+    data.append("action", "addEnemy");
+    data.append("enemyType", enemySelect.value);
+    data.append("enemyQuantity", enemyQuantity.value);
+    let request = new XMLHttpRequest();
+    request.onload = updateCharactersList();
+    request.open("post", "indexScript.php", true);
+    request.send(data);
+});
 
-    //Pass time by 2 hours
-    document.getElementById("shortRestBtn").addEventListener("click", () => {
-        let request = new XMLHttpRequest();
-        request.onload = function() { updateTime(); console.log(this.responseText) };
-        request.open("post", "indexScript.php");
-        let data = new FormData();
-        data.append("action", "shortRest");
-        request.send(data);
-    });
+//Rewind time
+document.getElementById("rewindTimeBtn").addEventListener("click", () => {
+    let request = new XMLHttpRequest();
+    request.onload = function() { updateTime(); };
+    request.open("post", "indexScript.php");
+    let data = new FormData();
+    data.append("action", "passTime");
+    data.append("hoursToPass", hoursInput.value*-1);
+    request.send(data);
+});
 
-    //Pass time by 8 hours
-    document.getElementById("longRestBtn").addEventListener("click", () => {
-        let request = new XMLHttpRequest();
-        request.onload = function() { updateTime(); };
-        request.open("post", "indexScript.php");
-        let data = new FormData();
-        data.append("action", "longRest");
-        request.send(data);
-    });
+//Pass time
+document.getElementById("forwardTimeBtn").addEventListener("click", () => {
+    let request = new XMLHttpRequest();
+    request.onload = function() { updateTime(); };
+    request.open("post", "indexScript.php");
+    let data = new FormData();
+    data.append("action", "passTime");
+    data.append("hoursToPass", hoursInput.value);
+    request.send(data);
+});
 
-    //Stop propagation
-    document.querySelectorAll(".character > *").forEach(function(child) {
-        child.addEventListener("click", (e) => {
-            e.stopPropagation();
-        });
-    })
-}
-initCurrentCharacter();
-initListeners();
-updateCharactersList();
+//Pass time by 2 hours
+document.getElementById("shortRestBtn").addEventListener("click", () => {
+    let request = new XMLHttpRequest();
+    request.onload = function() { updateTime(); };
+    request.open("post", "indexScript.php");
+    let data = new FormData();
+    data.append("action", "shortRest");
+    request.send(data);
+});
+
+//Pass time by 8 hours
+document.getElementById("longRestBtn").addEventListener("click", () => {
+    let request = new XMLHttpRequest();
+    request.onload = function() { updateTime(); };
+    request.open("post", "indexScript.php");
+    let data = new FormData();
+    data.append("action", "longRest");
+    request.send(data);
+});
 
 //Next turn on space click
 window.addEventListener("keydown", function(e) {
@@ -236,3 +218,5 @@ window.addEventListener("keydown", function(e) {
         setCurrentCharacter(nextCharacter)
     }
 });
+
+updateCharactersList();

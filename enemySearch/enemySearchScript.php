@@ -1,4 +1,6 @@
 <?php
+    include "../parsedown/Parsedown.php";
+    include "../parsedown/ParsedownExtra.php";
     include "../dbConnection.php";
 
     function checkIfMonsterExists(mysqli $conn, string $monsterName) {
@@ -19,11 +21,17 @@
             $armorClass = $_POST['armorClass'];
             $initiativeBonus = $_POST['initiativeBonus'];
             $moreInfo = $_POST['info'];
-
             mysqli_query($conn, 'INSERT INTO enemies(name, min_health, max_health, AC, initiative_bonus, more_info) values("'.$name.'", '.$minHealth.', '.$maxHealth.', '.$armorClass.', '.$initiativeBonus.', "'.$moreInfo.'")');
         } elseif($action == 'checkIfExists') {
             $monsterName = $_POST['monsterName'];
             echo checkIfMonsterExists($conn, $monsterName);
+        } elseif($action == 'parseMarkdown') {
+            $markdown = $_POST['markdown'];
+            $parsedown = new ParsedownExtra();
+            $markdown = str_replace("___", "", $markdown);
+            $markdown = $parsedown->text($markdown);
+            $markdown = str_replace("<hr>", "", $markdown);
+            echo $markdown;
         }
     }
     mysqli_close($conn);

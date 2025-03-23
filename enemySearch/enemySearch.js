@@ -66,6 +66,7 @@ function searchMonster(monsterName) {
                     monsterElement.innerHTML = element.name + `<pre class="moreMonsterInfo">${markdown}</pre>`
                     monsterElement.addEventListener("click", () => {
                         let formData = new FormData();
+                        formData.append("action", "parseMarkdown")
                         formData.append("markdown", markdown);
                         let request = new XMLHttpRequest();
                         markdownResult.innerHTML = markdown;
@@ -80,7 +81,7 @@ function searchMonster(monsterName) {
                         request.onload = () => {
                             monsterInfo.innerHTML = request.responseText;
                         }
-                        request.open("post", "parseMarkdown.php", true);
+                        request.open("post", "enemySearchScript.php", true);
                         request.send(formData);
                     })
                     matchList.appendChild(monsterElement);

@@ -41,6 +41,15 @@ function getCurrentCharacter() {
     }
     return null;
 }
+function getNextCharacter() {
+    let nextCharacter;
+    if(arrOfCharacterElements.indexOf(currentCharacter) + 1 >= arrOfCharacterElements.length) {
+        nextCharacter = arrOfCharacterElements[0];
+    } else {
+        nextCharacter = arrOfCharacterElements[arrOfCharacterElements.indexOf(currentCharacter) + 1];
+    }
+    return nextCharacter;
+}
 function setCurrentCharacter(character) {
     currentCharacter = getCurrentCharacter() ?? arrOfCharacterElements[0];
     currentCharacter.setAttribute("data-current", "0");
@@ -66,11 +75,15 @@ listOfCharacters.addEventListener("click", (e) => {
     // Delete button
     if (target.classList.contains("deleteBtn")) {
         let request = new XMLHttpRequest();
-        request.onload = function() { updateCharactersList(); };
         request.open("post", "indexScript.php", true);
         let data = new FormData();
         data.append("action", "delete");
         data.append("characterId", target.parentNode.getAttribute("data-characterId"));
+        if(target.parentNode.getAttribute("data-current") == 1) {
+            setCurrentCharacter(getNextCharacter());
+        }
+        target.parentNode.remove();
+        arrOfCharacterElements = Array.from(document.querySelectorAll(".character"))
         request.send(data);
     }
 
@@ -208,13 +221,7 @@ document.getElementById("longRestBtn").addEventListener("click", () => {
 //Next turn on space click
 window.addEventListener("keydown", function(e) {
     if(e.key == " ") {
-        let nextCharacter;
-        if(arrOfCharacterElements.indexOf(currentCharacter) + 1 >= arrOfCharacterElements.length) {
-            nextCharacter = arrOfCharacterElements[0];
-        } else {
-            nextCharacter = arrOfCharacterElements[arrOfCharacterElements.indexOf(currentCharacter) + 1];
-        }
-        setCurrentCharacter(nextCharacter)
+        setCurrentCharacter(getNextCharacter())
     }
 });
 

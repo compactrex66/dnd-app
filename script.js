@@ -19,7 +19,8 @@ function updateCharactersList() {
         arrOfCharacterElements = Array.from(document.querySelectorAll(".character"));
         setCurrentCharacter();
     };
-    request.open("post", "indexScript.php", true);
+    request.open("post", "indexActions.php", true);
+
     let formData = new FormData();
     formData.append("action", "getCharacters");
     request.send(formData);    
@@ -27,7 +28,8 @@ function updateCharactersList() {
 function updateTime() {
     let request = new XMLHttpRequest();
     request.onload = function() { timeElement.innerHTML = this.responseText };
-    request.open("post", "indexScript.php");
+    request.open("post", "indexActions.php");
+
     let data = new FormData();
     data.append("action", "getDate");
     request.send(data);
@@ -60,8 +62,10 @@ function setCurrentCharacter(character) {
     currentCharacter.style.border = "none";
     character.style.border = "1px solid white";
     moreInfoPanel.innerHTML = character.querySelector(".moreInfo")?.innerHTML ?? `<div class="container"><h1>Player Character</h1></div>`;
+
     let request = new XMLHttpRequest();
-    request.open("post", `indexScript.php`, true);
+    request.open("post", `indexActions.php`, true);
+
     let data = new FormData();
     data.append("action", "setCurrent");
     data.append("characterId", character.getAttribute("data-characterid"));
@@ -75,7 +79,8 @@ listOfCharacters.addEventListener("click", (e) => {
     // Delete button
     if (target.classList.contains("deleteBtn")) {
         let request = new XMLHttpRequest();
-        request.open("post", "indexScript.php", true);
+        request.open("post", "indexActions.php", true);
+
         let data = new FormData();
         data.append("action", "delete");
         data.append("characterId", target.parentNode.getAttribute("data-characterId"));
@@ -91,7 +96,8 @@ listOfCharacters.addEventListener("click", (e) => {
     if (target.classList.contains("addHealthBtn")) {
         let request = new XMLHttpRequest();
         request.onload = function() { updateCharactersList(); };
-        request.open("post", "indexScript.php", true);
+        request.open("post", "indexActions.php", true);
+
         let data = new FormData();
         data.append("action", "adjustHealth");
         data.append("characterId", target.parentNode.parentNode.getAttribute("data-characterId"));
@@ -103,7 +109,8 @@ listOfCharacters.addEventListener("click", (e) => {
     if(target.classList.contains("substractHealthBtn")) {
         let request = new XMLHttpRequest();
         request.onload = function() { updateCharactersList(); };
-        request.open("post", `indexScript.php`, true);
+        request.open("post", `indexActions.php`, true);
+
         let data = new FormData();
         data.append("action", "adjustHealth");
         data.append("characterId", target.parentNode.parentNode.getAttribute("data-characterId"));
@@ -126,7 +133,8 @@ listOfCharacters.addEventListener("change", (e) => {
     if (target.id === "modifiedInitiativeInput") {
         let request = new XMLHttpRequest();
         request.onload = function() { updateCharactersList(); };
-        request.open("post", "indexScript.php", true);
+        request.open("post", "indexActions.php", true);
+
         let data = new FormData();
         data.append("action", "changeInitiative");
         data.append("initiative", target.value);
@@ -138,7 +146,8 @@ listOfCharacters.addEventListener("change", (e) => {
     if(target.id == "modifiedACInput") {
         let request = new XMLHttpRequest();
         request.onload = function() { updateCharactersList(); };
-        request.open("post", `indexScript.php`);
+        request.open("post", `indexActions.php`);
+
         let data = new FormData();
         data.append("action", "changeAC")
         data.append("AC", target.value)
@@ -148,8 +157,35 @@ listOfCharacters.addEventListener("change", (e) => {
 });
 
 listOfCharacters.addEventListener("dblclick", (e) => {
-    if(e.target.classList.contains("character")) {
+    const target = e.target
+
+    if(target.classList.contains("character")) {
         setCurrentCharacter(e.target);
+    }
+
+    if(target.classList.contains("characterName")) {
+        let inputNewNameElement = document.createElement("textarea"), oldName = target.innerText;
+        inputNewNameElement.value = target.innerText;
+        inputNewNameElement.classList.add("newCharacterName");
+        inputNewNameElement.addEventListener("focusout", () => {
+            if(inputNewNameElement.value != oldName) {
+                let data = new FormData();
+                data.append("action", "changeCharacterName");
+                data.append("newName", inputNewNameElement.value)
+                data.append("characterId", target.parentNode.getAttribute("data-characterId"))
+
+                let request = new XMLHttpRequest();
+                request.onload = function() { updateCharactersList(); };
+                request.open("post", "indexActions.php", true);
+                request.send(data);
+            } else {
+                target.innerHTML = oldName;
+            }
+        });
+
+        target.innerHTML = "";
+        target.appendChild(inputNewNameElement);
+        inputNewNameElement.focus();
     }
 })
 
@@ -157,11 +193,13 @@ deleteEnemiesBtn.addEventListener("click", () => {
     if(confirm('Are you sure you want delete all enemies ?')) {
         let request = new XMLHttpRequest();
         request.onload = function() { updateCharactersList(); };
-        request.open("post", "indexScript.php");
+        request.open("post", "indexActions.php");
+
         let data = new FormData();
         data.append("action", "deleteAllEnemies");
         request.send(data);
     }
+    deleteEnemiesBtn.blur();
 });
 
 //Add enemy
@@ -170,52 +208,67 @@ addEnemyBtn.addEventListener("click", () => {
     data.append("action", "addEnemy");
     data.append("enemyType", enemySelect.value);
     data.append("enemyQuantity", enemyQuantity.value);
+
     let request = new XMLHttpRequest();
     request.onload = function() { updateCharactersList(); };
-    request.open("post", "indexScript.php", true);
+    request.open("post", "indexActions.php", true);
     request.send(data);
+
+    addEnemyBtn.blur();
 });
 
 //Rewind time
 document.getElementById("rewindTimeBtn").addEventListener("click", () => {
     let request = new XMLHttpRequest();
     request.onload = function() { updateTime(); };
-    request.open("post", "indexScript.php");
+    request.open("post", "indexActions.php");
+
     let data = new FormData();
     data.append("action", "passTime");
     data.append("hoursToPass", hoursInput.value*-1);
     request.send(data);
+
+    document.getElementById("rewindTimeBtn").blur();
 });
 
 //Pass time
 document.getElementById("forwardTimeBtn").addEventListener("click", () => {
     let request = new XMLHttpRequest();
     request.onload = function() { updateTime(); };
-    request.open("post", "indexScript.php");
+    request.open("post", "indexActions.php");
+
     let data = new FormData();
     data.append("action", "passTime");
     data.append("hoursToPass", hoursInput.value);
     request.send(data);
+
+    document.getElementById("forwardTimeBtn").blur();
 });
 
 //Pass time by 2 hours
 document.getElementById("shortRestBtn").addEventListener("click", () => {
     let request = new XMLHttpRequest();
     request.onload = function() { updateTime(); };
-    request.open("post", "indexScript.php");
+    request.open("post", "indexActions.php");
+
     let data = new FormData();
     data.append("action", "shortRest");
     request.send(data);
+
+    document.getElementById("shortRestBtn").blur()
 });
 
 //Pass time by 8 hours
 document.getElementById("longRestBtn").addEventListener("click", () => {
     let request = new XMLHttpRequest();
     request.onload = function() { updateTime(); };
-    request.open("post", "indexScript.php");
+    request.open("post", "indexActions.php");
+
     let data = new FormData();
     data.append("action", "longRest");
     request.send(data);
+
+    document.getElementById("longRestBtn").blur()
 });
 
 //Next turn on space click

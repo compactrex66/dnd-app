@@ -53,6 +53,10 @@ function setAC($conn, $AC, $characterId) {
     mysqli_query($conn, "UPDATE current_fight SET AC = $AC WHERE id = $characterId");
 }
 
+function changeCharacterName($conn, $newName, $characterId) {
+    mysqli_query($conn, "UPDATE current_fight SET name = '$newName' WHERE id = $characterId");
+}
+
 function shortRest($conn) {
     passTime($conn, 2);
 }
@@ -62,9 +66,9 @@ function longRest($conn) {
 }
 
 function setCurrent($conn, $characterId = null) {
-    mysqli_query($conn, "UPDATE current_fight SET current=0");
+    mysqli_query($conn, "UPDATE current_fight SET current = 0");
     if($characterId != null) {
-        mysqli_query($conn, "UPDATE current_fight SET current=1 WHERE id = ".$characterId);
+        mysqli_query($conn, "UPDATE current_fight SET current = 1 WHERE id = ".$characterId);
     } else {
         mysqli_query($conn, "UPDATE current_fight SET current = 1 WHERE initiative = (SELECT characterId FROM current_fight WHERE initiative = (SELECT MAX(initiative) FROM current_fight) LIMIT 1)");
     }

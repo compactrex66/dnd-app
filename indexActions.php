@@ -19,7 +19,10 @@
             }
             elseif($action == 'changeAC') {
                 setAC($conn, $_POST['AC'], $characterId);
-            } 
+            }
+            elseif($action == 'changeCharacterName') {
+                changeCharacterName($conn, $_POST['newName'], $characterId);
+            }
         }
         if($action == 'getCharacters') {
             $sql = "SELECT * FROM current_fight ORDER BY initiative DESC";

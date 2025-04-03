@@ -37,7 +37,7 @@
         <input type="number" name="initiativeBonus" id="initiativeBonusInput">
         <textarea name="moreInfo" name="moreInfo" id="moreInfoInput"></textarea>
     </form>
-    <header>Add New Enemy</header>
+    <header><a href="../index.php"><button>Fight</button></a>Add New Enemy</header>
     <form action="" id="addNewEnemyForm">
         <textarea name="enemyInfo" id="enemyInfo" required></textarea>
         <span style="display: flex; width: 100%; gap: 20px; justify-content:center; ">

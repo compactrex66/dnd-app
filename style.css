@@ -70,10 +70,20 @@ li {
     display: flex;
     flex-direction: column;
     gap: 20px;
+    padding-right: 20px;
     height: 88vh;
     overflow-y: auto;
     overflow-x: hidden;
     width: 48vw;
+}
+.listOfCharacters::-webkit-scrollbar {
+    background-color: transparent;
+    width: 15px;
+}
+.listOfCharacters::-webkit-scrollbar-thumb {
+    background-color: gray;
+    border-radius: 20px;
+    
 }
 .character {
     position: relative;
@@ -91,6 +101,14 @@ span {
 }
 .characterName {
     width: 17%;
+}
+.newCharacterName {
+    width: 100%;
+    font-size: inherit;
+    padding: 10px;
+    border: 1px solid white;
+    word-wrap: normal;
+    box-sizing: border-box;
 }
 .characterHealth {
     width: 12%;
@@ -113,11 +131,13 @@ span {
 .greenBtn {
     background-color: rgb(43, 86, 43);
 }
-select, button, input, .checkboxInput {
+select, button, input, .checkboxInput, textarea {
     padding: 10px;
     background-color: var(--secondary);   
     color: var(--text);
     border: 0;
+    resize: none;
+    font-family: inherit;
 }
 .checkboxInput {
     display: flex;

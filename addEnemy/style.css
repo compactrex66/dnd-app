@@ -1,5 +1,6 @@
 header {
     justify-content: center;
+    gap: 20px;
 }
 textarea {
     background-color: var(--secondary);

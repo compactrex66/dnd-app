@@ -1,6 +1,7 @@
 :root {
     --primary: black;
     --secondary: rgb(32, 32, 32);
+    --active-secondary: rgb(136, 136, 136);
     --text: white;
 }
 body {
@@ -76,11 +77,11 @@ li {
     overflow-x: hidden;
     width: 48vw;
 }
-.listOfCharacters::-webkit-scrollbar {
+::-webkit-scrollbar {
     background-color: transparent;
     width: 15px;
 }
-.listOfCharacters::-webkit-scrollbar-thumb {
+::-webkit-scrollbar-thumb {
     background-color: gray;
     border-radius: 20px;
     
@@ -119,11 +120,12 @@ span {
     gap: 10px;
 }
 .big-text {
-    align-self: center;
     background-color: var(--secondary);
     padding: 5px;
     box-sizing: border-box;
     font-size: 32px;
+    display: flex;
+    align-items: center;
 }
 .redBtn {
     background-color: rgb(152, 40, 40);
@@ -131,13 +133,38 @@ span {
 .greenBtn {
     background-color: rgb(43, 86, 43);
 }
-select, button, input, .checkboxInput, textarea {
+select, button, input, .checkboxInput, textarea, .secondary-btn {
     padding: 10px;
     background-color: var(--secondary);   
     color: var(--text);
     border: 0;
     resize: none;
     font-family: inherit;
+}
+.select {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 10%;
+    font-size:smaller;
+}
+.options {
+    display: none;
+    position: absolute;
+    z-index: 2;
+    background-color: transparent;
+    grid-template-columns: 8vw 8vw 8vw;
+    grid-auto-rows: 1fr;
+    max-height: 35vh;
+    translate: 100px 90px;
+}
+.options .option {
+    text-align: center;
+    align-content: center;
+    padding: 10px;
+    border: 1px solid white;
+    background-color: var(--secondary);
+    font-size: medium;
 }
 .checkboxInput {
     display: flex;

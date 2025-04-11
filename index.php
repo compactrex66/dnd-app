@@ -12,21 +12,22 @@
 </head>
 <body>
     <header class="row-form">
-            <select id="enemySelect" name="enemyType">
-                <?php
-                    include "parsedown/Parsedown.php";
-                    include "parsedown/ParsedownExtra.php";
-                    include "dbConnection.php";
+            <div class="select secondary-btn" id="enemySelect" name="enemyType">
+                <div id="selectedEnemy">Enemy type</div>
+                <div class="options" id="enemyList">
+                    <?php
+                        include "parsedown/Parsedown.php";
+                        include "parsedown/ParsedownExtra.php";
+                        include "dbConnection.php";
 
-                    $sql = "SELECT * FROM enemies order by name asc";
-                    $result = mysqli_query($conn, $sql);
-                    while($row = mysqli_fetch_assoc($result)) {
-                        echo "<option value='".$row['name']."'>";
-                        echo $row['name'];
-                        echo "</option>";
-                    }
-                ?>
-            </select>
+                        $sql = "SELECT * FROM enemies order by name asc";
+                        $result = mysqli_query($conn, $sql);
+                        while($row = mysqli_fetch_assoc($result)) {
+                            echo "<div class='option'>".$row["name"]."</div>";
+                        }
+                    ?>
+                </div>
+            </div>
             <input style="border: 0;" id="enemyQuantity" type="number" name="enemyQuantity" value="1" max="100">
             <button id="addEnemyBtn">Add Enemy</button>
             <button type="button" id="deleteEnemiesBtn">Delete all enemies</button>

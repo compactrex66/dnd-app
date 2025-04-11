@@ -7,6 +7,8 @@ const hoursInput = document.getElementById("hoursInput");
 const deleteEnemiesBtn = document.getElementById("deleteEnemiesBtn");
 const addEnemyBtn = document.getElementById("addEnemyBtn");
 const enemySelect = document.getElementById("enemySelect");
+const selectedEnemy = document.getElementById("selectedEnemy");
+const enemyOptions = document.getElementById("enemyList")
 const enemyQuantity = document.getElementById("enemyQuantity");
 
 let arrOfCharacterElements = Array.from(document.querySelectorAll(".character"));
@@ -44,13 +46,18 @@ function getCurrentCharacter() {
     return null;
 }
 function getNextCharacter() {
-    let nextCharacter;
     if(arrOfCharacterElements.indexOf(currentCharacter) + 1 >= arrOfCharacterElements.length) {
-        nextCharacter = arrOfCharacterElements[0];
+        return arrOfCharacterElements[0];
     } else {
-        nextCharacter = arrOfCharacterElements[arrOfCharacterElements.indexOf(currentCharacter) + 1];
+        return arrOfCharacterElements[arrOfCharacterElements.indexOf(currentCharacter) + 1];
     }
-    return nextCharacter;
+}
+function getPreviousCharacter() {
+    if(arrOfCharacterElements.indexOf(currentCharacter) - 1 < 0) {
+        return arrOfCharacterElements[arrOfCharacterElements.length - 1];
+    } else {
+        return arrOfCharacterElements[arrOfCharacterElements.indexOf(currentCharacter) - 1];
+    }
 }
 function setCurrentCharacter(character) {
     currentCharacter = getCurrentCharacter() ?? arrOfCharacterElements[0];
@@ -73,6 +80,7 @@ function setCurrentCharacter(character) {
     currentCharacter = character;
 }
 
+//Handle character clicks
 listOfCharacters.addEventListener("click", (e) => {
     const target = e.target;
 
@@ -124,8 +132,7 @@ listOfCharacters.addEventListener("click", (e) => {
         moreInfoPanel.innerHTML = moreInfo == null ? "Player Character" : moreInfo.innerHTML;
     }
 });
-
-// Handle input changes
+//Handle input changes
 listOfCharacters.addEventListener("change", (e) => {
     const target = e.target;
 
@@ -155,7 +162,7 @@ listOfCharacters.addEventListener("change", (e) => {
         request.send(data);
     }
 });
-
+//Handle character double clicks
 listOfCharacters.addEventListener("dblclick", (e) => {
     const target = e.target
 
@@ -188,7 +195,7 @@ listOfCharacters.addEventListener("dblclick", (e) => {
         inputNewNameElement.focus();
     }
 })
-
+//Delete all enemies
 deleteEnemiesBtn.addEventListener("click", () => {
     if(confirm('Are you sure you want delete all enemies ?')) {
         let request = new XMLHttpRequest();
@@ -201,12 +208,11 @@ deleteEnemiesBtn.addEventListener("click", () => {
     }
     deleteEnemiesBtn.blur();
 });
-
 //Add enemy
 addEnemyBtn.addEventListener("click", () => {
     let data = new FormData();
     data.append("action", "addEnemy");
-    data.append("enemyType", enemySelect.value);
+    data.append("enemyType", selectedEnemy.innerText);
     data.append("enemyQuantity", enemyQuantity.value);
 
     let request = new XMLHttpRequest();
@@ -216,7 +222,6 @@ addEnemyBtn.addEventListener("click", () => {
 
     addEnemyBtn.blur();
 });
-
 //Rewind time
 document.getElementById("rewindTimeBtn").addEventListener("click", () => {
     let request = new XMLHttpRequest();
@@ -230,7 +235,6 @@ document.getElementById("rewindTimeBtn").addEventListener("click", () => {
 
     document.getElementById("rewindTimeBtn").blur();
 });
-
 //Pass time
 document.getElementById("forwardTimeBtn").addEventListener("click", () => {
     let request = new XMLHttpRequest();
@@ -244,7 +248,6 @@ document.getElementById("forwardTimeBtn").addEventListener("click", () => {
 
     document.getElementById("forwardTimeBtn").blur();
 });
-
 //Pass time by 2 hours
 document.getElementById("shortRestBtn").addEventListener("click", () => {
     let request = new XMLHttpRequest();
@@ -257,7 +260,6 @@ document.getElementById("shortRestBtn").addEventListener("click", () => {
 
     document.getElementById("shortRestBtn").blur()
 });
-
 //Pass time by 8 hours
 document.getElementById("longRestBtn").addEventListener("click", () => {
     let request = new XMLHttpRequest();
@@ -270,11 +272,24 @@ document.getElementById("longRestBtn").addEventListener("click", () => {
 
     document.getElementById("longRestBtn").blur()
 });
-
-//Next turn on space click
+//Next turn on space click or previous turn on shift + space
 window.addEventListener("keydown", function(e) {
     if(e.key == " ") {
-        setCurrentCharacter(getNextCharacter())
+        if(!e.shiftKey) setCurrentCharacter(getNextCharacter());
+        else setCurrentCharacter(getPreviousCharacter());
+    }
+});
+//Toggle enemy list visibility: 
+enemySelect.addEventListener("click", () => {
+    if(enemyOptions.style.display != "grid") enemyOptions.style.display = "grid";
+    else enemyOptions.style.display = "none";
+});
+//Change selected enemy
+enemyOptions.addEventListener("click", (e) => {
+    e.stopPropagation();
+    if(e.target.classList.contains("option")) {
+        selectedEnemy.innerText = e.target.innerText;            
+        enemyOptions.style.display = "none"
     }
 });
 

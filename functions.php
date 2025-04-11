@@ -5,7 +5,6 @@ function passTime($conn, $hours) {
         $currentHour = mysqli_fetch_array(mysqli_query($conn, "SELECT `hour` FROM `time` WHERE time_id=1"))[0];
         $overflowHour = 0;
         $daysToPass = floor(($currentHour + $hours) / 24);
-        // echo $currentHour." ".$hours." ".($daysToPass);
         if($currentHour + $hours >= 24 || $currentHour + $hours < 0) {
             $overflowHour = $currentHour + $hours - (24*$daysToPass);
             mysqli_query($conn, "UPDATE `time` SET `hour` = ".$overflowHour);

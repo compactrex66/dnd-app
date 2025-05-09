@@ -123,7 +123,7 @@ data.actions.forEach(element => {
     markdown += `\r>***${element.name}.*** ${element.desc}\r>`;
 });
 
-if(data.reactions) {
+if(data.reactions.length > 0) {
     markdown += `>### Reactions`;
     data.reactions.forEach(element => {
         markdown += `\r>**${element.name}.** ${element.desc}`;

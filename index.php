@@ -46,7 +46,7 @@
                $date = $result['date'];
                $hour = $result['hour'];
                $minute = $result['minute'];
-               echo "<span class='big-text' id='time'>".($hour < 10 ? '0'.$hour : $hour).":".($minute < 10 ? '0'.$minute : $minute)." | ".$date." <img src='media/calendarIcon.svg'></span>";
+               echo "<span class='big-text' id='time'>".($hour < 10 ? '0'.$hour : $hour).":".($minute < 10 ? '0'.$minute : $minute)." | ".$date."</span>";
             ?>
     </header>
     <main>

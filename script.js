@@ -82,7 +82,7 @@ function setCurrentCharacter(character) {
 
 //Handle character clicks
 listOfCharacters.addEventListener("click", (e) => {
-    const target = e.target;
+    let target = e.target;
 
     // Delete button
     if (target.classList.contains("deleteBtn")) {
@@ -127,9 +127,10 @@ listOfCharacters.addEventListener("click", (e) => {
     }
 
     //change more info in the panel
-    if(target.classList.contains("character")) {
+    if(target.classList.contains("character") || target.classList.contains("characterName")) {
+        target = target.classList.contains("characterName") ? target.parentNode : target;
         let moreInfo = target.querySelector(".moreInfo");
-        moreInfoPanel.innerHTML = moreInfo == null ? "Player Character" : moreInfo.innerHTML;
+        moreInfoPanel.innerHTML = moreInfo == null ? `<div class="container"><h1>Player Character</h1></div>` : moreInfo.innerHTML;
     }
 });
 //Handle input changes

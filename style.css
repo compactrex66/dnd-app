@@ -16,7 +16,7 @@ body {
 }
 header {
     box-sizing: border-box;
-    padding: 20px;
+    padding: 5px 20px 20px 20px;
     width: 100%;
     display: flex;
     flex-direction: row;
@@ -71,7 +71,7 @@ li {
     display: flex;
     flex-direction: column;
     gap: 20px;
-    padding-right: 20px;
+    padding-right: 10px;
     height: 88vh;
     overflow-y: auto;
     overflow-x: hidden;
@@ -79,21 +79,20 @@ li {
 }
 ::-webkit-scrollbar {
     background-color: transparent;
-    width: 15px;
+    width: 10px;
 }
 ::-webkit-scrollbar-thumb {
     background-color: gray;
     border-radius: 20px;
-    
 }
 .character {
     position: relative;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    align-items: center;
+    align-items: stretch;
     width: 100%;
-    padding: 20px;
+    padding: 20px 0 20px 20px;
     background-color: var(--secondary);
     box-sizing: border-box;
 }
@@ -102,6 +101,7 @@ span {
 }
 .characterName {
     width: 17%;
+    font-size: small;
 }
 .newCharacterName {
     width: 100%;
@@ -111,42 +111,51 @@ span {
     word-wrap: normal;
     box-sizing: border-box;
 }
-.characterHealth {
-    width: 12%;
+.icon {
+    height: 24px;
+    aspect-ratio: 1;
 }
 .inline-row {
     display: flex;
     flex-direction: row;
     gap: 10px;
+    align-items: center;
 }
 .big-text {
     background-color: var(--secondary);
     padding: 5px;
     box-sizing: border-box;
-    font-size: 32px;
     display: flex;
     align-items: center;
+    font-size: 120%;
 }
-.redBtn {
-    background-color: rgb(152, 40, 40);
-}
-.greenBtn {
-    background-color: rgb(43, 86, 43);
-}
-select, button, input, .checkboxInput, textarea, .secondary-btn {
-    padding: 10px;
+select, button, input, .checkboxInput, textarea, .secondary-btn, .select, .characterHealth {
+    padding: 7px;
     background-color: var(--secondary);   
     color: var(--text);
     border: 0;
     resize: none;
     font-family: inherit;
+    font-size: 70%;
+}
+.characterHealth {
+    width: 12%;
+    padding: 0;
+}
+.redBtn {
+    background-color: rgb(152, 40, 40);
+    align-self: stretch;
+}
+.greenBtn {
+    background-color: rgb(43, 86, 43);
+    align-self: stretch;
 }
 .select {
     display: flex;
     align-items: center;
     justify-content: center;
     width: 10%;
-    font-size:smaller;
+    cursor: pointer;
 }
 .options {
     display: none;
@@ -154,17 +163,19 @@ select, button, input, .checkboxInput, textarea, .secondary-btn {
     z-index: 2;
     background-color: transparent;
     grid-template-columns: 8vw 8vw 8vw;
-    grid-auto-rows: 1fr;
-    max-height: 35vh;
-    translate: 100px 90px;
+    grid-auto-rows: 50px;
+    max-height: calc(50px * 4);
+    translate: 83px 130px;
+    overflow-y: auto;
 }
 .options .option {
+    cursor: default;
     text-align: center;
     align-content: center;
     padding: 10px;
     border: 1px solid white;
     background-color: var(--secondary);
-    font-size: medium;
+    font-size: small;
 }
 .checkboxInput {
     display: flex;
@@ -181,12 +192,16 @@ input[type=number] {
     border: 1px solid var(--text);
     -moz-appearance: textfield;
     appearance: textfield;
+    align-self: stretch;
 }
 .deleteBtn, .inactiveDeleteBtn {
     cursor: pointer;
-    padding: 10px;
-    scale: 1.7;
+    padding: 5px;
     background-color: transparent;
+}
+.deleteBtn img, .inactiveDeleteBtn img {
+    height: 32px;
+    aspect-ratio: 1;
 }
 .inactiveDeleteBtn {
     filter: brightness(0.25);
@@ -208,9 +223,13 @@ table, td, th {
     overflow-y: auto;
     background-color: var(--secondary);
     padding: 20px;
+    display: flex;
 }
 #moreInfoPanel blockquote {
     margin: 0;
+}
+#moreInfoPanel > blockquote > * {
+    font-size: 85%;
 }
 a {
     display: flex;
@@ -223,4 +242,7 @@ a * {
 .vl {
     width: 2px;
     background-color: white;
+}
+h2 {
+    font-size: 100% !important;
 }

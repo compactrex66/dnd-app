@@ -38,17 +38,26 @@
                     $moreInfo['more_info'] = str_replace("___", "", $moreInfo['more_info']);
                     $moreInfo = $parsedown->text($moreInfo['more_info']);
                     $moreInfo = str_replace("<hr>", "", $moreInfo);
+                    $spells = preg_grep("/<li>.*?:\s*([^<]+)<\/li>/g", $moreInfo);
+                    foreach($spells as $spell) {
+                        $spellName = str_replace(' ', '_', strtolower($spell));
+                        $sql = "SELECT * FROM spells WHERE spell_name='$spellName'";
+                        $result = mysqli_fetch_array(mysqli_query($conn, $sql));
+                        $wrappedSpell = "<span class='spell'>$spell</span>";
+                        $moreInfo = str_replace($spell, $wrappedSpell, $moreInfo);
+                    }
+                    
                     echo "<div style='display: none;' class='moreInfo'>".$moreInfo."</div>";
                 }
-                echo "<span class='characterName'>".$row['name']."</span>";
-                echo "<span class='characterHealth inline-row'><img src='media/healthIcon.svg'>".$row['health']."/".$row['max_health']."</span>";
-                echo "<span style='display: flex; gap: 10px; align-items: center;'><img src='media/initiativeBoltIcon.svg'><input class='no-spinner' type='number' value=".$row['initiative']." id='modifiedInitiativeInput'></input></span>";
-                echo "<span style='display: flex; gap: 10px; align-items: center;'><img src='media/acIcon.svg'><input class='no-spinner' type='number' value=".$row['AC']." id='modifiedACInput'></input></span>";
+                echo "<span class='inline-row characterName'>".$row['name']."</span>";
+                echo "<span class='inline-row characterHealth'><img class='icon' src='media/healthIcon.svg'>".$row['health']."/".$row['max_health']."</span>";
+                echo "<span class='inline-row'><img class='icon' src='media/initiativeBoltIcon.svg'><input class='no-spinner' type='number' value=".$row['initiative']." id='modifiedInitiativeInput'></input></span>";
+                echo "<span class='inline-row'><img class='icon' src='media/acIcon.svg'><input class='no-spinner' type='number' value=".$row['AC']." id='modifiedACInput'></input></span>";
                 echo '<span class="inline-row"><button class="redBtn substractHealthBtn"><img src="media/removeIcon.svg"></button><input class="no-spinner" type="number" id="healthInput"></input><button class="greenBtn addHealthBtn"><img src="media/addIcon.svg"></button></span>';
                 if($row['is_player'] != 1) {
-                    echo '<button class="deleteBtn"><img src="media/closeIcon.svg"></button>';
+                    echo '<button class="deleteBtn"><img class="icon" src="media/closeIcon.svg"></button>';
                 } else {
-                    echo '<button class="inactiveDeleteBtn"><img src="media/closeIcon.svg"></button>';
+                    echo '<button class="inactiveDeleteBtn"><img class="icon" src="media/closeIcon.svg"></button>';
                 }
                 echo "</div>";
             }

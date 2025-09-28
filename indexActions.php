@@ -38,15 +38,57 @@
                     $moreInfo['more_info'] = str_replace("___", "", $moreInfo['more_info']);
                     $moreInfo = $parsedown->text($moreInfo['more_info']);
                     $moreInfo = str_replace("<hr>", "", $moreInfo);
-                    $spells = preg_grep("/<li>.*?:\s*([^<]+)<\/li>/g", $moreInfo);
+                    preg_match_all("/<li>.*?:\s*([^<]+)<\/li>/", $moreInfo, $matches);
+                    $spells = [];
+                    foreach ($matches[1] as $match) {
+                        $parts = array_map('trim', explode(',', $match));
+                        $spells = array_merge($spells, $parts);
+                    }
+                    $multiCurl = curl_multi_init();
+                    $handles = [];
                     foreach($spells as $spell) {
-                        $spellName = str_replace(' ', '_', strtolower($spell));
-                        $sql = "SELECT * FROM spells WHERE spell_name='$spellName'";
-                        $result = mysqli_fetch_array(mysqli_query($conn, $sql));
+                        $sql = "SELECT * FROM spells WHERE spell_name='$spell'";
+                        $spellResults = mysqli_fetch_array(mysqli_query($conn, $sql));
+                        if(!$spellResults) {
+                            $curl = curl_init();
+                            curl_setopt_array($curl, [
+                                CURLOPT_URL => "https://api.open5e.com/v2/spells/?document__key__in=srd-2024&name=".ucwords(str_replace(' ', '%20', $spell)),
+                                CURLOPT_RETURNTRANSFER => 1
+                            ]);
+                            curl_multi_add_handle($multiCurl, $curl);
+                            $handles[spl_object_id($curl)] = ['handle' => $curl, 'spell' => $spell];
+                        }
+                    }
+
+                    $running = null;
+                    do {
+                        curl_multi_exec($multiCurl, $running);
+                        curl_multi_select($multiCurl); // wait for activity
+                    } while ($running > 0);
+
+                    foreach ($handles as $info) {
+                        $curl = $info['handle'];
+                        $spell = $info['spell'];
+
+                        $response = curl_multi_getcontent($curl);
+
+                        if (curl_errno($curl)) {
+                            echo "Error fetching $spell: " . curl_error($curl) . "\n";
+                        } else {
+                            $decodedData = json_decode($response, true);
+                            //TODO insert to db
+                        }
+
+                        // Clean up
+                        curl_multi_remove_handle($multiCurl, $curl);
+                        curl_close($curl);
+
+                        // Replace in $moreInfo
                         $wrappedSpell = "<span class='spell'>$spell</span>";
                         $moreInfo = str_replace($spell, $wrappedSpell, $moreInfo);
                     }
-                    
+
+                    curl_multi_close($multiCurl);
                     echo "<div style='display: none;' class='moreInfo'>".$moreInfo."</div>";
                 }
                 echo "<span class='inline-row characterName'>".$row['name']."</span>";

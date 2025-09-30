@@ -156,6 +156,7 @@ select, button, input, .checkboxInput, textarea, .secondary-btn, .select, .chara
     justify-content: center;
     width: 10%;
     cursor: pointer;
+    position: relative;
 }
 .options {
     display: none;
@@ -165,7 +166,7 @@ select, button, input, .checkboxInput, textarea, .secondary-btn, .select, .chara
     grid-template-columns: 8vw 8vw 8vw;
     grid-auto-rows: 50px;
     max-height: calc(50px * 4);
-    translate: 83px 130px;
+    translate: 130px 100px;
     overflow-y: auto;
 }
 .options .option {

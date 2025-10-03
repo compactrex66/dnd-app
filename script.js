@@ -138,10 +138,10 @@ listOfCharacters.addEventListener("click", (e) => {
                 popup.style.display = "inline-block";
 
                 let rect = popup.getBoundingClientRect();
-                console.log(rect.right + " " + rect.width);
+                console.log(rect.right + " " + rect.left + " " + rect.width + " | " + window.innerWidth);
                 
-                if (rect.right > window.innerWidth) {
-                    popup.style.right = `${window.innerWidth - rect.width}px`;
+                if (rect.right+10 > window.innerWidth) {
+                    popup.style.left = `${window.innerWidth - (rect.right) - 30}px`;
                 }
             }
         })

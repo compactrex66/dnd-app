@@ -121,12 +121,15 @@ span {
     gap: 10px;
     align-items: center;
 }
-.big-text {
+.big-text-container {
     background-color: var(--secondary);
     padding: 5px;
     box-sizing: border-box;
     display: flex;
     align-items: center;
+    font-size: 120%;
+}
+.big-text {
     font-size: 120%;
 }
 select, button, input, .checkboxInput, textarea, .secondary-btn, .select, .characterHealth {
@@ -222,6 +225,7 @@ table, td, th {
     width: 48vw;
     height: 88vh;
     overflow-y: auto;
+    overflow-x: hidden;
     background-color: var(--secondary);
     padding: 20px;
     display: flex;
@@ -231,6 +235,25 @@ table, td, th {
 }
 #moreInfoPanel > blockquote > * {
     font-size: 85%;
+}
+.spell {
+    position: relative;
+}
+.hint-popup {
+    position: absolute;
+    height: fit-content;
+    min-width: 35vw;
+    padding: 5px;
+    background-color: var(--secondary);
+    border: 1px solid var(--text);
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+}
+.hint-header {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
 }
 a {
     display: flex;

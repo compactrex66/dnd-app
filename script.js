@@ -131,6 +131,25 @@ listOfCharacters.addEventListener("click", (e) => {
         target = target.classList.contains("characterName") ? target.parentNode : target;
         let moreInfo = target.querySelector(".moreInfo");
         moreInfoPanel.innerHTML = moreInfo == null ? `<div class="container"><h1>Player Character</h1></div>` : moreInfo.innerHTML;
+        moreInfoPanel.addEventListener("mouseover", e => {
+            let target = e.target;
+            if(target.classList.contains("spell")) {
+                let popup = target.querySelector(".hint-popup");
+                popup.style.display = "inline-block";
+
+                let rect = popup.getBoundingClientRect();
+                console.log(rect.right + " " + rect.width);
+                
+                if (rect.right > window.innerWidth) {
+                    popup.style.right = `${window.innerWidth - rect.width}px`;
+                }
+            }
+        })
+        moreInfoPanel.querySelectorAll(".hint-popup").forEach(hintPopup => {
+            hintPopup.addEventListener("mouseleave", e => {
+                hintPopup.style.display = "none";
+            });
+        })
     }
 });
 //Handle input changes

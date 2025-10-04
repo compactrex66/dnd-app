@@ -1,0 +1,54 @@
+body {
+    display: flex;
+    justify-content: left;
+}
+header {
+    justify-content: center;
+    gap: 20px;
+}
+.monster-result {
+    background-color: var(--secondary);
+    height: 80vh;
+    width: 50vw;
+}
+#matchList {
+    width: 20vw;
+    height: 80vh;
+    background-color: var(--secondary);
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+.moreInfoPanel {
+    position: relative;
+    box-sizing: border-box;
+    width: 48vw;
+    overflow-y: auto;
+    background-color: var(--secondary);
+    padding: 20px;
+}
+.moreInfoPanel blockquote {
+    margin: 0;
+}
+.moreMonsterInfo {
+    display: none;
+}
+.corner-btn {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    padding: 20px;
+}
+.corner-btn img {
+    height: 35px;
+}
+main {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 20px;
+    width: 65vw;
+}
+.inline-row {
+    padding: 15px;
+    border: 1px solid white;
+}

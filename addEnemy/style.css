@@ -1,0 +1,14 @@
+header {
+    justify-content: center;
+    gap: 20px;
+}
+textarea {
+    background-color: var(--secondary);
+    border: 0;
+    padding: 10px;
+    width: 60vw;
+    height: 70vh;
+    margin-bottom: 20px;
+    resize: none;
+    color: white;
+}

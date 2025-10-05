@@ -1,12 +1,11 @@
 const monsterInput = document.getElementById("monsterInput");
 const searchButton = document.getElementById("searchButton");
-const monsterInfo = document.getElementById("monsterInfo");
+const monsterInfoElement = document.getElementById("monsterInfo");
 const matchList = document.getElementById("matchList");
 const addMonsterBtn = document.getElementById("addEnemyBtn");
 const monsterNameElement = document.getElementById("monsterName");
 
-let markdownResult = document.getElementById("markdownResult");
-let enemyInfo, monsterName;
+let monsterName, minHealth, maxHealth, armorClass, initiativeBonus, moreInfo;
 
 searchButton.addEventListener("click", () => {
     monsterName = monsterInput.value.toLowerCase();
@@ -14,7 +13,7 @@ searchButton.addEventListener("click", () => {
         matchList.innerHTML = '';
         searchMonster(monsterName);
     } else {
-        monsterInfo.innerHTML = "Please enter a monster name.";
+        monsterInfoElement.innerHTML = "Please enter a monster name.";
     }
 });
 
@@ -26,16 +25,14 @@ addMonsterBtn.addEventListener("click", () => {
     request.onload = () => {
         if(request.responseText == true) {
             alert("Such enemy already exists");
-        } else {
-            enemyInfo = markdownResult.innerHTML;
-            
+        } else {            
             formData.append("action", "addEnemy");
-            formData.append("name", monsterNameElement.innerText);
-            formData.append("minHealth", minHealth.innerText);
-            formData.append("maxHealth", maxHealth.innerText);
-            formData.append("armorClass", armorClass.innerText);
-            formData.append("initiativeBonus", initiativeBonus.innerText);
-            formData.append("info", markdownResult.innerHTML.replaceAll("&gt;", ">"));
+            formData.append("name", monsterNameElement);
+            formData.append("minHealth", minHealth);
+            formData.append("maxHealth", maxHealth);
+            formData.append("armorClass", armorClass);
+            formData.append("initiativeBonus", initiativeBonus);
+            formData.append("info", moreInfo);
 
             request = new XMLHttpRequest();
             request.onload = () => {
@@ -50,13 +47,21 @@ addMonsterBtn.addEventListener("click", () => {
 });
 
 async function searchMonster(monsterName) {
-    let response = await fetch(`https://api.open5e.com/v2/creatures/?name__icontains=${monsterName}`);
+    let response = await fetch(`https://api.open5e.com/v2/creatures/?name__icontains=${monsterName}&ordering=name`);
     if(response.ok) {
         let json = await response.json();
-        monsterInfo.innerHTML = generateHtml(json['results'][2]);
-        // json['results'].forEach(monster => {
-        //     generateHtml(monster);
-        // });
+        matchList.innerHTML = "";
+        json['results'].forEach(monster => {
+            let monsterResult = document.createElement('div');
+            monsterResult.setAttribute("class", "inline-row monster");
+            monsterResult.innerHTML = `<span class="more-monster-info" style="display: none;">${generateHtml(monster)}</span><span>${monster.name}</span><span>${monster.document.key}</span>`;
+            monsterResult.addEventListener("click", e => {
+                moreInfo = monsterResult.querySelector(".more-monster-info").innerHTML;
+                monsterName = monster.name;
+                monsterInfoElement.innerHTML = moreInfo;
+            });
+            matchList.append(monsterResult);
+        });
     } else {
         alert("HTTP-Error: " + response.status + response.url);
     }
@@ -81,7 +86,7 @@ function generateHtml(monster) {
             </li>
             <li>
                 <strong>Speed </strong>
-                ${monster.speed_all.walk} ${monster.speed_all.fly != 0 ? ', '+monster.speed_all.fly : ''} ${monster.speed_all.burrow != 0 ? ', '+monster.speed_all.burrow : ''} ${monster.speed_all.unit}
+                ${monster.speed_all.walk} ${monster.speed_all.fly != 0 ? ', Fly '+monster.speed_all.fly : ''} ${monster.speed_all.burrow != 0 ? ', Burrow '+monster.speed_all.burrow : ''} ${monster.speed_all.unit}
             </li>
             <li>
                 <strong>Initiative </strong>
@@ -155,8 +160,9 @@ function generateHtml(monster) {
                     ${Object.entries(monster.skill_bonuses).map(([key, value]) => `${key} ${value >= 0 ? `+${value}` : value}`).join(', ')}
                 </li>`
             }
-html +=
-`            <li>
+    html +=`${monster.resistances_and_immunities.damage_resistances_display != "" ? `<li><strong>Resistances </strong>${monster.resistances_and_immunities.damage_resistances_display}</li>`: ""}
+            ${monster.resistances_and_immunities.damage_immunities_display != "" ? `<li><strong>Immunities </strong>${monster.resistances_and_immunities.damage_immunities_display}</li>`: ""}
+            <li>
                 <strong>Senses </strong>
                 ${monster.darkvision_range != null ? `Darkvision ${monster.darkvision_range} ft.` : ''}
                 ${monster.blindsight_range != null ? `Blindsight ${monster.blindsight_range} ft.` : ''}
@@ -173,8 +179,8 @@ html +=
                 ${monster.challenge_rating_text} (XP ${monster.experience_points}; PB +${monster.proficiency_bonus ?? 0})
             </li>
         </ul>
-        ${monster.traits.map(trait => `<p><strong><em>${trait.name}. </em></strong>${trait.desc.replaceAll(/[\n]| - /gm, "<br><br>")}</p>`).join('')}
-        ${monster.actions.map(trait => `<p><strong><em>${trait.name}. </em></strong>${trait.desc.replaceAll(/[\n]| - /gm, "<br><br>")}</p>`).join('')}
+        ${monster.traits.map(trait => `<p><strong><em>${trait.name}. </em></strong>${trait.desc.replaceAll(/\n{2}|\n| - /gm, "<br><br>")}</p>`).join('')}
+        ${monster.actions.map(trait => `<p><strong><em>${trait.name}. </em></strong>${trait.desc.replaceAll(/\n{2}|\n| - /gm, "<br><br>")}</p>`).join('')}
     </blockquote>
     `
     return html;
@@ -184,133 +190,23 @@ function isEmpty(obj) {
     return Object.keys(obj).length === 0;
 }
 
-function generateMarkdown(data) {
-    let markdown =
-`___
->## ${data.name}
->*${data.size} ${data.type}${data.subtype ? ` (${data.subtype})` : ''}, ${data.alignment}*
->___
->- **Armor Class** ${data.armor_class[0].value} (${data.armor_class[0].desc == undefined ? data.armor_class[0].type + " armor": data.armor_class[0].desc})
->- **Hit Points** ${data.hit_points} (${(data.hit_points_roll).replace("+", " + ")})
->- **Speed** ${formatSpeed(data.speed)}
->___
->|STR|DEX|CON|INT|WIS|CHA|
->|:---:|:---:|:---:|:---:|:---:|:---:|
->|${data.strength} (${modifier(data.strength)})|${data.dexterity} (${modifier(data.dexterity)})|${data.constitution} (${modifier(data.constitution)})|${data.intelligence} (${modifier(data.intelligence)})|${data.wisdom} (${modifier(data.wisdom)})|${data.charisma} (${modifier(data.charisma)})|
->___
-`
-markdown = formatAttributes(data, markdown)
-markdown += `>___\r`
-data.special_abilities.forEach(element => {
-    markdown += `>***${element.name}.*** ${element.desc.replaceAll('\n', '\r>')}\r>\r`;
-});
+function convertStarLinesToList(text) {
+  // Split into lines
+  const lines = text.split(/\r?\n/);
 
-markdown += `>###Actions`
-data.actions.forEach(element => {
-    markdown += `\r>***${element.name}.*** ${element.desc}\r>`;
-});
+  // Extract only lines that start with "*"
+  const listItems = lines
+    .filter(line => line.trim().startsWith('*'))
+    .map(line => line.replace(/^\*\s*/, '').trim()); // remove the * and spaces
 
-if(data.reactions.length > 0) {
-    markdown += `>### Reactions`;
-    data.reactions.forEach(element => {
-        markdown += `\r>**${element.name}.** ${element.desc}`;
-    });
+  // If no list items found, return the original text
+  if (listItems.length === 0) return text;
+
+  // Wrap in <ul> and <li> tags
+  const listHtml = `<ul>\n${listItems.map(item => `  <li>${item}</li>`).join('\n')}\n</ul>`;
+
+  return listHtml;
 }
 
-if(data.legendary_actions.length > 0) {
-    markdown += `
->### Legendary Actions
->*Legendary Action Uses: 3. Immediately after another creature's turn, The ${data.name} can expend a use to take one of the following actions. The ${data.name} regains all expended uses at the start of each of its turns.*\r>`
-    data.legendary_actions.forEach(element => {
-        markdown += `\r>**${element.name}.** ${element.desc}`;
-    });
-}
-return markdown
-}
-
-// Helper functions
-
-function modifier(score) {
-    let mod = Math.floor((score - 10) / 2);
-    return mod >= 0 ? `+${mod}` : `-${mod}`;
-}
-
-function capitalizeFirstLetter(val) {
-    return String(val).charAt(0).toUpperCase() + String(val).slice(1);
-}
-
-function formatSpeed(speed) {
-    if (typeof speed === "object") {
-        return Object.entries(speed).map(([key, value]) => `${key === 'walk' ? '' : key} ${value}`).join(", ");
-    }
-    return speed;
-}
-
-function formatAttributes(data, markdown) {
-    let isSkillBonus = false;
-    if (data.proficiencies.length > 0) {
-        markdown += `>- **Saving Throws** `
-        for (let proficiency of data.proficiencies) {
-            if(proficiency.proficiency.name.match(/[A-Z]{3}/gm)) {
-                markdown += capitalizeFirstLetter(proficiency.proficiency.name.match(/[A-Z]{3}/gm)[0].toLowerCase()) + ` +${proficiency.value}, `;
-            } else {
-                if(!isSkillBonus) {
-                    markdown += `\r>- **Skills** `
-                }
-                markdown += proficiency.proficiency.name.replace("Skill: ", '') + ` +${proficiency.value}, `;
-                isSkillBonus = true;
-            }
-        }
-        markdown += '\r'
-    }
-
-    if (data.damage_vulnerabilities.length > 0) {
-        markdown += `>- **Damage Vulnerabilities** `
-        for (let damage_vulnerability of data.damage_vulnerabilities) {
-            markdown += `${damage_vulnerability}, `;
-        }
-        markdown += '\r';
-    }
-
-    if (data.damage_resistances.length > 0) {
-        markdown += `>- **Damage Resistances** `
-        for (let damage_resistance of data.damage_resistances) {
-            markdown += damage_resistance + ", ";
-        }
-        markdown += '\r'
-    }
-
-    if (data.damage_immunities.length > 0) {
-        markdown += `>- **Damage Immunities** `
-        for (let damage_immunity of data.damage_immunities) {
-            markdown += damage_immunity + ", ";
-        }
-        markdown += '\r'
-    }
-
-    if (data.condition_immunities.length > 0) {
-        markdown += `>- **Condition Immunities** `
-        for (let condition_immunity of data.condition_immunities) {
-            markdown += condition_immunity.name + ", ";
-        }
-        markdown += '\r'
-    }
-
-    if (data.senses) {
-        markdown += `>- **Senses** `        
-        for (let sense in data.senses) {            
-            markdown += `${sense} ${data.senses[sense]}, `.replace('.', '').replace('_', ' ');
-        }
-        markdown += '\r'
-    }
-
-    if (data.languages) {
-        markdown += `>- **Langauges** ${data.languages}\r`;
-    }
-
-    markdown += `>- **Challenge** ${data.challenge_rating} (XP ${data.xp}; PB ${data.proficiency_bonus})\r`
-    markdown += `>- **Proficiency Bonus** +${data.proficiency_bonus}\r`
-    return markdown;
-}
 
 searchMonster("Archmage");

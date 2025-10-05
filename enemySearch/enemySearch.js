@@ -3,15 +3,14 @@ const searchButton = document.getElementById("searchButton");
 const monsterInfoElement = document.getElementById("monsterInfo");
 const matchList = document.getElementById("matchList");
 const addMonsterBtn = document.getElementById("addEnemyBtn");
-const monsterNameElement = document.getElementById("monsterName");
 
-let monsterName, minHealth, maxHealth, armorClass, initiativeBonus, moreInfo;
+let inputMonsterName, postMonsterName, minHealth, maxHealth, armorClass, initiativeBonus, moreInfo;
 
-searchButton.addEventListener("click", () => {
-    monsterName = monsterInput.value.toLowerCase();
-    if (monsterName) {
+monsterInput.addEventListener("input", () => {
+    inputMonsterName = monsterInput.value.toLowerCase();
+    if (inputMonsterName) {
         matchList.innerHTML = '';
-        searchMonster(monsterName);
+        searchMonster(inputMonsterName);
     } else {
         monsterInfoElement.innerHTML = "Please enter a monster name.";
     }
@@ -20,14 +19,14 @@ searchButton.addEventListener("click", () => {
 addMonsterBtn.addEventListener("click", () => {
     let formData = new FormData();
     formData.append("action", "checkIfExists");
-    formData.append("monsterName", monsterNameElement.innerText)
+    formData.append("monsterName", postMonsterName)
     let request = new XMLHttpRequest();
     request.onload = () => {
         if(request.responseText == true) {
             alert("Such enemy already exists");
         } else {            
             formData.append("action", "addEnemy");
-            formData.append("name", monsterNameElement);
+            formData.append("name", postMonsterName);
             formData.append("minHealth", minHealth);
             formData.append("maxHealth", maxHealth);
             formData.append("armorClass", armorClass);
@@ -36,6 +35,7 @@ addMonsterBtn.addEventListener("click", () => {
 
             request = new XMLHttpRequest();
             request.onload = () => {
+                console.log(request.responseText);
                 alert("Enemy has been added to the database");
             }
             request.open("post", `enemySearchScript.php`, true);
@@ -54,10 +54,19 @@ async function searchMonster(monsterName) {
         json['results'].forEach(monster => {
             let monsterResult = document.createElement('div');
             monsterResult.setAttribute("class", "inline-row monster");
-            monsterResult.innerHTML = `<span class="more-monster-info" style="display: none;">${generateHtml(monster)}</span><span>${monster.name}</span><span>${monster.document.key}</span>`;
+            monsterResult.innerHTML = `<span>${monster.name}</span><span>${monster.document.key}</span>`;
             monsterResult.addEventListener("click", e => {
-                moreInfo = monsterResult.querySelector(".more-monster-info").innerHTML;
-                monsterName = monster.name;
+                postMonsterName = monster.name;                
+                if(monster.hit_dice != null) {
+                    minHealth = monster.hit_dice.match(/\d+/)*1 + monster.hit_dice.match(/(?<=\+)\d+$/)*1;
+                    maxHealth = monster.hit_dice.match(/\d+/) * monster.hit_dice.match(/(?<=d)\d+/)*1 + monster.hit_dice.match(/\d+$/)*1;
+                } else {
+                    minHealth = monster.hit_points;
+                    maxHealth = minHealth;
+                }
+                armorClass = monster.armor_class;
+                initiativeBonus = monster.initiative_bonus;
+                moreInfo = generateHtml(monster);
                 monsterInfoElement.innerHTML = moreInfo;
             });
             matchList.append(monsterResult);
@@ -78,7 +87,7 @@ function generateHtml(monster) {
         <ul>
             <li>
                 <strong>Armor Class </strong>
-                ${monster.armor_class} ${monster.armor_detail != "" ? `, ${monster.armor_detail}` : ``}
+                ${monster.armor_class} ${monster.armor_detail != "" ? ` (${monster.armor_detail})` : ``}
             </li>
             <li>
                 <strong>Hit Points </strong>
@@ -179,11 +188,23 @@ function generateHtml(monster) {
                 ${monster.challenge_rating_text} (XP ${monster.experience_points}; PB +${monster.proficiency_bonus ?? 0})
             </li>
         </ul>
+        ${!isEmpty(monster.traits) ? `<h3>Traits</h3>` : ''}
         ${monster.traits.map(trait => `<p><strong><em>${trait.name}. </em></strong>${trait.desc.replaceAll(/\n{2}|\n| - /gm, "<br><br>")}</p>`).join('')}
-        ${monster.actions.map(trait => `<p><strong><em>${trait.name}. </em></strong>${trait.desc.replaceAll(/\n{2}|\n| - /gm, "<br><br>")}</p>`).join('')}
+        
+        ${!isEmpty(monster.actions.filter(action => action.action_type == "ACTION")) ? `<h3>Actions</h3>` : ''}
+        ${monster.actions.filter(action => action.action_type == "ACTION").map(action => `<p><strong><em>${action.name}. </em></strong>${action.desc.replaceAll(/\n{2}|\n| - /gm, "<br><br>")}</p>`).join('')}
+
+        ${!isEmpty(monster.actions.filter(action => action.action_type == "BONUS_ACTION")) ? `<h3>Bonus Actions</h3>` : ''}
+        ${monster.actions.filter(action => action.action_type == "BONUS_ACTION").map(action => `<p><strong><em>${action.name}. </em></strong>${action.desc.replaceAll(/\n{2}|\n| - /gm, "<br><br>")}</p>`).join('')}
+        
+        ${!isEmpty(monster.actions.filter(action => action.action_type == "REACTION")) ? `<h3>Reactions</h3>` : ''}
+        ${monster.actions.filter(action => action.action_type == "REACTION").map(action => `<p><strong><em>${action.name}. </em></strong>${action.desc.replaceAll(/\n{2}|\n| - /gm, "<br><br>")}</p>`).join('')}
+        
+        ${!isEmpty(monster.actions.filter(action => action.action_type == "LEGENDARY_ACTION")) ? `<h3>Legendary Actions</h3>` : ''}
+        ${monster.actions.filter(action => action.action_type == "LEGENDARY_ACTION").map(action => `<p><strong><em>${action.name}. </em></strong>${action.desc.replaceAll(/\n{2}|\n| - /gm, "<br><br>")}</p>`).join('')}
     </blockquote>
     `
-    return html;
+    return convertStarLinesToList(html);
 }
 
 function isEmpty(obj) {
@@ -191,22 +212,13 @@ function isEmpty(obj) {
 }
 
 function convertStarLinesToList(text) {
-  // Split into lines
-  const lines = text.split(/\r?\n/);
+    //Match all lines starting with <br><br>*
+    let listLines = [...text.matchAll(/(?:<br><br>\* )((?:\d|Cantrips)[^<]+)/g)].map(match => match[1]);
+    // listLines = listLines.map(line => line.replaceAll(/[\w\d ()]+(?=\:)/g, match => `<strong>${match}</strong>`));
 
-  // Extract only lines that start with "*"
-  const listItems = lines
-    .filter(line => line.trim().startsWith('*'))
-    .map(line => line.replace(/^\*\s*/, '').trim()); // remove the * and spaces
+    if(isEmpty(listLines))
+        return text;    
 
-  // If no list items found, return the original text
-  if (listItems.length === 0) return text;
-
-  // Wrap in <ul> and <li> tags
-  const listHtml = `<ul>\n${listItems.map(item => `  <li>${item}</li>`).join('\n')}\n</ul>`;
-
-  return listHtml;
+    const listHtml = `<ul>\n${listLines.map(item => `  <li>${item}</li>`).join('\n')}\n</ul>`;
+    return text.replace(/<br><br>[\s\S]*?(?=\* The archmage casts|<\/p>)/g, listHtml)
 }
-
-
-searchMonster("Archmage");

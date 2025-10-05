@@ -33,20 +33,7 @@
         <div id="matchList"></div>
         <div class="monster-result moreInfoPanel">
             <button id="addEnemyBtn" class="corner-btn"><img src="../media/addIcon.svg" alt=""></button>
-            <span id="monsterInfo">
-            <?php
-                include "../parsedown/Parsedown.php";
-                include "../parsedown/ParsedownExtra.php";
-                if(!empty($_POST['info'])) {
-                    $moreInfo = $_POST['info'];
-                    $parsedown = new ParsedownExtra();
-                    $moreInfo = str_replace("___", "", $moreInfo);
-                    $moreInfo = $parsedown->text($moreInfo);
-                    $moreInfo = str_replace("<hr>", "", $moreInfo);
-                    echo $moreInfo;
-                }
-            ?>
-            </span>
+            <span id="monsterInfo"></span>
         </div>
     </main>
     <script src="enemySearch.js"></script>

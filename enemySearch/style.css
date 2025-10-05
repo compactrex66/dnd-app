@@ -11,6 +11,11 @@ header {
     height: 80vh;
     width: 50vw;
 }
+.monster {
+    border-bottom: 1px solid var(--text);
+    padding: 15px;
+    cursor: pointer;
+}
 #matchList {
     width: 20vw;
     height: 80vh;
@@ -47,8 +52,4 @@ main {
     justify-content: center;
     gap: 20px;
     width: 65vw;
-}
-.inline-row {
-    padding: 15px;
-    border: 1px solid white;
 }

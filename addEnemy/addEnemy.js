@@ -19,7 +19,7 @@ addEnemyBtn.addEventListener("click", () => {
     armorClass = enemyInfo.match(/[s]{2}[*]{2}\s\d+/gm)[0].match(/\d+/)[0]
     initiativeBonus = parseInt(enemyInfo.match(/\d+\s[(].\d+[)]/gm)[1].match(/[+,-]\d+/)[0])    
     
-    nameInput.value = enemyInfo.match(/\n(>## ).+/gm)[0].match(/[a-zA-Z]+/)[0];
+    nameInput.value = enemyInfo.match(/(?:>#{2} )([a-zA-Z ]+)/m)[1];
     minHealthInput.value = minHealth
     maxHealthInput.value = maxHealth
     armorClassInput.value = armorClass

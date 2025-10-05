@@ -49,52 +49,139 @@ addMonsterBtn.addEventListener("click", () => {
     request.send(formData);
 });
 
-function searchMonster(monsterName) {
-    fetch("https://www.dnd5eapi.co/api/monsters")
-        .then(response => response.json())
-        .then(data => {
-            const monsters = data.results;            
-            const matchedMonsters = monsters.filter(monster => monster.name.toLowerCase().includes(monsterName));            
-            for(let element of matchedMonsters) {
-                fetch("https://www.dnd5eapi.co" + element.url)
-                .then(response => response.json())
-                .then(data => {
-                    const markdown = generateMarkdown(data);
-                    const monsterElement = document.createElement("div");
-                    monsterElement.classList.add("inline-row");
-                    monsterElement.classList.add("monster");
-                    monsterElement.innerHTML = element.name + `<pre class="moreMonsterInfo">${markdown}</pre>`
-                    monsterElement.addEventListener("click", () => {
-                        let formData = new FormData();
-                        formData.append("action", "parseMarkdown")
-                        formData.append("markdown", markdown);
-                        let request = new XMLHttpRequest();
-                        markdownResult.innerHTML = markdown;
-                        monsterNameElement.innerText = data.name;
-                        let healthValues = data.hit_points_roll.match(/[0-9]+/gm);
-                        for(let i = 0; i < healthValues.length; i++) healthValues[i] = parseInt(healthValues[i]);
-                        if(healthValues.length < 3) healthValues[2] = 0;
-                        minHealth.innerText = healthValues[0] + healthValues[2];
-                        maxHealth.innerText = healthValues[0] * healthValues[1] + healthValues[2];
-                        armorClass.innerText = data.armor_class[0].value;
-                        initiativeBonus.innerText = modifier(data.dexterity);
-                        request.onload = () => {
-                            monsterInfo.innerHTML = request.responseText;
-                        }
-                        request.open("post", "enemySearchScript.php", true);
-                        request.send(formData);
-                    })
-                    matchList.appendChild(monsterElement);
-                })
-                .catch(error => console.error("Error fetching data:", error));
+async function searchMonster(monsterName) {
+    let response = await fetch(`https://api.open5e.com/v2/creatures/?name__icontains=${monsterName}`);
+    if(response.ok) {
+        let json = await response.json();
+        monsterInfo.innerHTML = generateHtml(json['results'][2]);
+        // json['results'].forEach(monster => {
+        //     generateHtml(monster);
+        // });
+    } else {
+        alert("HTTP-Error: " + response.status + response.url);
+    }
+}
+
+function generateHtml(monster) {
+    let html =
+    `
+    <blockquote>
+        <h2>${monster.name}</h2>
+        <p>
+            <em>${monster.size.name} ${monster.type.name}, ${monster.alignment}</em>
+        </p>
+        <ul>
+            <li>
+                <strong>Armor Class </strong>
+                ${monster.armor_class} ${monster.armor_detail != "" ? `, ${monster.armor_detail}` : ``}
+            </li>
+            <li>
+                <strong>Hit Points </strong>
+                ${monster.hit_points} (${monster.hit_dice ?? "No Hit Dice"})
+            </li>
+            <li>
+                <strong>Speed </strong>
+                ${monster.speed_all.walk} ${monster.speed_all.fly != 0 ? ', '+monster.speed_all.fly : ''} ${monster.speed_all.burrow != 0 ? ', '+monster.speed_all.burrow : ''} ${monster.speed_all.unit}
+            </li>
+            <li>
+                <strong>Initiative </strong>
+                ${monster.initiative_bonus >= 0 ? `+${monster.initiative_bonus}` : monster.initiative_bonus}
+            </li>
+        </ul>
+        <div class="inline-row">
+            <table>
+                <tr>
+                    <th colspan="2"></th>
+                    <th>MOD</th>
+                    <th>SAVE</th>
+                </tr>
+                <tr>
+                    <td>Str</td>
+                    <td>${monster.ability_scores.strength}</td>
+                    <td>${monster.modifiers.strength >= 0 ? `+${monster.modifiers.strength}` : monster.modifiers.strength}</td>
+                    <td>${monster.saving_throws_all.strength >= 0 ? `+${monster.saving_throws_all.strength}` : monster.saving_throws_all.strength}</td>
+                </tr>
+                <tr>
+                    <td>Int</td>
+                    <td>${monster.ability_scores.intelligence}</td>
+                    <td>${monster.modifiers.intelligence >= 0 ? `+${monster.modifiers.intelligence}` : monster.modifiers.intelligence}</td>
+                    <td>${monster.saving_throws_all.intelligence >= 0 ? `+${monster.saving_throws_all.intelligence}` : monster.saving_throws_all.intelligence}</td>
+                </tr>
+            </table>
+            <table>
+                <tr>
+                    <th colspan="2"></th>
+                    <th>MOD</th>
+                    <th>SAVE</th>
+                </tr>
+                <tr>
+                    <td>Dex</td>
+                    <td>${monster.ability_scores.dexterity}</td>
+                    <td>${monster.modifiers.dexterity >= 0 ? `+${monster.modifiers.dexterity}` : monster.modifiers.dexterity}</td>
+                    <td>${monster.saving_throws_all.dexterity >= 0 ? `+${monster.saving_throws_all.dexterity}` : monster.saving_throws_all.dexterity}</td>
+                </tr>
+                <tr>
+                    <td>Wis</td>
+                    <td>${monster.ability_scores.wisdom}</td>
+                    <td>${monster.modifiers.wisdom >= 0 ? `+${monster.modifiers.wisdom}` : monster.modifiers.wisdom}</td>
+                    <td>${monster.saving_throws_all.wisdom >= 0 ? `+${monster.saving_throws_all.wisdom}` : monster.saving_throws_all.wisdom}</td>
+                </tr>
+            </table>
+            <table>
+                <tr>
+                    <th colspan="2"></th>
+                    <th>MOD</th>
+                    <th>SAVE</th>
+                </tr>
+                <tr>
+                    <td>Con</td>
+                    <td>${monster.ability_scores.constitution}</td>
+                    <td>${monster.modifiers.constitution >= 0 ? `+${monster.modifiers.constitution}` : monster.modifiers.constitution}</td>
+                    <td>${monster.saving_throws_all.constitution >= 0 ? `+${monster.saving_throws_all.constitution}` : monster.saving_throws_all.constitution}</td>
+                </tr>
+                <tr>
+                    <td>Cha</td>
+                    <td>${monster.ability_scores.charisma}</td>
+                    <td>${monster.modifiers.charisma >= 0 ? `+${monster.modifiers.charisma}` : monster.modifiers.charisma}</td>
+                    <td>${monster.saving_throws_all.charisma >= 0 ? `+${monster.saving_throws_all.charisma}` : monster.saving_throws_all.charisma}</td>
+                </tr>
+            </table>
+        </div>
+        <ul>`
+            if(!isEmpty(monster.skill_bonuses)) {                
+                html +=
+                `<li>
+                    <strong>Skills </strong>
+                    ${Object.entries(monster.skill_bonuses).map(([key, value]) => `${key} ${value >= 0 ? `+${value}` : value}`).join(', ')}
+                </li>`
             }
-            
-            if (!matchedMonsters) {
-                monsterInfo.innerHTML = "Monster not found.";
-                return;
-            }
-        })
-        
+html +=
+`            <li>
+                <strong>Senses </strong>
+                ${monster.darkvision_range != null ? `Darkvision ${monster.darkvision_range} ft.` : ''}
+                ${monster.blindsight_range != null ? `Blindsight ${monster.blindsight_range} ft.` : ''}
+                ${monster.tremorsense_range != null ? `Tremorsense ${monster.tremorsense_range} ft.` : ''}
+                ${monster.truesight_range != null ? `Truesight ${monster.truesight_range} ft.` : ''}
+                Passive Perception ${monster.passive_perception}
+            </li>
+            <li>
+                <strong>Languages </strong>
+                ${monster.languages.as_string}
+            </li>
+            <li>
+                <strong>Challenge </strong>
+                ${monster.challenge_rating_text} (XP ${monster.experience_points}; PB +${monster.proficiency_bonus ?? 0})
+            </li>
+        </ul>
+        ${monster.traits.map(trait => `<p><strong><em>${trait.name}. </em></strong>${trait.desc.replaceAll(/[\n]| - /gm, "<br><br>")}</p>`).join('')}
+        ${monster.actions.map(trait => `<p><strong><em>${trait.name}. </em></strong>${trait.desc.replaceAll(/[\n]| - /gm, "<br><br>")}</p>`).join('')}
+    </blockquote>
+    `
+    return html;
+}
+
+function isEmpty(obj) {
+    return Object.keys(obj).length === 0;
 }
 
 function generateMarkdown(data) {
@@ -225,3 +312,5 @@ function formatAttributes(data, markdown) {
     markdown += `>- **Proficiency Bonus** +${data.proficiency_bonus}\r`
     return markdown;
 }
+
+searchMonster("Archmage");

@@ -73,4 +73,10 @@ function setCurrent($conn, $characterId = null) {
     }
 }
 
+function normalize_string($value) {
+    if (is_array($value)) return implode("\n", $value);
+    if (is_object($value)) return json_encode($value);
+    return (string)$value;
+}
+
 ?>

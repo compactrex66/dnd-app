@@ -70,6 +70,12 @@ function setCurrentCharacter(character) {
     character.style.border = "1px solid white";
     moreInfoPanel.innerHTML = character.querySelector(".moreInfo")?.innerHTML ?? `<div class="container"><h1>Player Character</h1></div>`;
 
+    moreInfoPanel.querySelectorAll(".hint-popup").forEach(hintPopup => {
+        hintPopup.addEventListener("mouseleave", e => {
+            hintPopup.style.display = "none";
+        });
+    })
+
     let request = new XMLHttpRequest();
     request.open("post", `indexActions.php`, true);
 
@@ -82,7 +88,7 @@ function setCurrentCharacter(character) {
 
 //Handle character clicks
 listOfCharacters.addEventListener("click", (e) => {
-    const target = e.target;
+    let target = e.target;
 
     // Delete button
     if (target.classList.contains("deleteBtn")) {
@@ -127,11 +133,42 @@ listOfCharacters.addEventListener("click", (e) => {
     }
 
     //change more info in the panel
-    if(target.classList.contains("character")) {
+    if(target.classList.contains("character") || target.classList.contains("characterName")) {
+        target = target.classList.contains("characterName") ? target.parentNode : target;
         let moreInfo = target.querySelector(".moreInfo");
-        moreInfoPanel.innerHTML = moreInfo == null ? "Player Character" : moreInfo.innerHTML;
+        moreInfoPanel.innerHTML = moreInfo == null ? `<div class="container"><h1>Player Character</h1></div>` : moreInfo.innerHTML;
+
+        moreInfoPanel.querySelectorAll(".hint-popup").forEach(hintPopup => {
+            hintPopup.addEventListener("mouseleave", e => {
+                hintPopup.style.display = "none";
+            });
+        })
     }
 });
+
+//Handle clicks outside elements
+document.addEventListener("click", e => {
+    let target = e.target;
+    
+    if(!target.classList.contains("option") && !target.classList.contains("options") && !target.classList.contains("select") && target.id != "selectedEnemy" && enemyOptions.style.display != "none") {
+        enemyOptions.style.display = "none";
+    }
+});
+//handle mouseover spell to show spell hint
+moreInfoPanel.addEventListener("mouseover", e => {
+    let target = e.target;
+    if(target.classList.contains("spell")) {
+        let popup = target.querySelector(".hint-popup");
+        popup.style.display = "inline-block";
+
+        let rect = popup.getBoundingClientRect();
+        console.log(rect.right + " " + rect.left + " " + rect.width + " | " + window.innerWidth);
+        
+        if (rect.right+10 > window.innerWidth) {
+            popup.style.left = `${window.innerWidth - (rect.right) - 30}px`;
+        }
+    }
+})
 //Handle input changes
 listOfCharacters.addEventListener("change", (e) => {
     const target = e.target;

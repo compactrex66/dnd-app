@@ -8,23 +8,9 @@ let menuSidePanelAnimOptions = {
     easing: "cubic-bezier(0,.73,.17,1.11)",
 }
 
-openMenuBtn.addEventListener("click", (e) => {
-    menuSidePanel.animate(
-        [
-            { translate: "0 0" }
-        ],
-        menuSidePanelAnimOptions
-    )
-});
+openMenuBtn.addEventListener("click", showSidePanelMenu);
 
-closeMenuBtn.addEventListener("click", (e) => {
-    menuSidePanel.animate(
-        [
-            { translate: "16vw 0" }
-        ],
-        menuSidePanelAnimOptions
-    )
-});
+closeMenuBtn.addEventListener("click", hideSidePanelMenu);
 
 function generateHtml(monster) {
     let html =
@@ -188,4 +174,22 @@ function convertStarLinesToList(text) {
 
     const listHtml = `<ul>\n${listLines.map(item => `  <li>${item}</li>`).join('\n')}\n</ul>`;
     return text.replace(/<br><br>[\s\S]*?(?=\* The archmage casts|<\/p>)/g, listHtml)
+}
+
+function hideSidePanelMenu() {
+    menuSidePanel.animate(
+        [
+            { translate: "16vw 0" }
+        ],
+        menuSidePanelAnimOptions
+    )
+}
+
+function showSidePanelMenu() {
+    menuSidePanel.animate(
+        [
+            { translate: "0 0" }
+        ],
+        menuSidePanelAnimOptions
+    )
 }

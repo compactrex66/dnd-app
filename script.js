@@ -159,6 +159,10 @@ document.addEventListener("click", e => {
         )
         fadeOutAnimation.onfinish = () => { enemyOptions.style.display = "none"; }
     }
+    
+    if(!target.classList.contains("side-panel") && !target.parentNode.classList.contains("side-panel") && !target.parentNode.parentNode.classList.contains("side-panel") && target.id != "menuIcon") {
+        hideSidePanelMenu();
+    }
 });
 
 //handle mouseover spell to show spell hint

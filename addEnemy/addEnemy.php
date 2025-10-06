@@ -54,6 +54,7 @@ if (isset($_GET['name'])) {
         <input type="number" name="maxHealth" id="maxHealthInput">
         <input type="number" name="armorClass" id="armorClassInput">
         <input type="number" name="initiativeBonus" id="initiativeBonusInput">
+        <input type="text" name="documentKey" id="documentKeyInput">
         <textarea name="moreInfo" name="moreInfo" id="moreInfoInput"></textarea>
     </form>
     <header><a href="../index.php"><button>Fight</button></a>Add New Enemy</header>

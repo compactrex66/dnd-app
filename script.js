@@ -151,9 +151,16 @@ document.addEventListener("click", e => {
     let target = e.target;
     
     if(!target.classList.contains("option") && !target.classList.contains("options") && !target.classList.contains("select") && target.id != "selectedEnemy" && enemyOptions.style.display != "none") {
-        enemyOptions.style.display = "none";
+        let fadeOutAnimation = enemyOptions.animate(
+            [
+                { opacity: 0 }
+            ],
+            selectAnimOptions
+        )
+        fadeOutAnimation.onfinish = () => { enemyOptions.style.display = "none"; }
     }
 });
+
 //handle mouseover spell to show spell hint
 moreInfoPanel.addEventListener("mouseover", e => {
     let target = e.target;
@@ -169,6 +176,7 @@ moreInfoPanel.addEventListener("mouseover", e => {
         }
     }
 })
+
 //Handle input changes
 listOfCharacters.addEventListener("change", (e) => {
     const target = e.target;
@@ -199,6 +207,7 @@ listOfCharacters.addEventListener("change", (e) => {
         request.send(data);
     }
 });
+
 //Handle character double clicks
 listOfCharacters.addEventListener("dblclick", (e) => {
     const target = e.target
@@ -232,6 +241,7 @@ listOfCharacters.addEventListener("dblclick", (e) => {
         inputNewNameElement.focus();
     }
 })
+
 //Delete all enemies
 deleteEnemiesBtn.addEventListener("click", () => {
     if(confirm('Are you sure you want delete all enemies ?')) {
@@ -245,6 +255,7 @@ deleteEnemiesBtn.addEventListener("click", () => {
     }
     deleteEnemiesBtn.blur();
 });
+
 //Add enemy
 addEnemyBtn.addEventListener("click", () => {
     let data = new FormData();
@@ -259,6 +270,7 @@ addEnemyBtn.addEventListener("click", () => {
 
     addEnemyBtn.blur();
 });
+
 //Rewind time
 document.getElementById("rewindTimeBtn").addEventListener("click", () => {
     let request = new XMLHttpRequest();
@@ -272,6 +284,7 @@ document.getElementById("rewindTimeBtn").addEventListener("click", () => {
 
     document.getElementById("rewindTimeBtn").blur();
 });
+
 //Pass time
 document.getElementById("forwardTimeBtn").addEventListener("click", () => {
     let request = new XMLHttpRequest();
@@ -285,6 +298,7 @@ document.getElementById("forwardTimeBtn").addEventListener("click", () => {
 
     document.getElementById("forwardTimeBtn").blur();
 });
+
 //Pass time by 2 hours
 document.getElementById("shortRestBtn").addEventListener("click", () => {
     let request = new XMLHttpRequest();
@@ -297,6 +311,7 @@ document.getElementById("shortRestBtn").addEventListener("click", () => {
 
     document.getElementById("shortRestBtn").blur()
 });
+
 //Pass time by 8 hours
 document.getElementById("longRestBtn").addEventListener("click", () => {
     let request = new XMLHttpRequest();
@@ -309,6 +324,7 @@ document.getElementById("longRestBtn").addEventListener("click", () => {
 
     document.getElementById("longRestBtn").blur()
 });
+
 //Next turn on space click or previous turn on shift + space
 window.addEventListener("keydown", function(e) {
     if(e.key == " ") {
@@ -316,11 +332,34 @@ window.addEventListener("keydown", function(e) {
         else setCurrentCharacter(getPreviousCharacter());
     }
 });
+
+let selectAnimOptions = {
+    duration: 300,
+    fill: "forwards",
+    easing: "cubic-bezier(0,.73,.17,1.11)",
+}
 //Toggle enemy list visibility: 
 enemySelect.addEventListener("click", () => {
-    if(enemyOptions.style.display != "grid") enemyOptions.style.display = "grid";
-    else enemyOptions.style.display = "none";
+    if(enemyOptions.style.display != "grid") {
+        enemyOptions.style.display = "grid";
+        enemyOptions.animate(
+            [
+                { opacity: 1 }
+            ],
+            selectAnimOptions
+        )
+    }
+    else {
+        let fadeOutAnimation = enemyOptions.animate(
+            [
+                { opacity: 0 }
+            ],
+            selectAnimOptions
+        )
+        fadeOutAnimation.onfinish = () => { enemyOptions.style.display = "none"; }
+    }
 });
+
 //Change selected enemy
 enemyOptions.addEventListener("click", (e) => {
     e.stopPropagation();

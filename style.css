@@ -1,6 +1,6 @@
 :root {
-    --primary: black;
-    --secondary: rgb(32, 32, 32);
+    --primary: rgb(14, 14, 14);
+    --secondary: rgb(28, 28, 28);
     --third: rgb(46, 46, 46);
     --fourth: rgb(55, 55, 55);
     --active-secondary: rgb(136, 136, 136);
@@ -15,6 +15,7 @@ body {
     color: var(--text);
     align-items: center;
     font-family: "Ubuntu";
+    overflow: hidden;
 }
 header {
     box-sizing: border-box;
@@ -37,10 +38,11 @@ button {
     cursor: pointer;
 }
 ul {
-    padding-left: 20px;
+    padding-left: 0;
 }
 li {
     margin: 10px 0;
+    list-style: none;
 }
 span {
     display: inline;
@@ -60,18 +62,21 @@ button img {
     pointer-events: none;
 }
 table, td, th {
-    border-collapse: separate;
+    border-collapse: collapse;
     text-align: center;
-    background-color: var(--third);
+    padding: 5px;
 }
 table {
-    
+    width: 30%;
 }
 tbody > tr:nth-child(odd) > td{
     background-color: var(--third);
 }
 tbody > tr:nth-child(even) > td{
     background-color: var(--fourth);
+}
+table th {
+    background-color: var(--third);
 }
 a {
     display: flex;
@@ -80,6 +85,7 @@ a {
 }
 a * {
     height: 100%;
+    width: 100%;
 }
 .container {
     display: flex;
@@ -94,8 +100,10 @@ a * {
     justify-content: space-between;
     align-items: stretch;
     gap: 10px;
-    align-self: stretch;
     width: 100%;
+}
+.row-form *:not(.vl, .redBtn, .greenBtn, img) {
+    flex-grow: 1;
 }
 .row {
     display: flex;
@@ -198,9 +206,11 @@ select, button, input, .checkboxInput, textarea, .secondary-btn, .select, .chara
     width: 10%;
     cursor: pointer;
     position: relative;
+    text-align: center;
 }
 .options {
     display: none;
+    opacity: 0;
     position: absolute;
     z-index: 2;
     background-color: transparent;
@@ -211,15 +221,18 @@ select, button, input, .checkboxInput, textarea, .secondary-btn, .select, .chara
     top: 50px;
     overflow-y: auto;
     overflow-x: hidden;
+    cursor: default;
 }
 .options .option {
-    cursor: default;
     text-align: center;
     align-content: center;
     padding: 10px;
     border: 1px solid white;
     background-color: var(--secondary);
     font-size: small;
+}
+.option {
+    cursor: pointer;
 }
 .checkboxInput {
     display: flex;
@@ -267,7 +280,7 @@ select, button, input, .checkboxInput, textarea, .secondary-btn, .select, .chara
     padding: 5px;
     background-color: var(--secondary);
     border: 1px solid var(--text);
-    z-index: 999;
+    z-index: 2;
     display: flex;
     flex-direction: column;
     color: var(--text);
@@ -280,4 +293,37 @@ select, button, input, .checkboxInput, textarea, .secondary-btn, .select, .chara
 .vl {
     width: 2px;
     background-color: white;
+}
+.side-panel {
+    position: absolute;
+    background-color: var(--third);
+    width: 16vw;
+    height: 100vh;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    align-self: stretch;
+    justify-items: stretch;
+    box-shadow: -5px 0 20px rgb(14, 14, 14);
+    translate: 16vw;
+}
+.side-panel button {
+    font-size: medium;
+    text-align: right;
+    padding: 16px;
+    border-bottom: 2px solid var(--third);
+}
+#menuIcon {
+    cursor: pointer;
+    align-self: stretch;
+    justify-self: stretch;
+    aspect-ratio: 1;
+}
+#sidePanelCloseBtn {
+    cursor: pointer;
+    position: absolute;
+    top: 0;
+    border-radius: 50%;
+    background-color: var(--third);
+    margin: 5px 0 0 5px;
 }

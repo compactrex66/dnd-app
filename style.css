@@ -1,6 +1,8 @@
 :root {
     --primary: black;
     --secondary: rgb(32, 32, 32);
+    --third: rgb(46, 46, 46);
+    --fourth: rgb(55, 55, 55);
     --active-secondary: rgb(136, 136, 136);
     --text: white;
 }
@@ -58,10 +60,18 @@ button img {
     pointer-events: none;
 }
 table, td, th {
-    border: 1px solid white;
-    border-collapse: collapse;
-    padding: 15px;
+    border-collapse: separate;
     text-align: center;
+    background-color: var(--third);
+}
+table {
+    
+}
+tbody > tr:nth-child(odd) > td{
+    background-color: var(--third);
+}
+tbody > tr:nth-child(even) > td{
+    background-color: var(--fourth);
 }
 a {
     display: flex;

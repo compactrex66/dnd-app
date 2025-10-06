@@ -6,7 +6,7 @@ const addMonsterBtn = document.getElementById("addEnemyBtn");
 
 let inputMonsterName, postMonsterName, minHealth, maxHealth, armorClass, initiativeBonus, moreInfo;
 
-monsterInput.addEventListener("input", () => {
+searchButton.addEventListener("click", () => {
     inputMonsterName = monsterInput.value.toLowerCase();
     if (inputMonsterName) {
         matchList.innerHTML = '';

@@ -33,11 +33,12 @@
                 echo "<div class='character' data-characterId='".$row['id']."' data-current='".$current."'>";
                 if($row['enemy_id'] != null) {
                     $moreInfo = mysqli_fetch_assoc(mysqli_query($conn, "SELECT name, more_info FROM enemies WHERE id = ".$row['enemy_id']));
-                    $parsedown = new ParsedownExtra();
                     echo "<span style='display: none;' class='name'><h1>".$moreInfo['name']."</h1></span>";
-                    $moreInfo['more_info'] = str_replace("___", "", $moreInfo['more_info']);
-                    $moreInfo = $parsedown->text($moreInfo['more_info']);
-                    $moreInfo = str_replace("<hr>", "", $moreInfo);
+                    $moreInfo = $moreInfo['more_info'];
+                    // $parsedown = new ParsedownExtra();
+                    // $moreInfo['more_info'] = str_replace("___", "", $moreInfo['more_info']);
+                    // $moreInfo = $parsedown->text($moreInfo['more_info']);
+                    // $moreInfo = str_replace("<hr>", "", $moreInfo);
                     preg_match_all("/<li>[^:]+:\s*([^<]+)<\/li>/i", $moreInfo, $matches);
                     $spells = [];
                     foreach ($matches[1] as $match) {

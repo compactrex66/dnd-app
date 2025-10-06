@@ -1,6 +1,8 @@
 :root {
     --primary: black;
     --secondary: rgb(32, 32, 32);
+    --third: rgb(46, 46, 46);
+    --fourth: rgb(55, 55, 55);
     --active-secondary: rgb(136, 136, 136);
     --text: white;
 }
@@ -23,22 +25,6 @@ header {
     align-items: center;
     justify-content: space-between;
 }
-.container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-    width: 100%;
-}
-.row-form {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: stretch;
-    gap: 10px;
-    align-self: stretch;
-    width: 100%;
-}
 main {
     display: flex;
     flex-direction: row;
@@ -55,6 +41,61 @@ ul {
 }
 li {
     margin: 10px 0;
+}
+span {
+    display: inline;
+}
+input[type=number].no-spinner::-webkit-inner-spin-button, input[type=number].no-spinner::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+input[type=number] {
+    width: 25px;
+    border: 1px solid var(--text);
+    -moz-appearance: textfield;
+    appearance: textfield;
+    align-self: stretch;
+}
+button img {
+    pointer-events: none;
+}
+table, td, th {
+    border-collapse: separate;
+    text-align: center;
+    background-color: var(--third);
+}
+table {
+    
+}
+tbody > tr:nth-child(odd) > td{
+    background-color: var(--third);
+}
+tbody > tr:nth-child(even) > td{
+    background-color: var(--fourth);
+}
+a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+}
+a * {
+    height: 100%;
+}
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+}
+.row-form {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: stretch;
+    gap: 10px;
+    align-self: stretch;
+    width: 100%;
 }
 .row {
     display: flex;
@@ -95,9 +136,6 @@ li {
     padding: 20px 0 20px 20px;
     background-color: var(--secondary);
     box-sizing: border-box;
-}
-span {
-    display: inline;
 }
 .characterName {
     width: 17%;
@@ -189,17 +227,6 @@ select, button, input, .checkboxInput, textarea, .secondary-btn, .select, .chara
     width: fit-content;
     align-items: center;
 }
-input[type=number].no-spinner::-webkit-inner-spin-button, input[type=number].no-spinner::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
-input[type=number] {
-    width: 25px;
-    border: 1px solid var(--text);
-    -moz-appearance: textfield;
-    appearance: textfield;
-    align-self: stretch;
-}
 .deleteBtn, .inactiveDeleteBtn {
     cursor: pointer;
     padding: 5px;
@@ -212,15 +239,6 @@ input[type=number] {
 .inactiveDeleteBtn {
     filter: brightness(0.25);
     cursor: default;
-}
-button img {
-    pointer-events: none;
-}
-table, td, th {
-    border: 1px solid white;
-    border-collapse: collapse;
-    padding: 15px;
-    text-align: center;
 }
 #moreInfoPanel {
     box-sizing: border-box;
@@ -235,8 +253,8 @@ table, td, th {
 #moreInfoPanel blockquote {
     margin: 0;
 }
-#moreInfoPanel > blockquote > * {
-    font-size: 85%;
+#moreInfoPanel h2 {
+    margin-top: 0;
 }
 .spell {
     position: relative;
@@ -259,18 +277,7 @@ table, td, th {
     flex-direction: row;
     gap: 10px;
 }
-a {
-    display: flex;
-    align-items: center;
-    text-decoration: none;
-}
-a * {
-    height: 100%;
-}
 .vl {
     width: 2px;
     background-color: white;
-}
-h2 {
-    font-size: 100% !important;
 }

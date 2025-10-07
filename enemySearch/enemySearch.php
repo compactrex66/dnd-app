@@ -21,10 +21,8 @@
         <a href="../updateEnemyInfo/updateEnemyInfo.php"><button>Update enemy info</button></a>
     </div>
     <header class="row-form">
-        <span>Monster Search</span>
         <input type="text" id="monsterInput" placeholder="Enter a monster name" />
         <button id="searchButton">Search</button>
-        <a href="../index.php" style="justify-self: left;"><button>Fight</button></a>
         <img src="../media/menuIcon.svg" alt="Menu icon" id="menuIcon" class="header-btn">
     </header>
     <main>

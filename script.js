@@ -343,7 +343,7 @@ let selectAnimOptions = {
     easing: "cubic-bezier(0,.73,.17,1.11)",
 }
 //Toggle enemy list visibility: 
-enemySelect.addEventListener("click", () => {
+enemySelect.addEventListener("click", () => {    
     if(enemyOptions.style.display != "grid") {
         enemyOptions.style.display = "grid";
         enemyOptions.animate(

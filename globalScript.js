@@ -141,7 +141,7 @@ function generateHtml(monster) {
         <br>
     </blockquote>
     `
-    return convertStarLinesToList(html);
+    return cleanUp(convertStarLinesToList(html));
 }
 
 function getMonsterInfo(monster) {
@@ -174,6 +174,10 @@ function convertStarLinesToList(text) {
 
     const listHtml = `<ul>\n${listLines.map(item => `  <li>${item}</li>`).join('\n')}\n</ul>`;
     return text.replace(/<br><br>[\s\S]*?(?=\* The archmage casts|<\/p>)/g, listHtml)
+}
+
+function cleanUp(text) {
+    return text.replaceAll(/(_.*?_)/gm, $1.replaceAll('_', ''));
 }
 
 function hideSidePanelMenu() {

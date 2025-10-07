@@ -10,6 +10,7 @@ const enemySelect = document.getElementById("enemySelect");
 const selectedEnemy = document.getElementById("selectedEnemy");
 const enemyOptions = document.getElementById("enemyList")
 const enemyQuantity = document.getElementById("enemyQuantity");
+const spellTooltip = document.getElementById("spellTooltip");
 
 let arrOfCharacterElements = Array.from(document.querySelectorAll(".character"));
 let currentCharacter;
@@ -165,21 +166,38 @@ document.addEventListener("click", e => {
     }
 });
 
+let spellToolTipAnimOptions = {
+    duration: 200,
+    fill: "forwards",
+    easing: "cubic-bezier(0,.73,.17,1.11)",
+}
 //handle mouseover spell to show spell hint
-moreInfoPanel.addEventListener("mouseover", e => {
+document.addEventListener("mouseover", e => {    
     let target = e.target;
     if(target.classList.contains("spell")) {
-        let popup = target.querySelector(".hint-popup");
-        popup.style.display = "inline-block";
-
-        let rect = popup.getBoundingClientRect();
-        console.log(rect.right + " " + rect.left + " " + rect.width + " | " + window.innerWidth);
-        
-        if (rect.right+10 > window.innerWidth) {
-            popup.style.left = `${window.innerWidth - (rect.right) - 30}px`;
-        }
+        let spellRect = target.getBoundingClientRect();
+        let tooltipHtml = target.querySelector(".spell-tooltip-data").innerHTML;
+        spellTooltip.animate(
+            [
+                { opacity: 1 }
+            ],
+            spellToolTipAnimOptions
+        )
+        spellTooltip.innerHTML = tooltipHtml;
+        spellTooltip.style.bottom = `${window.innerHeight - spellRect.bottom + spellRect.height + 10}px`;
+    } else {
+        spellTooltip.animate(
+            [
+                { opacity: 0 }
+            ],
+            spellToolTipAnimOptions
+        )
     }
 })
+
+document.addEventListener('mousemove', e => {
+    spellTooltip.style.left = `${e.clientX - 10 - spellTooltip.getBoundingClientRect().width}px`;
+});
 
 //Handle input changes
 listOfCharacters.addEventListener("change", (e) => {

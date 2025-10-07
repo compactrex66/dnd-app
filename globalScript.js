@@ -2,12 +2,6 @@ const openMenuBtn = document.getElementById("menuIcon");
 const closeMenuBtn = document.getElementById("sidePanelCloseBtn");
 const menuSidePanel = document.getElementById("menu");
 
-let menuSidePanelAnimOptions = {
-    duration: 300,
-    fill: "forwards",
-    easing: "cubic-bezier(0,.73,.17,1.11)",
-}
-
 openMenuBtn.addEventListener("click", showSidePanelMenu);
 
 closeMenuBtn.addEventListener("click", hideSidePanelMenu);
@@ -177,9 +171,14 @@ function convertStarLinesToList(text) {
 }
 
 function cleanUp(text) {
-    return text.replaceAll(/(_.*?_)/gm, $1.replaceAll('_', ''));
+    return text.replaceAll(/_(.*?)_/g, (_, g1) => g1);
 }
 
+let menuSidePanelAnimOptions = {
+    duration: 300,
+    fill: "forwards",
+    easing: "cubic-bezier(0,.73,.17,1.11)",
+}
 function hideSidePanelMenu() {
     menuSidePanel.animate(
         [

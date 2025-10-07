@@ -12,11 +12,13 @@ header {
     width: 50vw;
 }
 .monster {
-    border-bottom: 1px solid var(--text);
     padding: 15px;
     cursor: pointer;
     display: flex;
     justify-content: space-between;
+}
+.monster:not(.monster:last-child) {
+    border-bottom: 2px solid var(--third);
 }
 #matchList {
     width: 20vw;

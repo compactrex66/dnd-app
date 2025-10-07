@@ -35,18 +35,18 @@
                     $moreInfo = mysqli_fetch_assoc(mysqli_query($conn, "SELECT name, more_info FROM enemies WHERE id = ".$row['enemy_id']));
                     echo "<span style='display: none;' class='name'><h1>".$moreInfo['name']."</h1></span>";
                     $moreInfo = $moreInfo['more_info'];
-                    // $parsedown = new ParsedownExtra();
-                    // $moreInfo['more_info'] = str_replace("___", "", $moreInfo['more_info']);
-                    // $moreInfo = $parsedown->text($moreInfo['more_info']);
-                    // $moreInfo = str_replace("<hr>", "", $moreInfo);
                     preg_match_all("/<li>[^:]+:\s*([^<]+)<\/li>/i", $moreInfo, $matches);
                     $spells = [];
                     foreach ($matches[1] as $match) {
                         $parts = array_map('trim', explode(',', $match));
+                        $parts = str_replace("*", "", $parts);
                         $spells = array_merge($spells, $parts);
                     }
                     $multiCurl = curl_multi_init();
                     $handles = [];
+                    usort($spells, function($a, $b) {
+                        return strlen($b) <=> strlen($a);
+                    });
                     foreach($spells as $spell) {
                         $sql = "SELECT * FROM spells WHERE name='$spell'";
                         $spellResults = mysqli_fetch_array(mysqli_query($conn, $sql));
@@ -61,7 +61,7 @@
                         } else {
                             $wrappedSpell = "
                             <span class='spell'>
-                                <span class='hint-popup' style='display: none;'>
+                                <div class='spell-tooltip-data' style='display: none;'>
                                 <span class='big-text'>$spellResults[name]</span>
                                     <span class='hint-header'>
                                         <span>Level: $spellResults[level]</span>
@@ -73,7 +73,7 @@
                                         $spellResults[description]
                                         <br><br>
                                         $spellResults[higher_level]
-                                </span>
+                                </div>
                                 $spell
                             </span>
                             ";

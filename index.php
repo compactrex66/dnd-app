@@ -18,6 +18,7 @@
         <a href="addEnemy/addEnemy.php"><button>Add new enemies with markdown</button></a>
         <a href="updateEnemyInfo/updateEnemyInfo.php"><button>Update enemy info</button></a>
     </div>
+    <div class="spell-tooltip" id="spellTooltip"></div>
     <header class="row-form">
             <div class="select secondary-btn" id="enemySelect" name="enemyType">
                 <div id="selectedEnemy">Enemy type</div>

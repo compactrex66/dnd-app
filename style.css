@@ -6,6 +6,7 @@
     --active-secondary: rgb(136, 136, 136);
     --text: white;
 }
+
 body {
     position: relative;
     margin: 0;
@@ -17,6 +18,7 @@ body {
     font-family: "Ubuntu";
     overflow: hidden;
 }
+
 header {
     box-sizing: border-box;
     padding: 5px 20px 20px 20px;
@@ -26,6 +28,7 @@ header {
     align-items: center;
     justify-content: space-between;
 }
+
 main {
     display: flex;
     flex-direction: row;
@@ -34,23 +37,30 @@ main {
     padding: 0 20px;
     box-sizing: border-box;
 }
+
 button {
     cursor: pointer;
 }
+
 ul {
     padding-left: 0;
 }
+
 li {
     margin: 10px 0;
     list-style: none;
 }
+
 span {
     display: inline;
 }
-input[type=number].no-spinner::-webkit-inner-spin-button, input[type=number].no-spinner::-webkit-outer-spin-button {
+
+input[type=number].no-spinner::-webkit-inner-spin-button,
+input[type=number].no-spinner::-webkit-outer-spin-button {
     -webkit-appearance: none;
     margin: 0;
 }
+
 input[type=number] {
     width: 25px;
     border: 1px solid var(--text);
@@ -58,35 +68,46 @@ input[type=number] {
     appearance: textfield;
     align-self: stretch;
 }
+
 button img {
     pointer-events: none;
 }
-table, td, th {
+
+table,
+td,
+th {
     border-collapse: collapse;
     text-align: center;
     padding: 5px;
 }
+
 table {
     width: 30%;
 }
-tbody > tr:nth-child(odd) > td{
+
+tbody>tr:nth-child(odd)>td {
     background-color: var(--third);
 }
-tbody > tr:nth-child(even) > td{
+
+tbody>tr:nth-child(even)>td {
     background-color: var(--fourth);
 }
+
 table th {
     background-color: var(--third);
 }
+
 a {
     display: flex;
     align-items: center;
     text-decoration: none;
 }
+
 a * {
     height: 100%;
     width: 100%;
 }
+
 .container {
     display: flex;
     justify-content: center;
@@ -94,6 +115,7 @@ a * {
     height: 100%;
     width: 100%;
 }
+
 .row-form {
     display: flex;
     flex-direction: row;
@@ -102,19 +124,23 @@ a * {
     gap: 10px;
     width: 100%;
 }
+
 .row-form *:not(.vl, .redBtn, .greenBtn, img) {
     flex-grow: 1;
 }
+
 .row {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     gap: 5px;
 }
+
 .specialText {
-    font-weight:bold;
+    font-weight: bold;
     font-style: italic;
 }
+
 .listOfCharacters {
     box-sizing: border-box;
     display: flex;
@@ -126,14 +152,17 @@ a * {
     overflow-x: hidden;
     width: 48vw;
 }
+
 ::-webkit-scrollbar {
     background-color: transparent;
     width: 10px;
 }
+
 ::-webkit-scrollbar-thumb {
     background-color: gray;
     border-radius: 20px;
 }
+
 .character {
     position: relative;
     display: flex;
@@ -145,10 +174,12 @@ a * {
     background-color: var(--secondary);
     box-sizing: border-box;
 }
+
 .characterName {
     width: 17%;
     font-size: small;
 }
+
 .newCharacterName {
     width: 100%;
     font-size: inherit;
@@ -157,16 +188,19 @@ a * {
     word-wrap: normal;
     box-sizing: border-box;
 }
+
 .icon {
     height: 24px;
     aspect-ratio: 1;
 }
+
 .inline-row {
     display: flex;
     flex-direction: row;
     gap: 10px;
     align-items: center;
 }
+
 .big-text-container {
     background-color: var(--secondary);
     padding: 5px;
@@ -175,30 +209,43 @@ a * {
     align-items: center;
     font-size: 120%;
 }
+
 .big-text {
     font-size: 120%;
 }
-select, button, input, .checkboxInput, textarea, .secondary-btn, .select, .characterHealth {
+
+select,
+button,
+input,
+.checkboxInput,
+textarea,
+.secondary-btn,
+.select,
+.characterHealth {
     padding: 7px;
-    background-color: var(--secondary);   
+    background-color: var(--secondary);
     color: var(--text);
     border: 0;
     resize: none;
     font-family: inherit;
     font-size: 70%;
 }
+
 .characterHealth {
     width: 12%;
     padding: 0;
 }
+
 .redBtn {
     background-color: rgb(152, 40, 40);
     align-self: stretch;
 }
+
 .greenBtn {
     background-color: rgb(43, 86, 43);
     align-self: stretch;
 }
+
 .select {
     display: flex;
     align-items: center;
@@ -208,6 +255,7 @@ select, button, input, .checkboxInput, textarea, .secondary-btn, .select, .chara
     position: relative;
     text-align: center;
 }
+
 .options {
     display: none;
     opacity: 0;
@@ -222,78 +270,110 @@ select, button, input, .checkboxInput, textarea, .secondary-btn, .select, .chara
     overflow-y: auto;
     overflow-x: hidden;
     cursor: default;
+    filter: drop-shadow(0 0 10px var(--primary));
+    /* box-shadow: 0 0 10px 5px var(--primary); */
 }
+
 .options .option {
     text-align: center;
     align-content: center;
     padding: 10px;
-    border: 1px solid white;
     background-color: var(--secondary);
     font-size: small;
 }
-.option {
+
+.options>* {
     cursor: pointer;
+    border-right: 2px solid var(--third);
+    border-bottom: 2px solid var(--third);
 }
+
+/* Remove right border from last column */
+.options>*:nth-child(3n) {
+    border-right: none;
+}
+
+/* Remove bottom border from last row */
+.options>*:nth-last-child(-n+3) {
+    border-bottom: none;
+}
+
 .checkboxInput {
     display: flex;
     justify-content: space-between;
     width: fit-content;
     align-items: center;
 }
-.deleteBtn, .inactiveDeleteBtn {
+
+.deleteBtn,
+.inactiveDeleteBtn {
     cursor: pointer;
     padding: 5px;
     background-color: transparent;
 }
-.deleteBtn img, .inactiveDeleteBtn img {
+
+.deleteBtn img,
+.inactiveDeleteBtn img {
     height: 32px;
     aspect-ratio: 1;
 }
+
 .inactiveDeleteBtn {
     filter: brightness(0.25);
     cursor: default;
 }
+
 #moreInfoPanel {
     box-sizing: border-box;
     width: 48vw;
     height: 88vh;
-    overflow-y: auto;
-    overflow-x: hidden;
+    overflow: auto;
     background-color: var(--secondary);
     padding: 20px;
     display: flex;
 }
+
 #moreInfoPanel blockquote {
     margin: 0;
 }
+
 #moreInfoPanel h2 {
     margin-top: 0;
 }
+
 .spell {
+    cursor: default;
     position: relative;
     color: rgb(180, 180, 254);
 }
-.hint-popup {
-    position: absolute;
+
+.spell-tooltip {
+    opacity: 0;
+    position: fixed;
     height: fit-content;
-    min-width: 35vw;
-    padding: 5px;
+    width: 35vw;
+    padding: 10px;
     background-color: var(--secondary);
-    border: 1px solid var(--text);
     z-index: 2;
     display: flex;
     flex-direction: column;
     color: var(--text);
+    box-shadow: 0 0 10px 5px var(--primary);
+    border-top: 5px solid var(--third);
+    border-bottom: 5px solid var(--third);
 }
+
 .hint-header {
     display: flex;
     flex-direction: row;
     gap: 10px;
 }
+
 .vl {
     width: 2px;
     background-color: white;
 }
+
 .side-panel {
     position: absolute;
     background-color: var(--third);
@@ -304,21 +384,24 @@ select, button, input, .checkboxInput, textarea, .secondary-btn, .select, .chara
     flex-direction: column;
     align-self: stretch;
     justify-items: stretch;
-    box-shadow: -5px 0 20px rgb(14, 14, 14);
+    box-shadow: -5px 0 20px var(--primary);
     translate: 16vw;
 }
+
 .side-panel button {
     font-size: medium;
     text-align: right;
     padding: 16px;
     border-bottom: 2px solid var(--third);
 }
+
 #menuIcon {
     cursor: pointer;
     align-self: stretch;
     justify-self: stretch;
     aspect-ratio: 1;
 }
+
 #sidePanelCloseBtn {
     cursor: pointer;
     position: absolute;

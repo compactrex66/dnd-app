@@ -56,8 +56,8 @@ async function searchMonster(monsterName) {
             let monsterResult = document.createElement('div');
             monsterResult.setAttribute("class", "inline-row monster");
             monsterResult.innerHTML = `<span>${monster.name}</span><span>${monster.document.key}</span>`;
-            monsterResult.addEventListener("click", e => {
-                let monsterInfo = getMonsterInfo(monster)
+            monsterResult.addEventListener("click", async e => {
+                let monsterInfo = await getMonsterInfo(monster)
                 postMonsterName = monsterInfo['name'];           
                 minHealth = monsterInfo['minHealth'];
                 maxHealth = monsterInfo['maxHealth'];
@@ -73,3 +73,5 @@ async function searchMonster(monsterName) {
         alert("HTTP-Error: " + response.status + response.url);
     }
 }
+
+searchMonster("archmage");

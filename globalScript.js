@@ -6,7 +6,9 @@ openMenuBtn.addEventListener("click", showSidePanelMenu);
 
 closeMenuBtn.addEventListener("click", hideSidePanelMenu);
 
-function generateHtml(monster) {
+let spells = [];
+let replacements = {};
+async function generateHtml(monster) {
     let html =
     `
     <blockquote>
@@ -117,10 +119,42 @@ function generateHtml(monster) {
                 <strong>Challenge </strong>
                 ${monster.challenge_rating_text} (XP ${monster.experience_points}; PB +${monster.proficiency_bonus ?? 0})
             </li>
-        </ul>
+        </ul>`;
+        let spellFindRegex = /((?<=can cast ).+(?=the))|\*[^:\n]*?: (.+)|(?<=\-[^:\n]+: )([\w ,]*?(?=(?:[-"]|$)))/g;
+        if(!isEmpty(monster.traits)) {
+            let traits = monster.traits;
+            traits.forEach(trait => {                
+                let matches = [...trait['desc'].matchAll(spellFindRegex)];                
+                if(!isEmpty(matches)) {
+                    let firstGroup = matches[0][0].replaceAll(/(and|at|will|has|level|\d|without|expending|a|spell|slot|\.|they|have)(?=[ .])/gi, "").trim().split(/ {2,}/);
+                    
+                    matches = matches.map(m => m[2] || m[3]).filter(Boolean);
+                    matches = matches.map(spells => spells.replaceAll('*', '').split(','));
+                    matches.forEach(match => {
+                        match = match.map(match => match.trim());
+                        spells = spells.concat(match);
+                    });
+                    spells = spells.concat(firstGroup);
+                }
+            });
+        }
+        if(!isEmpty(monster.actions.filter(action => action.action_type == "ACTION"))) {
+            let actions = monster.actions.filter(action => action.action_type == "ACTION");
+            actions.forEach(action => {                                
+                let matches = [...action['desc'].matchAll(spellFindRegex)];                
+                if(!isEmpty(matches)) {
+                    matches = matches.map(m => m[2] || m[3]).filter(Boolean);
+                    matches = matches.map(spells => spells.replaceAll('*', '').split(','));
+                    matches.forEach(match => {
+                        match = match.map(match => match.trim());
+                        spells = spells.concat(match);
+                    });
+                }
+            });
+        }
+        html+= `
         ${!isEmpty(monster.traits) ? `<h3>Traits</h3>` : ''}
         ${monster.traits.map(trait => `<p><strong><em>${trait.name}. </em></strong>${trait.desc.replaceAll(/\n{2}|\n| - /gm, "<br><br>")}</p>`).join('')}
-        
         ${!isEmpty(monster.actions.filter(action => action.action_type == "ACTION")) ? `<h3>Actions</h3>` : ''}
         ${monster.actions.filter(action => action.action_type == "ACTION").map(action => `<p><strong><em>${action.name}. </em></strong>${action.desc.replaceAll(/\n{2}|\n| - /gm, "<br><br>")}</p>`).join('')}
 
@@ -135,10 +169,112 @@ function generateHtml(monster) {
         <br>
     </blockquote>
     `
-    return cleanUp(convertStarLinesToList(html));
+    if(!isEmpty(spells)) {
+        const fetches = spells.map(async (spell) => {
+            let spellDocKey = `a5e-ag_${spell.replaceAll(' ', '-').toLowerCase()}`;
+            let formData = new FormData();
+            formData.append("action", "getSpell");
+            formData.append("spellDocumentKey", spellDocKey);
+            const json = await new Promise((resolve) => {
+                let request = new XMLHttpRequest();
+                request.open("post", "../indexActions.php", true);
+                request.onload = async () => {
+                    console.log(request.responseText);
+                    
+                    let data = JSON.parse(request.responseText);
+                    if (request.status == 404) {
+                        const response = await fetch(`https://api.open5e.com/v2/spells/${spellDocKey}`);
+                        data = await response.json();
+                        let spellData = new FormData();
+                        spellData.append("action", "addSpell");
+                        spellData.append("name", spell);
+                        spellData.append("desc", data.desc);
+                        spellData.append("level", data.level);
+                        spellData.append("school", data.school.name);
+                        spellData.append("higher_level", data.higher_level);
+                        spellData.append("target_type", data.target_type);
+                        spellData.append("range_text", data.range_text);
+                        spellData.append("range_num", data.range);
+                        spellData.append("ritual", data.ritual);
+                        spellData.append("casting_time", data.casting_time);
+                        spellData.append("verbal", data.verbal);
+                        spellData.append("somatic", data.somatic);
+                        spellData.append("material", data.material);
+                        spellData.append("target_count", data.target_count);
+                        spellData.append("attack_roll", data.attack_roll);
+                        spellData.append("duration", data.duration);
+                        spellData.append("concentration", data.concentration);
+                        spellData.append("document_key", data.key);
+                        data = {
+                            name: spell,
+                            desc: data.desc,
+                            level: data.level,
+                            school: data.school?.name || '',
+                            higher_level: data.higher_level || '',
+                            target_type: data.target_type || '',
+                            range_text: data.range_text || '',
+                            range_num: data.range || 0,
+                            ritual: data.ritual ? 1 : 0,
+                            casting_time: data.casting_time || '',
+                            verbal: data.verbal ? 1 : 0,
+                            somatic: data.somatic ? 1 : 0,
+                            material: data.material ? 1 : 0,
+                            target_count: data.target_count || 0,
+                            attack_roll: data.attack_roll ? 1 : 0,
+                            duration: data.duration || '',
+                            concentration: data.concentration ? 1 : 0,
+                            document_key: data.key || ''
+                        };
+                        let addSpellRequest = new XMLHttpRequest();
+                        addSpellRequest.open("post", "../indexActions.php", true);
+                        addSpellRequest.send(spellData);
+                        addSpellRequest.onload = () => { console.log(addSpellRequest.responseText) }
+                    }
+                    resolve(data);
+                };
+                request.send(formData);
+            });
+
+            replacements[spell] = 
+            `
+            <span class='spell'>
+                <div class='spell-tooltip-data' style='display: none;'>
+                <span class='big-text'>${json.name}</span>
+                    <span class='hint-header'>
+                        <span>Level: ${json.level}</span>
+                        <span>Can target: ${json.target_type}</span>
+                        <span>Range: ${json.range_text}</span>
+                        <span>Cast Time: ${json.casting_time}</span>
+                    </span>
+                        <br>
+                        ${json.description}
+                        <br><br>
+                        ${json.higher_level}
+                </div>
+                ${spell}
+            </span>
+            `;
+        })
+
+        await Promise.all(fetches);
+
+        const regex = new RegExp(
+            "\\b(" +
+                Object.keys(replacements)
+                .sort((a, b) => b.length - a.length)
+                .map(escapeRegExp)
+                .join("|") +
+            ")\\b","g"
+        );
+        
+        html = html.replace(regex, match => replacements[match])        
+    }    
+    spells = [];
+    html = cleanUp(convertStarLinesToList(html))    
+    return html;
 }
 
-function getMonsterInfo(monster) {
+async function getMonsterInfo(monster) {
     postMonsterName = monster.name;                
     if(monster.hit_dice != null) {
         minHealth = monster.hit_dice.match(/\d+/)*1 + monster.hit_dice.match(/(?<=\+)\d+$/)*1;
@@ -150,7 +286,9 @@ function getMonsterInfo(monster) {
     armorClass = monster.armor_class;
     initiativeBonus = monster.initiative_bonus;
     documentKey = monster.key;
-    moreInfo = generateHtml(monster);
+    moreInfo = await generateHtml(monster);
+    console.log(moreInfo);
+    
     return {'name': postMonsterName, 'minHealth': minHealth, 'maxHealth': maxHealth, 'armorClass': armorClass, 'initiativeBonus': initiativeBonus, 'documentKey': documentKey, 'moreInfo': moreInfo}
 }
 
@@ -187,7 +325,6 @@ function hideSidePanelMenu() {
         menuSidePanelAnimOptions
     )
 }
-
 function showSidePanelMenu() {
     menuSidePanel.animate(
         [
@@ -195,4 +332,7 @@ function showSidePanelMenu() {
         ],
         menuSidePanelAnimOptions
     )
+}
+function escapeRegExp(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }

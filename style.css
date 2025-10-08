@@ -282,20 +282,24 @@ textarea,
     font-size: small;
 }
 
-.options>* {
+.options>.option {
     cursor: pointer;
     border-right: 2px solid var(--third);
     border-bottom: 2px solid var(--third);
 }
 
 /* Remove right border from last column */
-.options>*:nth-child(3n) {
+.options>.option:nth-child(3n) {
     border-right: none;
 }
 
 /* Remove bottom border from last row */
-.options>*:nth-last-child(-n+3) {
+.options>.option:nth-last-child(-n+3) {
     border-bottom: none;
+}
+
+.options>.option:nth-last-child(-n+1) {
+    border-right: 0;
 }
 
 .checkboxInput {

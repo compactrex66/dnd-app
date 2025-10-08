@@ -35,10 +35,11 @@
                     $moreInfo = mysqli_fetch_assoc(mysqli_query($conn, "SELECT name, more_info FROM enemies WHERE id = ".$row['enemy_id']));
                     echo "<span style='display: none;' class='name'><h1>".$moreInfo['name']."</h1></span>";
                     $moreInfo = $moreInfo['more_info'];
-                    preg_match_all("/<li>[^:]+:\s*([^<]+)<\/li>/i", $moreInfo, $matches);
+                    preg_match_all("/<li>[^:]+:\s*([^<]+)<\/li>|spellcasting.+(?!:)/", $moreInfo, $matches);
                     $spells = [];
                     foreach ($matches[1] as $match) {
-                        $parts = array_map('trim', explode(',', $match));
+                        $parts = explode(" ", $match);
+                        var_dump($match);
                         $parts = str_replace("*", "", $parts);
                         $spells = array_merge($spells, $parts);
                     }

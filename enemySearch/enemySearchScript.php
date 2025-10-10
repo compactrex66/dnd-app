@@ -12,7 +12,6 @@
     }
 
     if(isset($_POST['action'])) {
-        include '../dbConnection.php';
         $action = $_POST['action'];
         if($action == 'addEnemy') {
             $name = $_POST['name'];
@@ -20,12 +19,13 @@
             $maxHealth = $_POST['maxHealth'];
             $armorClass = $_POST['armorClass'];
             $initiativeBonus = $_POST['initiativeBonus'];
+            $documentKey = $_POST['documentKey'];
             $moreInfo = $_POST['info'];
             $stmt = $conn->prepare(
-                "INSERT INTO enemies (name, min_health, max_health, AC, initiative_bonus, more_info)
-                VALUES (?, ?, ?, ?, ?, ?)"
+                "INSERT INTO enemies (name, min_health, max_health, AC, initiative_bonus, document_key, more_info)
+                VALUES (?, ?, ?, ?, ?, ?, ?)"
             );
-            $stmt->bind_param("siiiis", $name, $minHealth, $maxHealth, $armorClass, $initiativeBonus, $moreInfo);
+            $stmt->bind_param("siiiiss", $name, $minHealth, $maxHealth, $armorClass, $initiativeBonus, $documentKey, $moreInfo);
 
             if ($stmt->execute()) {
                 echo "1";

@@ -79,4 +79,16 @@ function normalize_string($value) {
     return (string)$value;
 }
 
+function str_replace_first_instance($needle, $replacement_text, $haystack)
+{
+    $needle_position = strpos($haystack, $needle);
+    
+    if ($needle_position !== false)
+    {
+        $haystack = substr_replace($haystack, $replacement_text, $needle_position, strlen($needle));
+    }
+    
+    return $haystack;
+}
+
 ?>

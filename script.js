@@ -10,9 +10,10 @@ const enemySelect = document.getElementById("enemySelect");
 const selectedEnemy = document.getElementById("selectedEnemy");
 const enemyOptions = document.getElementById("enemyList")
 const enemyQuantity = document.getElementById("enemyQuantity");
+const spellTooltip = document.getElementById("spellTooltip");
 
 let arrOfCharacterElements = Array.from(document.querySelectorAll(".character"));
-let currentCharacter;
+let currentCharacter, isTooltipFreezed = false;
 
 function updateCharactersList() {
     let request = new XMLHttpRequest();
@@ -151,24 +152,61 @@ document.addEventListener("click", e => {
     let target = e.target;
     
     if(!target.classList.contains("option") && !target.classList.contains("options") && !target.classList.contains("select") && target.id != "selectedEnemy" && enemyOptions.style.display != "none") {
-        enemyOptions.style.display = "none";
+        let fadeOutAnimation = enemyOptions.animate(
+            [
+                { opacity: 0 }
+            ],
+            selectAnimOptions
+        )
+        fadeOutAnimation.onfinish = () => { enemyOptions.style.display = "none"; }
+    }
+    
+    if( !target.classList.contains("side-panel") && 
+        !target.parentNode.classList.contains("side-panel") && 
+        !target.parentNode.parentNode.classList.contains("side-panel") && 
+        target.id != "menuIcon") {
+        hideSidePanelMenu();
     }
 });
-//handle mouseover spell to show spell hint
-moreInfoPanel.addEventListener("mouseover", e => {
-    let target = e.target;
-    if(target.classList.contains("spell")) {
-        let popup = target.querySelector(".hint-popup");
-        popup.style.display = "inline-block";
 
-        let rect = popup.getBoundingClientRect();
-        console.log(rect.right + " " + rect.left + " " + rect.width + " | " + window.innerWidth);
-        
-        if (rect.right+10 > window.innerWidth) {
-            popup.style.left = `${window.innerWidth - (rect.right) - 30}px`;
-        }
+let spellToolTipAnimOptions = {
+    duration: 200,
+    fill: "forwards",
+    easing: "cubic-bezier(0,.73,.17,1.11)",
+}
+//handle mouseover spell to show spell hint
+document.addEventListener("mouseover", e => {    
+    let target = e.target;
+    if(target.classList.contains("spell") && !isTooltipFreezed) {
+        let spellRect = target.getBoundingClientRect();
+        let tooltipHtml = target.getAttribute("data-tooltip");
+        spellTooltip.animate(
+            [
+                { opacity: 1 }
+            ],
+            spellToolTipAnimOptions
+        )
+        spellTooltip.innerHTML = tooltipHtml;
+        let spellTooltipRect = spellTooltip.getBoundingClientRect();
+        if(window.innerHeight - spellRect.bottom + spellRect.height + 10 + spellTooltipRect.height < window.innerHeight)
+            spellTooltip.style.bottom = `${window.innerHeight - spellRect.bottom + spellRect.height + 10}px`;
+        else
+            spellTooltip.style.bottom = `${window.innerHeight - spellRect.bottom - spellTooltipRect.height - 10}px`;
+    } else if(!isTooltipFreezed) {
+        spellTooltip.animate(
+            [
+                { opacity: 0 }
+            ],
+            spellToolTipAnimOptions
+        )
     }
 })
+
+document.addEventListener('mousemove', e => {
+    if(!isTooltipFreezed)
+        spellTooltip.style.left = `${e.clientX - 10 - spellTooltip.getBoundingClientRect().width}px`;
+});
+
 //Handle input changes
 listOfCharacters.addEventListener("change", (e) => {
     const target = e.target;
@@ -199,6 +237,7 @@ listOfCharacters.addEventListener("change", (e) => {
         request.send(data);
     }
 });
+
 //Handle character double clicks
 listOfCharacters.addEventListener("dblclick", (e) => {
     const target = e.target
@@ -232,6 +271,7 @@ listOfCharacters.addEventListener("dblclick", (e) => {
         inputNewNameElement.focus();
     }
 })
+
 //Delete all enemies
 deleteEnemiesBtn.addEventListener("click", () => {
     if(confirm('Are you sure you want delete all enemies ?')) {
@@ -245,6 +285,7 @@ deleteEnemiesBtn.addEventListener("click", () => {
     }
     deleteEnemiesBtn.blur();
 });
+
 //Add enemy
 addEnemyBtn.addEventListener("click", () => {
     let data = new FormData();
@@ -259,6 +300,7 @@ addEnemyBtn.addEventListener("click", () => {
 
     addEnemyBtn.blur();
 });
+
 //Rewind time
 document.getElementById("rewindTimeBtn").addEventListener("click", () => {
     let request = new XMLHttpRequest();
@@ -272,6 +314,7 @@ document.getElementById("rewindTimeBtn").addEventListener("click", () => {
 
     document.getElementById("rewindTimeBtn").blur();
 });
+
 //Pass time
 document.getElementById("forwardTimeBtn").addEventListener("click", () => {
     let request = new XMLHttpRequest();
@@ -285,6 +328,7 @@ document.getElementById("forwardTimeBtn").addEventListener("click", () => {
 
     document.getElementById("forwardTimeBtn").blur();
 });
+
 //Pass time by 2 hours
 document.getElementById("shortRestBtn").addEventListener("click", () => {
     let request = new XMLHttpRequest();
@@ -297,6 +341,7 @@ document.getElementById("shortRestBtn").addEventListener("click", () => {
 
     document.getElementById("shortRestBtn").blur()
 });
+
 //Pass time by 8 hours
 document.getElementById("longRestBtn").addEventListener("click", () => {
     let request = new XMLHttpRequest();
@@ -309,18 +354,44 @@ document.getElementById("longRestBtn").addEventListener("click", () => {
 
     document.getElementById("longRestBtn").blur()
 });
+
 //Next turn on space click or previous turn on shift + space
 window.addEventListener("keydown", function(e) {
     if(e.key == " ") {
         if(!e.shiftKey) setCurrentCharacter(getNextCharacter());
         else setCurrentCharacter(getPreviousCharacter());
+    } else if(e.key == "T" || e.key == "t") {
+        isTooltipFreezed = !isTooltipFreezed;
     }
 });
+
+let selectAnimOptions = {
+    duration: 300,
+    fill: "forwards",
+    easing: "cubic-bezier(0,.73,.17,1.11)",
+}
 //Toggle enemy list visibility: 
-enemySelect.addEventListener("click", () => {
-    if(enemyOptions.style.display != "grid") enemyOptions.style.display = "grid";
-    else enemyOptions.style.display = "none";
+enemySelect.addEventListener("click", () => {    
+    if(enemyOptions.style.display != "grid") {
+        enemyOptions.style.display = "grid";
+        enemyOptions.animate(
+            [
+                { opacity: 1 }
+            ],
+            selectAnimOptions
+        )
+    }
+    else {
+        let fadeOutAnimation = enemyOptions.animate(
+            [
+                { opacity: 0 }
+            ],
+            selectAnimOptions
+        )
+        fadeOutAnimation.onfinish = () => { enemyOptions.style.display = "none"; }
+    }
 });
+
 //Change selected enemy
 enemyOptions.addEventListener("click", (e) => {
     e.stopPropagation();

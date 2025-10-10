@@ -20,6 +20,7 @@
         <a href="../addenemy/addenemy.php"><button>Add new enemies with markdown</button></a>
         <a href="../updateEnemyInfo/updateEnemyInfo.php"><button>Update enemy info</button></a>
     </div>
+    <div class="spell-tooltip" id="spellTooltip"></div>
     <header class="row-form">
         <input type="text" id="monsterInput" placeholder="Enter a monster name" />
         <button id="searchButton">Search</button>

@@ -1,6 +1,7 @@
 const openMenuBtn = document.getElementById("menuIcon");
 const closeMenuBtn = document.getElementById("sidePanelCloseBtn");
 const menuSidePanel = document.getElementById("menu");
+const spellTooltip = document.getElementById("spellTooltip");
 
 openMenuBtn.addEventListener("click", showSidePanelMenu);
 
@@ -120,15 +121,20 @@ async function generateHtml(monster) {
                 ${monster.challenge_rating_text} (XP ${monster.experience_points}; PB +${monster.proficiency_bonus ?? 0})
             </li>
         </ul>`;
-    let spellFindRegex = /((?<=can cast ).+(?=the))|\*[^:\n]*?: (.+)|(?<=\-[^:\n]+: )([\w ,]*?(?=(?:[-"]|$)))/g;
+    let spellFindRegex = /((?<=can cast ).+(?=the))|\*[^:\n]*?: (.+)|(?<=\-[^:\n]+: )([\w ,]*?(?=(?:[-"]|$)))/g;    
     if (!isEmpty(monster.traits)) {
         let traits = monster.traits;
         traits.forEach(trait => {
             let matches = [...trait['desc'].matchAll(spellFindRegex)];
             if (!isEmpty(matches)) {
                 let firstGroup = matches[0][0].replaceAll(/(and|at|will|has|level|\d|without|expending|a|spell|slot|\.|they|have)(?=[ .])/gi, "").trim().split(/ {2,}/);
-
+                console.log(firstGroup);
+                
+                if(firstGroup[0].includes("* Cantrips"))
+                    firstGroup = [];
+                
                 matches = matches.map(m => m[2] || m[3]).filter(Boolean);
+                
                 matches = matches.map(spells => spells.replaceAll('*', '').split(','));
                 matches.forEach(match => {
                     match = match.map(match => match.trim());
@@ -169,8 +175,8 @@ async function generateHtml(monster) {
         ${monster.actions.filter(action => action.action_type == "LEGENDARY_ACTION").map(action => `<p><strong><em>${action.name}. </em></strong>${action.desc.replaceAll(/\n{2}|\n| - /gm, "<br><br>")}</p>`).join('')}
         <br>
     </blockquote>
-    `
-    if (!isEmpty(spells)) {
+    `    
+    if (!isEmpty(spells)) {        
         const fetches = spells.map(async (spell) => {
             let spellDocKey = `a5e-ag_${spell.replaceAll(' ', '-').toLowerCase()}`;
             let formData = new FormData();
@@ -232,7 +238,7 @@ async function generateHtml(monster) {
                 };
                 request.send(formData);
             });
-                        
+
             replacements[spell] = `
             <span class="spell" data-tooltip="
             <span class='big-text'>${json.name.replace(/\b[a-z]/g, match => match.toUpperCase())}</span>
@@ -261,6 +267,7 @@ async function generateHtml(monster) {
         html = html.replace(regex, match => replacements[match]);
     }
     spells = [];
+    html = cleanUp(html);
     return html;
 }
 
@@ -326,3 +333,46 @@ function showSidePanelMenu() {
 function escapeRegExp(str) {
     return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
+
+let isTooltipFreezed = false;
+let spellToolTipAnimOptions = {
+    duration: 200,
+    fill: "forwards",
+    easing: "cubic-bezier(0,.73,.17,1.11)",
+}
+//handle mouseover spell to show spell hint
+document.addEventListener("mouseover", e => {
+    let target = e.target;
+    if (target.classList.contains("spell") && !isTooltipFreezed) {
+        let spellRect = target.getBoundingClientRect();
+        let tooltipHtml = target.getAttribute("data-tooltip");
+        spellTooltip.animate(
+            [
+                { opacity: 1 }
+            ],
+            spellToolTipAnimOptions
+        )
+        spellTooltip.innerHTML = tooltipHtml;
+        let spellTooltipRect = spellTooltip.getBoundingClientRect();
+        if (window.innerHeight - spellRect.bottom + spellRect.height + 10 + spellTooltipRect.height < window.innerHeight)
+            spellTooltip.style.bottom = `${window.innerHeight - spellRect.bottom + spellRect.height + 10}px`;
+        else
+            spellTooltip.style.bottom = `${window.innerHeight - spellRect.bottom - spellTooltipRect.height - 10}px`;
+    } else if (!isTooltipFreezed) {
+        spellTooltip.animate(
+            [
+                { opacity: 0 }
+            ],
+            spellToolTipAnimOptions
+        )
+    }
+})
+document.addEventListener('mousemove', e => {
+    if (!isTooltipFreezed)
+        spellTooltip.style.left = `${e.clientX - 10 - spellTooltip.getBoundingClientRect().width}px`;
+});
+window.addEventListener("keydown", function (e) {
+    if (e.key == "T" || e.key == "t") {
+        isTooltipFreezed = !isTooltipFreezed;
+    }
+});

@@ -10,10 +10,9 @@ const enemySelect = document.getElementById("enemySelect");
 const selectedEnemy = document.getElementById("selectedEnemy");
 const enemyOptions = document.getElementById("enemyList")
 const enemyQuantity = document.getElementById("enemyQuantity");
-const spellTooltip = document.getElementById("spellTooltip");
 
 let arrOfCharacterElements = Array.from(document.querySelectorAll(".character"));
-let currentCharacter, isTooltipFreezed = false;
+let currentCharacter;
 
 function updateCharactersList() {
     let request = new XMLHttpRequest();
@@ -169,44 +168,6 @@ document.addEventListener("click", e => {
     }
 });
 
-let spellToolTipAnimOptions = {
-    duration: 200,
-    fill: "forwards",
-    easing: "cubic-bezier(0,.73,.17,1.11)",
-}
-//handle mouseover spell to show spell hint
-document.addEventListener("mouseover", e => {    
-    let target = e.target;
-    if(target.classList.contains("spell") && !isTooltipFreezed) {
-        let spellRect = target.getBoundingClientRect();
-        let tooltipHtml = target.getAttribute("data-tooltip");
-        spellTooltip.animate(
-            [
-                { opacity: 1 }
-            ],
-            spellToolTipAnimOptions
-        )
-        spellTooltip.innerHTML = tooltipHtml;
-        let spellTooltipRect = spellTooltip.getBoundingClientRect();
-        if(window.innerHeight - spellRect.bottom + spellRect.height + 10 + spellTooltipRect.height < window.innerHeight)
-            spellTooltip.style.bottom = `${window.innerHeight - spellRect.bottom + spellRect.height + 10}px`;
-        else
-            spellTooltip.style.bottom = `${window.innerHeight - spellRect.bottom - spellTooltipRect.height - 10}px`;
-    } else if(!isTooltipFreezed) {
-        spellTooltip.animate(
-            [
-                { opacity: 0 }
-            ],
-            spellToolTipAnimOptions
-        )
-    }
-})
-
-document.addEventListener('mousemove', e => {
-    if(!isTooltipFreezed)
-        spellTooltip.style.left = `${e.clientX - 10 - spellTooltip.getBoundingClientRect().width}px`;
-});
-
 //Handle input changes
 listOfCharacters.addEventListener("change", (e) => {
     const target = e.target;
@@ -360,8 +321,6 @@ window.addEventListener("keydown", function(e) {
     if(e.key == " ") {
         if(!e.shiftKey) setCurrentCharacter(getNextCharacter());
         else setCurrentCharacter(getPreviousCharacter());
-    } else if(e.key == "T" || e.key == "t") {
-        isTooltipFreezed = !isTooltipFreezed;
     }
 });
 

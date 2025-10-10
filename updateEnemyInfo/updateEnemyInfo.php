@@ -19,6 +19,7 @@
         <a href="../addenemy/addenemy.php"><button>Add new enemies with markdown</button></a>
         <a href="#"><button>Update enemy info</button></a>
     </div>
+    <div class="spell-tooltip" id="spellTooltip"></div>
     <header class="row-form">
         <button id="updateEnemiesInfoBtn">Update All Enemies Info</button>
         <img src="../media/menuIcon.svg" alt="Menu icon" id="menuIcon" class="header-btn">

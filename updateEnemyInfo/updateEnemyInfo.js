@@ -13,9 +13,7 @@ updateEnemiesInfoBtn.addEventListener("click", e => {
     let characters = listOfCharacters.querySelectorAll(".character");
     characters.forEach(async character => {
         let characterDocumentKey = character.querySelector(".character-document-key").innerText;
-        let monster = await fetchNewMonsterInfo(characterDocumentKey);
-        console.log(monster);
-        
+        let monster = await fetchNewMonsterInfo(characterDocumentKey);        
         let formData = new FormData();
         formData.append("action", "updateEnemy");
         formData.append("name", monster['name']);

@@ -10,7 +10,7 @@ let spells = [];
 let replacements = {};
 async function generateHtml(monster) {
     let html =
-    `
+        `
     <blockquote>
         <h2>${monster.name}</h2>
         <p>
@@ -27,7 +27,7 @@ async function generateHtml(monster) {
             </li>
             <li>
                 <strong>Speed </strong>
-                ${monster.speed_all.walk} ${monster.speed_all.fly != 0 ? ', Fly '+monster.speed_all.fly : ''} ${monster.speed_all.burrow != 0 ? ', Burrow '+monster.speed_all.burrow : ''} ${monster.speed_all.unit}
+                ${monster.speed_all.walk} ${monster.speed_all.fly != 0 ? ', Fly ' + monster.speed_all.fly : ''} ${monster.speed_all.burrow != 0 ? ', Burrow ' + monster.speed_all.burrow : ''} ${monster.speed_all.unit ?? "feet"}
             </li>
             <li>
                 <strong>Initiative </strong>
@@ -94,15 +94,15 @@ async function generateHtml(monster) {
             </table>
         </div>
         <ul>`
-            if(!isEmpty(monster.skill_bonuses)) {                
-                html +=
-                `<li>
+    if (!isEmpty(monster.skill_bonuses)) {
+        html +=
+            `<li>
                     <strong>Skills </strong>
                     ${Object.entries(monster.skill_bonuses).map(([key, value]) => `${key} ${value >= 0 ? `+${value}` : value}`).join(', ')}
                 </li>`
-            }
-    html +=`${monster.resistances_and_immunities.damage_resistances_display != "" ? `<li><strong>Resistances </strong>${monster.resistances_and_immunities.damage_resistances_display}</li>`: ""}
-            ${monster.resistances_and_immunities.damage_immunities_display != "" ? `<li><strong>Immunities </strong>${monster.resistances_and_immunities.damage_immunities_display}</li>`: ""}
+    }
+    html += `${monster.resistances_and_immunities.damage_resistances_display != "" ? `<li><strong>Resistances </strong>${monster.resistances_and_immunities.damage_resistances_display}</li>` : ""}
+            ${monster.resistances_and_immunities.damage_immunities_display != "" ? `<li><strong>Immunities </strong>${monster.resistances_and_immunities.damage_immunities_display}</li>` : ""}
             <li>
                 <strong>Senses </strong>
                 ${monster.darkvision_range != null ? `Darkvision ${monster.darkvision_range} ft.` : ''}
@@ -120,41 +120,42 @@ async function generateHtml(monster) {
                 ${monster.challenge_rating_text} (XP ${monster.experience_points}; PB +${monster.proficiency_bonus ?? 0})
             </li>
         </ul>`;
-        let spellFindRegex = /((?<=can cast ).+(?=the))|\*[^:\n]*?: (.+)|(?<=\-[^:\n]+: )([\w ,]*?(?=(?:[-"]|$)))/g;
-        if(!isEmpty(monster.traits)) {
-            let traits = monster.traits;
-            traits.forEach(trait => {                
-                let matches = [...trait['desc'].matchAll(spellFindRegex)];                
-                if(!isEmpty(matches)) {
-                    let firstGroup = matches[0][0].replaceAll(/(and|at|will|has|level|\d|without|expending|a|spell|slot|\.|they|have)(?=[ .])/gi, "").trim().split(/ {2,}/);
-                    
-                    matches = matches.map(m => m[2] || m[3]).filter(Boolean);
-                    matches = matches.map(spells => spells.replaceAll('*', '').split(','));
-                    matches.forEach(match => {
-                        match = match.map(match => match.trim());
-                        spells = spells.concat(match);
-                    });
-                    spells = spells.concat(firstGroup);
-                }
-            });
-        }
-        if(!isEmpty(monster.actions.filter(action => action.action_type == "ACTION"))) {
-            let actions = monster.actions.filter(action => action.action_type == "ACTION");
-            actions.forEach(action => {                                
-                let matches = [...action['desc'].matchAll(spellFindRegex)];                
-                if(!isEmpty(matches)) {
-                    matches = matches.map(m => m[2] || m[3]).filter(Boolean);
-                    matches = matches.map(spells => spells.replaceAll('*', '').split(','));
-                    matches.forEach(match => {
-                        match = match.map(match => match.trim());
-                        spells = spells.concat(match);
-                    });
-                }
-            });
-        }
-        html+= `
+    let spellFindRegex = /((?<=can cast ).+(?=the))|\*[^:\n]*?: (.+)|(?<=\-[^:\n]+: )([\w ,]*?(?=(?:[-"]|$)))/g;
+    if (!isEmpty(monster.traits)) {
+        let traits = monster.traits;
+        traits.forEach(trait => {
+            let matches = [...trait['desc'].matchAll(spellFindRegex)];
+            if (!isEmpty(matches)) {
+                let firstGroup = matches[0][0].replaceAll(/(and|at|will|has|level|\d|without|expending|a|spell|slot|\.|they|have)(?=[ .])/gi, "").trim().split(/ {2,}/);
+
+                matches = matches.map(m => m[2] || m[3]).filter(Boolean);
+                matches = matches.map(spells => spells.replaceAll('*', '').split(','));
+                matches.forEach(match => {
+                    match = match.map(match => match.trim());
+                    spells = spells.concat(match);
+                });
+                spells = spells.concat(firstGroup);
+            }
+        });
+    }
+    if (!isEmpty(monster.actions.filter(action => action.action_type == "ACTION"))) {
+        let actions = monster.actions.filter(action => action.action_type == "ACTION");
+        actions.forEach(action => {
+            let matches = [...action['desc'].matchAll(spellFindRegex)];
+            if (!isEmpty(matches)) {
+                matches = matches.map(m => m[2] || m[3]).filter(Boolean);
+                matches = matches.map(spells => spells.replaceAll('*', '').split(','));
+                matches.forEach(match => {
+                    match = match.map(match => match.trim());
+                    spells = spells.concat(match);
+                });
+            }
+        });
+    }
+    html += `
         ${!isEmpty(monster.traits) ? `<h3>Traits</h3>` : ''}
         ${monster.traits.map(trait => `<p><strong><em>${trait.name}. </em></strong>${trait.desc.replaceAll(/\n{2}|\n| - /gm, "<br><br>")}</p>`).join('')}
+        
         ${!isEmpty(monster.actions.filter(action => action.action_type == "ACTION")) ? `<h3>Actions</h3>` : ''}
         ${monster.actions.filter(action => action.action_type == "ACTION").map(action => `<p><strong><em>${action.name}. </em></strong>${action.desc.replaceAll(/\n{2}|\n| - /gm, "<br><br>")}</p>`).join('')}
 
@@ -169,7 +170,7 @@ async function generateHtml(monster) {
         <br>
     </blockquote>
     `
-    if(!isEmpty(spells)) {
+    if (!isEmpty(spells)) {
         const fetches = spells.map(async (spell) => {
             let spellDocKey = `a5e-ag_${spell.replaceAll(' ', '-').toLowerCase()}`;
             let formData = new FormData();
@@ -179,8 +180,6 @@ async function generateHtml(monster) {
                 let request = new XMLHttpRequest();
                 request.open("post", "../indexActions.php", true);
                 request.onload = async () => {
-                    console.log(request.responseText);
-                    
                     let data = JSON.parse(request.responseText);
                     if (request.status == 404) {
                         const response = await fetch(`https://api.open5e.com/v2/spells/${spellDocKey}`);
@@ -228,57 +227,48 @@ async function generateHtml(monster) {
                         let addSpellRequest = new XMLHttpRequest();
                         addSpellRequest.open("post", "../indexActions.php", true);
                         addSpellRequest.send(spellData);
-                        addSpellRequest.onload = () => { console.log(addSpellRequest.responseText) }
                     }
                     resolve(data);
                 };
                 request.send(formData);
             });
-
-            replacements[spell] = 
-            `
-            <span class='spell'>
-                <div class='spell-tooltip-data' style='display: none;'>
-                <span class='big-text'>${json.name}</span>
-                    <span class='hint-header'>
-                        <span>Level: ${json.level}</span>
-                        <span>Can target: ${json.target_type}</span>
-                        <span>Range: ${json.range_text}</span>
-                        <span>Cast Time: ${json.casting_time}</span>
-                    </span>
-                        <br>
-                        ${json.description}
-                        <br><br>
-                        ${json.higher_level}
-                </div>
-                ${spell}
-            </span>
-            `;
+                        
+            replacements[spell] = `
+            <span class="spell" data-tooltip="
+            <span class='big-text'>${json.name.replace(/\b[a-z]/g, match => match.toUpperCase())}</span>
+            <span class='hint-header'>
+                <span>Level: ${json.level}</span>
+                <span>Range: ${json.range_text}</span>
+                <span>Cast Time: ${json.casting_time}</span>
+            </span><br>
+            ${json.description.replaceAll("\n", '<br>')}
+            ${json.higher_level ? `<br><br>${json.higher_level}` : ''}
+            ">
+            ${spell}
+            </span>`;
         })
 
         await Promise.all(fetches);
 
         const regex = new RegExp(
             "\\b(" +
-                Object.keys(replacements)
+            Object.keys(replacements)
                 .sort((a, b) => b.length - a.length)
-                .map(escapeRegExp)
-                .join("|") +
-            ")\\b","g"
+                .join("|") + ")\\b", "g"
         );
-        
-        html = html.replace(regex, match => replacements[match])        
-    }    
+
+        html = cleanUp(html);
+        html = html.replace(regex, match => replacements[match]);
+    }
     spells = [];
-    html = cleanUp(convertStarLinesToList(html))    
     return html;
 }
 
 async function getMonsterInfo(monster) {
-    postMonsterName = monster.name;                
-    if(monster.hit_dice != null) {
-        minHealth = monster.hit_dice.match(/\d+/)*1 + monster.hit_dice.match(/(?<=\+)\d+$/)*1;
-        maxHealth = monster.hit_dice.match(/\d+/) * monster.hit_dice.match(/(?<=d)\d+/)*1 + monster.hit_dice.match(/\d+$/)*1;
+    postMonsterName = monster.name;
+    if (monster.hit_dice != null) {
+        minHealth = monster.hit_dice.match(/\d+/) * 1 + monster.hit_dice.match(/(?<=\+)\d+$/) * 1;
+        maxHealth = monster.hit_dice.match(/\d+/) * monster.hit_dice.match(/(?<=d)\d+/) * 1 + monster.hit_dice.match(/\d+$/) * 1;
     } else {
         minHealth = monster.hit_points;
         maxHealth = minHealth;
@@ -287,9 +277,7 @@ async function getMonsterInfo(monster) {
     initiativeBonus = monster.initiative_bonus;
     documentKey = monster.key;
     moreInfo = await generateHtml(monster);
-    console.log(moreInfo);
-    
-    return {'name': postMonsterName, 'minHealth': minHealth, 'maxHealth': maxHealth, 'armorClass': armorClass, 'initiativeBonus': initiativeBonus, 'documentKey': documentKey, 'moreInfo': moreInfo}
+    return { 'name': postMonsterName, 'minHealth': minHealth, 'maxHealth': maxHealth, 'armorClass': armorClass, 'initiativeBonus': initiativeBonus, 'documentKey': documentKey, 'moreInfo': moreInfo }
 }
 
 function isEmpty(obj) {
@@ -297,15 +285,17 @@ function isEmpty(obj) {
 }
 
 function convertStarLinesToList(text) {
-    //Match all lines starting with <br><br>*
-    let listLines = [...text.matchAll(/(?:<br><br>\* )((?:\d|Cantrips)[^<]+)/g)].map(match => match[1]);
-    // listLines = listLines.map(line => line.replaceAll(/[\w\d ()]+(?=\:)/g, match => `<strong>${match}</strong>`));
+    // Match blocks like: <br><br>* something<br>* another spell<br>* more
+    const regex = /(<br\s*\/?>){2}\* [^<\n]+(?:<br\s*\/?>\* [^<\n]+)*/g;
 
-    if(isEmpty(listLines))
-        return text;    
+    return text.replace(regex, block => {
+        // Extract each line that starts with *
+        const items = [...block.matchAll(/\* ([^<\n]+)/g)].map(m => m[1].trim());
+        if (!items.length) return block;
 
-    const listHtml = `<ul>\n${listLines.map(item => `  <li>${item}</li>`).join('\n')}\n</ul>`;
-    return text.replace(/<br><br>[\s\S]*?(?=\* The archmage casts|<\/p>)/g, listHtml)
+        // Convert to HTML list
+        return `<ul>\n${items.map(i => `  <li>${i}</li>`).join("\n")}\n</ul>`;
+    });
 }
 
 function cleanUp(text) {
@@ -334,5 +324,5 @@ function showSidePanelMenu() {
     )
 }
 function escapeRegExp(str) {
-  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }

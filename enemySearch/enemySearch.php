@@ -29,7 +29,7 @@
         <div id="matchList"></div>
         <div class="monster-result moreInfoPanel">
             <button id="addEnemyBtn" class="corner-btn"><img src="../media/addIcon.svg" alt=""></button>
-            <span id="monsterInfo"></span>
+            <div id="monsterInfo"></div>
         </div>
     </main>
     <script src="enemySearch.js"></script>

@@ -13,7 +13,7 @@ const enemyQuantity = document.getElementById("enemyQuantity");
 const spellTooltip = document.getElementById("spellTooltip");
 
 let arrOfCharacterElements = Array.from(document.querySelectorAll(".character"));
-let currentCharacter;
+let currentCharacter, isTooltipFreezed = false;
 
 function updateCharactersList() {
     let request = new XMLHttpRequest();
@@ -161,7 +161,10 @@ document.addEventListener("click", e => {
         fadeOutAnimation.onfinish = () => { enemyOptions.style.display = "none"; }
     }
     
-    if(!target.classList.contains("side-panel") && !target.parentNode.classList.contains("side-panel") && !target.parentNode.parentNode.classList.contains("side-panel") && target.id != "menuIcon") {
+    if( !target.classList.contains("side-panel") && 
+        !target.parentNode.classList.contains("side-panel") && 
+        !target.parentNode.parentNode.classList.contains("side-panel") && 
+        target.id != "menuIcon") {
         hideSidePanelMenu();
     }
 });
@@ -174,9 +177,9 @@ let spellToolTipAnimOptions = {
 //handle mouseover spell to show spell hint
 document.addEventListener("mouseover", e => {    
     let target = e.target;
-    if(target.classList.contains("spell")) {
+    if(target.classList.contains("spell") && !isTooltipFreezed) {
         let spellRect = target.getBoundingClientRect();
-        let tooltipHtml = target.querySelector(".spell-tooltip-data").innerHTML;
+        let tooltipHtml = target.getAttribute("data-tooltip");
         spellTooltip.animate(
             [
                 { opacity: 1 }
@@ -184,8 +187,12 @@ document.addEventListener("mouseover", e => {
             spellToolTipAnimOptions
         )
         spellTooltip.innerHTML = tooltipHtml;
-        spellTooltip.style.bottom = `${window.innerHeight - spellRect.bottom + spellRect.height + 10}px`;
-    } else {
+        let spellTooltipRect = spellTooltip.getBoundingClientRect();
+        if(window.innerHeight - spellRect.bottom + spellRect.height + 10 + spellTooltipRect.height < window.innerHeight)
+            spellTooltip.style.bottom = `${window.innerHeight - spellRect.bottom + spellRect.height + 10}px`;
+        else
+            spellTooltip.style.bottom = `${window.innerHeight - spellRect.bottom - spellTooltipRect.height - 10}px`;
+    } else if(!isTooltipFreezed) {
         spellTooltip.animate(
             [
                 { opacity: 0 }
@@ -196,7 +203,8 @@ document.addEventListener("mouseover", e => {
 })
 
 document.addEventListener('mousemove', e => {
-    spellTooltip.style.left = `${e.clientX - 10 - spellTooltip.getBoundingClientRect().width}px`;
+    if(!isTooltipFreezed)
+        spellTooltip.style.left = `${e.clientX - 10 - spellTooltip.getBoundingClientRect().width}px`;
 });
 
 //Handle input changes
@@ -352,6 +360,8 @@ window.addEventListener("keydown", function(e) {
     if(e.key == " ") {
         if(!e.shiftKey) setCurrentCharacter(getNextCharacter());
         else setCurrentCharacter(getPreviousCharacter());
+    } else if(e.key == "T" || e.key == "t") {
+        isTooltipFreezed = !isTooltipFreezed;
     }
 });
 

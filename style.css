@@ -365,6 +365,8 @@ textarea,
     box-shadow: 0 0 10px 5px var(--primary);
     border-top: 5px solid var(--third);
     border-bottom: 5px solid var(--third);
+    max-height: 50vh;
+    overflow-y: auto;
 }
 
 .hint-header {
@@ -390,6 +392,7 @@ textarea,
     justify-items: stretch;
     box-shadow: -5px 0 20px var(--primary);
     translate: 16vw;
+    z-index: 2;
 }
 
 .side-panel button {

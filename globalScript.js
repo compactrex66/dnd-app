@@ -274,8 +274,8 @@ async function generateHtml(monster) {
 async function getMonsterInfo(monster) {
     postMonsterName = monster.name;
     if (monster.hit_dice != null) {
-        minHealth = monster.hit_dice.match(/\d+/) * 1 + monster.hit_dice.match(/(?<=\+)\d+$/) * 1;
-        maxHealth = monster.hit_dice.match(/\d+/) * monster.hit_dice.match(/(?<=d)\d+/) * 1 + monster.hit_dice.match(/\d+$/) * 1;
+        minHealth = monster.hit_dice.match(/\d+/) * 1 + monster.hit_dice.match(/(?<=[\+ ])\d+/) * 1;        
+        maxHealth = monster.hit_dice.match(/\d+/) * monster.hit_dice.match(/(?<=d)\d+/) * 1 + monster.hit_dice.match(/(?<=[\+ ])\d+/) * 1;        
     } else {
         minHealth = monster.hit_points;
         maxHealth = minHealth;

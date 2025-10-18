@@ -197,6 +197,19 @@ listOfCharacters.addEventListener("change", (e) => {
         data.append("characterId", target.parentNode.parentNode.getAttribute("data-characterId"))
         request.send(data);
     }
+
+    //max health
+    if(target.id == "newMaxHealthInput") {
+        let request = new XMLHttpRequest();
+        request.onload = function() { updateCharactersList(); };
+        request.open("post", `indexActions.php`);
+
+        let data = new FormData();
+        data.append("action", "changeMaxHealth")
+        data.append("maxHealth", target.value)
+        data.append("characterId", target.parentNode.parentNode.getAttribute("data-characterId"))
+        request.send(data);
+    }
 });
 
 //Handle character double clicks

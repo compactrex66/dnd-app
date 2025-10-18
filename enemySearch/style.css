@@ -4,7 +4,6 @@ body {
 }
 header {
     gap: 10px;
-    padding-bottom: 10px;
 }
 .monster-result {
     background-color: var(--secondary);
@@ -54,11 +53,9 @@ header {
     height: 35px;
 }
 main {
-    height: 88vh;
     display: flex;
     flex-direction: row;
     justify-content: center;
-    gap: 10px;
-    padding: 0 20px;
+    gap: 20px;
     width: 100vw;
 }

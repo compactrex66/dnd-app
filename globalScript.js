@@ -178,7 +178,7 @@ async function generateHtml(monster) {
     `    
     if (!isEmpty(spells)) {        
         const fetches = spells.map(async (spell) => {
-            let spellDocKey = `a5e-ag_${spell.replaceAll(' ', '-').toLowerCase()}`;
+            let spellDocKey = `srd-2024_${spell.replaceAll(' ', '-').toLowerCase()}`;
             let formData = new FormData();
             formData.append("action", "getSpell");
             formData.append("spellDocumentKey", spellDocKey);
@@ -190,10 +190,23 @@ async function generateHtml(monster) {
                     if (request.status == 404) {
                         const response = await fetch(`https://api.open5e.com/v2/spells/${spellDocKey}`);
                         data = await response.json();
+                        const desc = await new Promise ((resolve) => {
+                            let parseMarkdownRequest = new XMLHttpRequest();
+                            parseMarkdownRequest.open("post", "../indexActions.php", true)
+    
+                            let markdownData = new FormData();
+                            markdownData.append("action", "parseMarkdown");
+                            markdownData.append("markdown", data.desc);
+                            parseMarkdownRequest.onload = async () => {
+                                resolve(parseMarkdownRequest.responseText);
+                            }
+                            parseMarkdownRequest.send(markdownData);
+                        })
+                        
                         let spellData = new FormData();
                         spellData.append("action", "addSpell");
                         spellData.append("name", spell);
-                        spellData.append("desc", data.desc);
+                        spellData.append("desc", desc);
                         spellData.append("level", data.level);
                         spellData.append("school", data.school.name);
                         spellData.append("higher_level", data.higher_level);
@@ -212,7 +225,7 @@ async function generateHtml(monster) {
                         spellData.append("document_key", data.key);
                         data = {
                             name: spell,
-                            desc: data.desc,
+                            description: desc,
                             level: data.level,
                             school: data.school?.name || '',
                             higher_level: data.higher_level || '',
@@ -238,7 +251,7 @@ async function generateHtml(monster) {
                 };
                 request.send(formData);
             });
-
+            
             replacements[spell] = `
             <span class="spell" data-tooltip="
             <span class='big-text'>${json.name.replace(/\b[a-z]/g, match => match.toUpperCase())}</span>

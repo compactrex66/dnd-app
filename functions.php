@@ -36,6 +36,11 @@ function changeHealth($conn, $healthChange, $characterId) {
     mysqli_query($conn, "UPDATE current_fight set health = $health WHERE id = $characterId");
 }
 
+function changeMaxHealth($conn, $newMax, $characterId) {
+    $sql = "UPDATE current_fight SET max_health=$newMax WHERE id=$characterId";
+    mysqli_query($conn, $sql);
+}
+
 function setInitiative($conn, $newInitiative, $characterId) {
     mysqli_query($conn, "UPDATE current_fight SET initiative = $newInitiative WHERE id = $characterId");
 }
@@ -79,8 +84,7 @@ function normalize_string($value) {
     return (string)$value;
 }
 
-function str_replace_first_instance($needle, $replacement_text, $haystack)
-{
+function str_replace_first_instance($needle, $replacement_text, $haystack) {
     $needle_position = strpos($haystack, $needle);
     
     if ($needle_position !== false)

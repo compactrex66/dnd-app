@@ -10,6 +10,8 @@ if (isset($_POST['action'])) {
         $characterId = $_POST['characterId'];
         if ($action == 'adjustHealth') {
             changeHealth($conn, $_POST['healthNumber'], $characterId);
+        } elseif ($action == 'changeMaxHealth') {
+            changeMaxHealth($conn, $_POST['maxHealth'], $characterId);
         } elseif ($action == 'changeInitiative') {
             setInitiative($conn, $_POST['initiative'], $characterId);
         } elseif ($action == 'delete') {
@@ -19,8 +21,7 @@ if (isset($_POST['action'])) {
         } elseif ($action == 'changeCharacterName') {
             changeCharacterName($conn, $_POST['newName'], $characterId);
         }
-    }
-    if ($action == 'getCharacters') {
+    } elseif ($action == 'getCharacters') {
         $sql = "SELECT * FROM current_fight ORDER BY initiative DESC";
         $result = mysqli_query($conn, $sql);
         while ($row = mysqli_fetch_assoc($result)) {
@@ -29,136 +30,36 @@ if (isset($_POST['action'])) {
             echo "<div class='character' data-characterId='" . $row['id'] . "' data-current='" . $current . "'>";
             if ($row['enemy_id'] != null) {
                 $moreInfo = mysqli_fetch_assoc(mysqli_query($conn, "SELECT name, more_info FROM enemies WHERE id = " . $row['enemy_id']));
-                echo "<span style='display: none;' class='name'><h1>" . $moreInfo['name'] . "</h1></span>";
-                $moreInfo = $moreInfo['more_info'];
-                // preg_match_all("/<li>[^:]+:\s*([^<]+)<\/li>|(?<=can cast ).+(?= the)/", $moreInfo, $matches);
-                // $spells = [];
-                // $placeholders = [];
-                // foreach ($matches[1] as $match) {
-                //     $parts = array_map("trim", explode(",", $match));
-                //     $parts = str_replace("*", "", $parts);
-                //     $spells = array_merge($spells, $parts);
-                // }
-                // $multiCurl = curl_multi_init();
-                // $handles = [];
-                // usort($spells, function($a, $b) {
-                //     return strlen($b) <=> strlen($a);
-                // });
-                // foreach($spells as $spell) {
-                //     $sql = "SELECT * FROM spells WHERE name='$spell'";
-                //     $spellResults = mysqli_fetch_array(mysqli_query($conn, $sql));
-                //     if(!$spellResults) {
-                //         $curl = curl_init();
-                //         curl_setopt_array($curl, [
-                //             CURLOPT_URL => "https://api.open5e.com/v2/spells/?key__in=srd-2024_".urlencode(preg_replace('/[^a-z0-9]+/', '-', $spell)),
-                //             CURLOPT_RETURNTRANSFER => 1
-                //         ]);
-                //         curl_multi_add_handle($multiCurl, $curl);
-                //         $handles[spl_object_id($curl)] = ['handle' => $curl, 'spell' => $spell];
-                //     } else {
-                //         $wrappedSpell = "
-                //         <span class='spell'>
-                //             <div class='spell-tooltip-data' style='display: none;'>
-                //             <span class='big-text'>$spellResults[name]</span>
-                //                 <span class='hint-header'>
-                //                     <span>Level: $spellResults[level]</span>
-                //                     <span>Can target: $spellResults[target_type]</span>
-                //                     <span>Range: $spellResults[range_text]</span>
-                //                     <span>Cast Time: $spellResults[casting_time]</span>
-                //                 </span>
-                //                     <br>
-                //                     $spellResults[description]
-                //                     <br><br>
-                //                     $spellResults[higher_level]
-                //             </div>
-                //             $spell
-                //         </span>
-                //         ";
-                //         $placeholder = "@@SPELL_" . md5($spell) . "@@";
-                //         $placeholders[$placeholder] = $wrappedSpell;
-
-                //         $pattern = '/\b' . preg_quote($spell, '/') . '\b/';
-                //         $moreInfo = preg_replace($pattern, $placeholder, $moreInfo);
-                //     }
-                // }
-
-                // $running = null;
-                // do {
-                //     curl_multi_exec($multiCurl, $running);
-                //     curl_multi_select($multiCurl); // wait for activity
-                // } while ($running > 0);
-
-                // foreach ($handles as $info) {
-                //     $curl = $info['handle'];
-                //     $spell = $info['spell'];
-                //     $response = curl_multi_getcontent($curl);
-
-                //     if (curl_errno($curl)) {
-                //         echo "Error fetching $spell: " . curl_error($curl) . "\n";
-                //     } else {
-                //         $decodedData = json_decode($response, true)['results'];
-                //         foreach($decodedData as $spell_response) {
-                //             $name = $spell_response['name'];
-                //             $desc = $spell_response['desc'];
-                //             $level = $spell_response['level'];
-                //             $higher_level = $spell_response['higher_level'];
-                //             $target_type = $spell_response['target_type'];
-                //             $range_text = $spell_response['range_text'];
-                //             $range_num = $spell_response['range'];
-                //             $ritual = $spell_response['ritual'];
-                //             $casting_time = $spell_response['casting_time'];
-                //             $verbal = $spell_response['verbal'];
-                //             $somatic = $spell_response['somatic'];
-                //             $target_count = $spell_response['target_count'];
-                //             $attack_roll = $spell_response['attack_roll'];
-                //             $duration = $spell_response['duration'];
-                //             $concentration = $spell_response['concentration'];
-
-                //             $stmt = $conn->prepare("
-                //                 INSERT INTO spells 
-                //                 (name, description, level, higher_level, target_type, range_text, range_num, ritual, casting_time, verbal, somatic, target_count, attack_roll, duration, concentration)
-                //                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                //             ");
-
-                //             $stmt->bind_param(
-                //                 "ssisssiisiiiisi",
-                //                 $name,
-                //                 $desc,
-                //                 $level,
-                //                 $higher_level,
-                //                 $target_type,
-                //                 $range_text,
-                //                 $range_num,
-                //                 $ritual,
-                //                 $casting_time,
-                //                 $verbal,
-                //                 $somatic,
-                //                 $target_count,
-                //                 $attack_roll,
-                //                 $duration,
-                //                 $concentration
-                //             );
-                //             $stmt->execute();
-                //         }
-                //     }
-
-                //     // Clean up
-                //     curl_multi_remove_handle($multiCurl, $curl);
-                //     curl_close($curl);
-
-                //     // Replace in $moreInfo
-                //     $wrappedSpell = "<span class='spell'>$spell</span>";
-                //     $moreInfo = strtr($moreInfo, $placeholders);
-                // }
-
-                // curl_multi_close($multiCurl);
-                echo "<div style='display: none;' class='moreInfo'>" . $moreInfo . "</div>";
+                if ($moreInfo != null) {
+                    echo "<span style='display: none;' class='name'><h1>" . $moreInfo['name'] . "</h1></span>";
+                    $moreInfo = $moreInfo['more_info'];
+                    echo "<div style='display: none;' class='moreInfo'>" . $moreInfo . "</div>";
+                } else {
+                    mysqli_query($conn, "DELETE FROM current_fight WHERE id=$row[id]");
+                    continue;
+                }
             }
-            echo "<span class='inline-row characterName'>" . $row['name'] . "</span>";
-            echo "<span class='inline-row characterHealth'><img class='icon' src='media/healthIcon.svg'>" . $row['health'] . "/" . $row['max_health'] . "</span>";
-            echo "<span class='inline-row'><img class='icon' src='media/initiativeBoltIcon.svg'><input class='no-spinner' type='number' value=" . $row['initiative'] . " id='modifiedInitiativeInput'></input></span>";
-            echo "<span class='inline-row'><img class='icon' src='media/acIcon.svg'><input class='no-spinner' type='number' value=" . $row['AC'] . " id='modifiedACInput'></input></span>";
-            echo '<span class="inline-row"><button class="redBtn substractHealthBtn"><img src="media/removeIcon.svg"></button><input class="no-spinner" type="number" id="healthInput"></input><button class="greenBtn addHealthBtn"><img src="media/addIcon.svg"></button></span>';
+            echo "
+            <span class='inline-row' style='width: 20%;'>
+                <span class='inline-row characterName'>$row[name]</span>
+                <span class='inline-row status-effects'><button><img src='media/addIcon.svg' class='icon'></button></span>
+            </span>
+            <span class='inline-row characterHealth'>
+                <img class='icon' src='media/healthIcon.svg'>
+                $row[health] /<input class='no-spinner' type='number' value='$row[max_health]' id='newMaxHealthInput' style='font-size: 100%;'></input>
+            </span>
+            <span class='inline-row'><img class='icon' src='media/initiativeBoltIcon.svg'>
+                <input class='no-spinner' type='number' value=" . $row['initiative'] . " id='modifiedInitiativeInput'></input>
+            </span>
+            <span class='inline-row'>
+                <img class='icon' src='media/acIcon.svg'>
+                <input class='no-spinner' type='number' value=" . $row['AC'] . " id='modifiedACInput'></input>
+            </span>
+            <span class='inline-row'>
+                <button class='redBtn substractHealthBtn'><img src='media/removeIcon.svg'></button>
+                <input class='no-spinner' type='number' id='healthInput'></input>
+                <button class='greenBtn addHealthBtn'><img src='media/addIcon.svg'></button>
+            </span>";
             if ($row['is_player'] != 1) {
                 echo '<button class="deleteBtn"><img class="icon" src="media/closeIcon.svg"></button>';
             } else {
@@ -166,8 +67,7 @@ if (isset($_POST['action'])) {
             }
             echo "</div>";
         }
-    }
-    if ($action == 'getDate') {
+    } elseif ($action == 'getDate') {
         $sql = "SELECT * FROM `time` WHERE time_id = 1";
         $result = mysqli_fetch_assoc(mysqli_query($conn, $sql));
         $date = $result['date'];
@@ -250,12 +150,15 @@ if (isset($_POST['action'])) {
         $document_key   = $_POST['document_key']   ?? '';
 
         $stmt = $conn->prepare("
-            INSERT INTO spells (
-                name, description, level, school, higher_level, target_type,
+            INSERT INTO spells (name, description, level, school, higher_level, target_type,
                 range_text, range_num, ritual, casting_time, verbal, somatic,
                 material, target_count, attack_roll, duration, concentration, document_key
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
+
+        if (!$stmt) {
+            die("Prepare failed: " . $conn->error);
+        }
 
         $stmt->bind_param(
             "ssissssiisiiisisis",
@@ -284,6 +187,11 @@ if (isset($_POST['action'])) {
         } else {
             echo "  Error inserting spell: " . $stmt->error;
         }
+    } elseif ($action == 'parseMarkdown') {
+        $markdown = $_POST['markdown'];
+        $parsedown = new ParsedownExtra();
+        $parsedMakrdown = $parsedown->text($markdown);
+        echo $parsedMakrdown;
     }
 }
 mysqli_close($conn);

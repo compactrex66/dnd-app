@@ -73,3 +73,5 @@ async function searchMonster(monsterName) {
         alert("HTTP-Error: " + response.status + response.url);
     }
 }
+
+searchMonster("mage");

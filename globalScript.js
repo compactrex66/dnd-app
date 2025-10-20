@@ -121,16 +121,19 @@ async function generateHtml(monster) {
                 ${monster.challenge_rating_text} (XP ${monster.experience_points}; PB +${monster.proficiency_bonus ?? 0})
             </li>
         </ul>`;
-    let spellFindRegex = /((?<=can cast ).+(?=the))|\*[^:\n]*?: (.+)|(?<=\-[^:\n]+: )([\w ,]*?(?=(?:[-"]|$)))/g;    
+    let spellFindRegex = /((?<=can cast ).+(?=the))|[\*\n][^:\n]*?: (.+)|(?<=\-[^:\n]+: )([\w ,]*?(?=(?:[-"]|$)))|(?<=_)[\w ]*?(?=_)/g;    
     if (!isEmpty(monster.traits)) {
         let traits = monster.traits;
         traits.forEach(trait => {
+            console.log(trait['desc']);
+            
             let matches = [...trait['desc'].matchAll(spellFindRegex)];
             if (!isEmpty(matches)) {
                 let firstGroup = matches[0][0].replaceAll(/(and|at|will|has|level|\d|without|expending|a|spell|slot|\.|they|have)(?=[ .])/gi, "").trim().split(/ {2,}/);
                 console.log(firstGroup);
                 
-                if(firstGroup[0].includes("* Cantrips"))
+                
+                if(firstGroup[0].match(/cantrips|Cantrips/g))
                     firstGroup = [];
                 
                 matches = matches.map(m => m[2] || m[3]).filter(Boolean);
@@ -147,10 +150,14 @@ async function generateHtml(monster) {
     if (!isEmpty(monster.actions.filter(action => action.action_type == "ACTION"))) {
         let actions = monster.actions.filter(action => action.action_type == "ACTION");
         actions.forEach(action => {
+            action['desc'] = action['desc'].replaceAll("<br>", "<br><br>");
             let matches = [...action['desc'].matchAll(spellFindRegex)];
+            
             if (!isEmpty(matches)) {
-                matches = matches.map(m => m[2] || m[3]).filter(Boolean);
+                matches = matches.map(m => m[0]).filter(Boolean);
                 matches = matches.map(spells => spells.replaceAll('*', '').split(','));
+                console.log(matches);
+                
                 matches.forEach(match => {
                     match = match.map(match => match.trim());
                     spells = spells.concat(match);
@@ -178,7 +185,7 @@ async function generateHtml(monster) {
     `    
     if (!isEmpty(spells)) {        
         const fetches = spells.map(async (spell) => {
-            let spellDocKey = `srd-2024_${spell.replaceAll(' ', '-').toLowerCase()}`;
+            let spellDocKey = `a5e-ag_${spell.replaceAll(' ', '-').toLowerCase()}`;
             let formData = new FormData();
             formData.append("action", "getSpell");
             formData.append("spellDocumentKey", spellDocKey);
@@ -190,19 +197,19 @@ async function generateHtml(monster) {
                     if (request.status == 404) {
                         const response = await fetch(`https://api.open5e.com/v2/spells/${spellDocKey}`);
                         data = await response.json();
-                        const desc = await new Promise ((resolve) => {
-                            let parseMarkdownRequest = new XMLHttpRequest();
-                            parseMarkdownRequest.open("post", "../indexActions.php", true)
+                        // const desc = await new Promise ((resolve) => {
+                        //     let parseMarkdownRequest = new XMLHttpRequest();
+                        //     parseMarkdownRequest.open("post", "../indexActions.php", true)
     
-                            let markdownData = new FormData();
-                            markdownData.append("action", "parseMarkdown");
-                            markdownData.append("markdown", data.desc);
-                            parseMarkdownRequest.onload = async () => {
-                                resolve(parseMarkdownRequest.responseText);
-                            }
-                            parseMarkdownRequest.send(markdownData);
-                        })
-                        
+                        //     let markdownData = new FormData();
+                        //     markdownData.append("action", "parseMarkdown");
+                        //     markdownData.append("markdown", data.desc);
+                        //     parseMarkdownRequest.onload = async () => {
+                        //         resolve(parseMarkdownRequest.responseText);
+                        //     }
+                        //     parseMarkdownRequest.send(markdownData);
+                        // })
+                        desc = data.desc;
                         let spellData = new FormData();
                         spellData.append("action", "addSpell");
                         spellData.append("name", spell);

@@ -70,7 +70,6 @@ input[type=number] {
     border: 1px solid var(--text);
     -moz-appearance: textfield;
     appearance: textfield;
-    align-self: stretch;
 }
 
 button img {
@@ -173,13 +172,13 @@ a * {
     justify-content: space-between;
     align-items: stretch;
     width: 100%;
-    padding: 20px 0 20px 20px;
+    padding: 15px 5px 15px 10px;
     background-color: var(--secondary);
     box-sizing: border-box;
 }
 
 .characterName {
-    width: 100%;
+    width: 12.5%;
     font-size: small;
 }
 
@@ -198,10 +197,15 @@ a * {
 }
 
 .inline-row {
+    position: relative;
     display: flex;
     flex-direction: row;
-    gap: 10px;
+    gap: 8px;
     align-items: center;
+}
+
+.h-100 {
+    height: 100%;
 }
 
 .big-text-container {
@@ -220,12 +224,12 @@ a * {
 select,
 button,
 input,
-.checkboxInput,
 textarea,
+.checkboxInput,
 .secondary-btn,
 .select,
 .characterHealth {
-    padding: 7px;
+    padding: 10px 5px;
     background-color: var(--secondary);
     color: var(--text);
     border: 0;
@@ -235,18 +239,15 @@ textarea,
 }
 
 .characterHealth {
-    width: 12%;
     padding: 0;
 }
 
 .redBtn {
     background-color: rgb(152, 40, 40);
-    align-self: stretch;
 }
 
 .greenBtn {
     background-color: rgb(43, 86, 43);
-    align-self: stretch;
 }
 
 .select {
@@ -291,6 +292,11 @@ textarea,
     border-bottom: 2px solid var(--third);
 }
 
+.fit {
+    width: fit-content;
+    height: fit-content;
+}
+
 /* Remove right border from last column */
 .options>.option:nth-child(3n) {
     border-right: none;
@@ -315,7 +321,6 @@ textarea,
 .deleteBtn,
 .inactiveDeleteBtn {
     cursor: pointer;
-    padding: 5px;
     background-color: transparent;
 }
 
@@ -323,6 +328,14 @@ textarea,
 .inactiveDeleteBtn img {
     height: 32px;
     aspect-ratio: 1;
+}
+
+.deleteBtn,
+.inactiveDeleteBtn,
+.greenBtn,
+.redBtn {
+    padding: 5px;
+    align-self: stretch;
 }
 
 .inactiveDeleteBtn {
@@ -334,7 +347,8 @@ textarea,
     box-sizing: border-box;
     width: 45vw;
     height: 100%;
-    overflow: auto;
+    overflow-y: auto;
+    overflow-x: hidden;
     background-color: var(--secondary);
     padding: 20px;
     display: flex;
@@ -368,7 +382,7 @@ textarea,
     box-shadow: 0 0 10px 5px var(--primary);
     border-top: 5px solid var(--third);
     border-bottom: 5px solid var(--third);
-    max-height: 50vh;
+    max-height: 44vh;
     overflow-y: auto;
 }
 
@@ -407,9 +421,6 @@ textarea,
 
 #menuIcon {
     cursor: pointer;
-    align-self: stretch;
-    justify-self: stretch;
-    aspect-ratio: 1;
 }
 
 #sidePanelCloseBtn {

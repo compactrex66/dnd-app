@@ -8,7 +8,7 @@ const deleteEnemiesBtn = document.getElementById("deleteEnemiesBtn");
 const addEnemyBtn = document.getElementById("addEnemyBtn");
 const enemySelect = document.getElementById("enemySelect");
 const selectedEnemy = document.getElementById("selectedEnemy");
-const enemyOptions = document.getElementById("enemyList")
+const enemyOptions = document.getElementById("enemyList");
 const enemyQuantity = document.getElementById("enemyQuantity");
 
 let arrOfCharacterElements = Array.from(document.querySelectorAll(".character"));
@@ -144,6 +144,45 @@ listOfCharacters.addEventListener("click", (e) => {
             });
         })
     }
+    
+    if(target.classList.contains("addConditionBtn")) {        
+        const options = target.nextSibling;
+        if(options.style.display != "grid") {
+            options.style.display = "grid";
+            options.animate(
+                [
+                    { opacity: 1 }
+                ],
+                selectAnimOptions
+            )
+        }
+        else {
+            let fadeOutAnimation = options.animate(
+                [
+                    { opacity: 0 }
+                ],
+                selectAnimOptions
+            )
+            fadeOutAnimation.onfinish = () => { options.style.display = "none"; }
+        }
+    }
+
+    if(target.classList.contains("option")) {
+        let conditionId = target.getAttribute("data-id");
+        let request = new XMLHttpRequest();
+        let turnsLeft = prompt("How long should the condition last ?");
+        request.open("post", "indexActions.php");
+        request.onload = () => {
+            
+            updateCharactersList();
+        }
+        let formData = new FormData();
+        formData.append("action", "addCondition");
+        formData.append("conditionId", conditionId);
+        formData.append("characterId", target.closest(".character").getAttribute("data-characterId"));
+        formData.append("turnsLeft", turnsLeft);
+        request.send(formData);
+    }    
 });
 
 //Handle clicks outside elements

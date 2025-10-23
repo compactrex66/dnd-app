@@ -20,6 +20,13 @@ if (isset($_POST['action'])) {
             setAC($conn, $_POST['AC'], $characterId);
         } elseif ($action == 'changeCharacterName') {
             changeCharacterName($conn, $_POST['newName'], $characterId);
+        } elseif ($action == 'addCondition') {
+            $conditionId = $_POST['conditionId'];
+            $turnsLeft = $_POST['turnsLeft'];
+            $stmt = $conn->prepare("INSERT INTO character_conditions values(null, ?, ?, ?)");
+            $stmt->bind_param("iii", $conditionId, $characterId, $turnsLeft);
+            $stmt->execute();
+            $stmt->close();
         }
     } elseif ($action == 'getCharacters') {
         $sql = "SELECT * FROM current_fight ORDER BY initiative DESC";
@@ -40,32 +47,51 @@ if (isset($_POST['action'])) {
                 }
             }
             echo "
-            <span class='inline-row' style='width: 20%;'>
-                <span class='inline-row characterName'>$row[name]</span>
-                <span class='inline-row status-effects'><button><img src='media/addIcon.svg' class='icon'></button></span>
+            <span class='inline-row characterName'>$row[name]</span>
+            <span class='inline-row'>";
+                $conditions = mysqli_query($conn, "SELECT current_fight.name, turns_left, conditions.name, conditions.description, icon_filename FROM character_conditions, conditions, current_fight WHERE current_fight.id = character_conditions.id AND character_conditions.id = conditions.id");
+                if(mysqli_num_rows($conditions) > 0) {
+                    while($condition = mysqli_fetch_array($conditions)) {
+                        echo "<img src='media/$condition[icon_filename]'>";
+                    }
+                }
+            echo "<img src='media/addIcon.svg' class='select fit addConditionBtn'>";
+                $conditions = mysqli_query($conn, "SELECT * FROM conditions");
+                if(mysqli_num_rows($conditions) > 0) {
+                    echo "<div class='options' id='conditionOptions'>";
+                    while($condition = mysqli_fetch_array($conditions)) {
+                        echo "<div class='option' data-id='$condition[id]'>$condition[name]</div>";
+                    }
+                    echo "</div>";
+                }
+            echo "
             </span>
-            <span class='inline-row characterHealth'>
-                <img class='icon' src='media/healthIcon.svg'>
-                $row[health] /<input class='no-spinner' type='number' value='$row[max_health]' id='newMaxHealthInput' style='font-size: 100%;'></input>
-            </span>
-            <span class='inline-row'><img class='icon' src='media/initiativeBoltIcon.svg'>
-                <input class='no-spinner' type='number' value=" . $row['initiative'] . " id='modifiedInitiativeInput'></input>
             </span>
             <span class='inline-row'>
-                <img class='icon' src='media/acIcon.svg'>
-                <input class='no-spinner' type='number' value=" . $row['AC'] . " id='modifiedACInput'></input>
+                <span class='inline-row characterHealth'>
+                    <img class='icon' src='media/healthIcon.svg'>
+                    $row[health] /<input class='no-spinner' type='number' value='$row[max_health]' id='newMaxHealthInput' style='font-size: 100%;'></input>
+                </span>
+                <span class='inline-row'><img class='icon' src='media/initiativeBoltIcon.svg'>
+                    <input class='no-spinner' type='number' value=" . $row['initiative'] . " id='modifiedInitiativeInput'></input>
+                </span>
+                <span class='inline-row'>
+                    <img class='icon' src='media/acIcon.svg'>
+                    <input class='no-spinner' type='number' value=" . $row['AC'] . " id='modifiedACInput'></input>
+                </span>
+                <span class='inline-row'>
+                    <button class='redBtn substractHealthBtn'><img src='media/removeIcon.svg'></button>
+                    <input class='no-spinner' type='number' id='healthInput'></input>
+                    <button class='greenBtn addHealthBtn'><img src='media/addIcon.svg'></button>
+                </span>";
+                if ($row['is_player'] != 1) {
+                    echo '<button class="deleteBtn"><img class="icon" src="media/closeIcon.svg"></button>';
+                } else {
+                    echo '<button class="inactiveDeleteBtn"><img class="icon" src="media/closeIcon.svg"></button>';
+                }
+            echo "
             </span>
-            <span class='inline-row'>
-                <button class='redBtn substractHealthBtn'><img src='media/removeIcon.svg'></button>
-                <input class='no-spinner' type='number' id='healthInput'></input>
-                <button class='greenBtn addHealthBtn'><img src='media/addIcon.svg'></button>
-            </span>";
-            if ($row['is_player'] != 1) {
-                echo '<button class="deleteBtn"><img class="icon" src="media/closeIcon.svg"></button>';
-            } else {
-                echo '<button class="inactiveDeleteBtn"><img class="icon" src="media/closeIcon.svg"></button>';
-            }
-            echo "</div>";
+        </div>";
         }
     } elseif ($action == 'getDate') {
         $sql = "SELECT * FROM `time` WHERE time_id = 1";

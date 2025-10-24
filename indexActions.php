@@ -27,6 +27,9 @@ if (isset($_POST['action'])) {
             $stmt->bind_param("iii", $conditionId, $characterId, $turnsLeft);
             $stmt->execute();
             $stmt->close();
+        } elseif ($action == 'setCurrent') {
+            $nextTurn = $_POST['nextTurn'];
+            setCurrent($conn, $characterId, $nextTurn);
         }
     } elseif ($action == 'getCharacters') {
         $sql = "SELECT * FROM current_fight ORDER BY initiative DESC";
@@ -34,7 +37,8 @@ if (isset($_POST['action'])) {
         while ($row = mysqli_fetch_assoc($result)) {
             if ($row['current'] == 1) $current = 1;
             else $current = 0;
-            echo "<div class='character' data-characterId='" . $row['id'] . "' data-current='" . $current . "'>";
+            if($current == 1) echo "<div class='character' data-characterId='" . $row['id'] . "' data-current='" . $current . "' style='border: 1px white solid;'>";
+            else echo "<div class='character' data-characterId='" . $row['id'] . "' data-current='" . $current . "'>";
             if ($row['enemy_id'] != null) {
                 $moreInfo = mysqli_fetch_assoc(mysqli_query($conn, "SELECT name, more_info FROM enemies WHERE id = " . $row['enemy_id']));
                 if ($moreInfo != null) {
@@ -49,10 +53,13 @@ if (isset($_POST['action'])) {
             echo "
             <span class='inline-row characterName'>$row[name]</span>
             <span class='inline-row'>";
-                $conditions = mysqli_query($conn, "SELECT current_fight.name, turns_left, conditions.name, conditions.description, icon_filename FROM character_conditions, conditions, current_fight WHERE current_fight.id = character_conditions.id AND character_conditions.id = conditions.id");
+                $conditions = mysqli_query($conn, "SELECT current_fight.name, turns_left, conditions.name, conditions.description, icon_filename FROM character_conditions, conditions, current_fight WHERE current_fight.id = character_conditions.character_id AND character_conditions.condition_id = conditions.id AND current_fight.id = $row[id]");
                 if(mysqli_num_rows($conditions) > 0) {
                     while($condition = mysqli_fetch_array($conditions)) {
-                        echo "<img src='media/$condition[icon_filename]'>";
+                        echo "<span class='inline-column'>
+                                <img class='icon' src='media/$condition[icon_filename]' alt='$condition[name]'>
+                                <span class='bottom-text'>$condition[turns_left]</span>
+                            </span>";
                     }
                 }
             echo "<img src='media/addIcon.svg' class='select fit addConditionBtn'>";
@@ -65,7 +72,6 @@ if (isset($_POST['action'])) {
                     echo "</div>";
                 }
             echo "
-            </span>
             </span>
             <span class='inline-row'>
                 <span class='inline-row characterHealth'>
@@ -106,8 +112,6 @@ if (isset($_POST['action'])) {
         deleteAllEnemies($conn);
     } elseif ($action == 'longRest') {
         longRest($conn);
-    } elseif ($action == 'setCurrent') {
-        setCurrent($conn, $characterId);
     } elseif ($action == "passTime") {
         passTime($conn, $_POST['hoursToPass']);
         echo "passtime";

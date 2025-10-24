@@ -14,18 +14,21 @@ const enemyQuantity = document.getElementById("enemyQuantity");
 let arrOfCharacterElements = Array.from(document.querySelectorAll(".character"));
 let currentCharacter;
 
-function updateCharactersList() {
-    let request = new XMLHttpRequest();
-    request.onload = () => {        
-        listOfCharacters.innerHTML = request.responseText;
-        arrOfCharacterElements = Array.from(document.querySelectorAll(".character"));
-        setCurrentCharacter();
-    };
-    request.open("post", "indexActions.php", true);
-
-    let formData = new FormData();
-    formData.append("action", "getCharacters");
-    request.send(formData);    
+async function updateCharactersList() {
+    await new Promise((resolve) => {
+        let request = new XMLHttpRequest();
+        request.onload = () => {                
+            listOfCharacters.innerHTML = request.responseText;
+            arrOfCharacterElements = Array.from(document.querySelectorAll(".character"));
+            currentCharacter = getCurrentCharacter();
+            resolve();
+        };
+        request.open("post", "indexActions.php", true);
+        
+        let formData = new FormData();
+        formData.append("action", "getCharacters");
+        request.send(formData);    
+    })
 }
 function updateTime() {
     let request = new XMLHttpRequest();
@@ -46,6 +49,8 @@ function getCurrentCharacter() {
     return null;
 }
 function getNextCharacter() {
+    console.log(arrOfCharacterElements);
+    
     if(arrOfCharacterElements.indexOf(currentCharacter) + 1 >= arrOfCharacterElements.length) {
         return arrOfCharacterElements[0];
     } else {
@@ -59,8 +64,7 @@ function getPreviousCharacter() {
         return arrOfCharacterElements[arrOfCharacterElements.indexOf(currentCharacter) - 1];
     }
 }
-function setCurrentCharacter(character) {
-    currentCharacter = getCurrentCharacter() ?? arrOfCharacterElements[0];
+function setCurrentCharacter(character, isNextTurn) {
     currentCharacter.setAttribute("data-current", "0");
     if(character == undefined) {
         character = currentCharacter;
@@ -77,11 +81,13 @@ function setCurrentCharacter(character) {
     })
 
     let request = new XMLHttpRequest();
+    request.onload = updateCharactersList;
     request.open("post", `indexActions.php`, true);
 
     let data = new FormData();
     data.append("action", "setCurrent");
     data.append("characterId", character.getAttribute("data-characterid"));
+    data.append("nextTurn", isNextTurn);
     request.send(data);
     currentCharacter = character;
 }
@@ -92,43 +98,46 @@ listOfCharacters.addEventListener("click", (e) => {
 
     // Delete button
     if (target.classList.contains("deleteBtn")) {
+        let characterAncestor = target.closest(".character");
         let request = new XMLHttpRequest();
         request.open("post", "indexActions.php", true);
 
         let data = new FormData();
         data.append("action", "delete");
-        data.append("characterId", target.parentNode.getAttribute("data-characterId"));
-        if(target.parentNode.getAttribute("data-current") == 1) {
-            setCurrentCharacter(getNextCharacter());
+        data.append("characterId", characterAncestor.getAttribute("data-characterId"));
+        if(characterAncestor.getAttribute("data-current") == 1) {
+            setCurrentCharacter(getNextCharacter(), true);
         }
-        target.parentNode.remove();
+        characterAncestor.remove();
         arrOfCharacterElements = Array.from(document.querySelectorAll(".character"))
         request.send(data);
     }
 
     // Add health button
     if (target.classList.contains("addHealthBtn")) {
+        let characterAncestor = target.closest(".character");
         let request = new XMLHttpRequest();
         request.onload = function() { updateCharactersList(); };
         request.open("post", "indexActions.php", true);
 
         let data = new FormData();
         data.append("action", "adjustHealth");
-        data.append("characterId", target.parentNode.parentNode.getAttribute("data-characterId"));
-        data.append("healthNumber", target.previousSibling.value);
+        data.append("characterId", characterAncestor.getAttribute("data-characterId"));
+        data.append("healthNumber", characterAncestor.querySelector("#healthInput").value);
         request.send(data);
     }
 
     //Substract health button
     if(target.classList.contains("substractHealthBtn")) {
+        let characterAncestor = target.closest(".character");
         let request = new XMLHttpRequest();
         request.onload = function() { updateCharactersList(); };
         request.open("post", `indexActions.php`, true);
 
         let data = new FormData();
         data.append("action", "adjustHealth");
-        data.append("characterId", target.parentNode.parentNode.getAttribute("data-characterId"));
-        data.append("healthNumber", target.nextSibling.value * -1);            
+        data.append("characterId", characterAncestor.getAttribute("data-characterId"));
+        data.append("healthNumber", characterAncestor.querySelector("#healthInput").value * -1);            
         request.send(data);
     }
 
@@ -213,6 +222,7 @@ listOfCharacters.addEventListener("change", (e) => {
 
     //initaitive
     if (target.id === "modifiedInitiativeInput") {
+        let characterAncestor = target.closest(".character");
         let request = new XMLHttpRequest();
         request.onload = function() { updateCharactersList(); };
         request.open("post", "indexActions.php", true);
@@ -220,12 +230,13 @@ listOfCharacters.addEventListener("change", (e) => {
         let data = new FormData();
         data.append("action", "changeInitiative");
         data.append("initiative", target.value);
-        data.append("characterId", target.parentNode.parentNode.getAttribute("data-characterId"));
+        data.append("characterId", characterAncestor.getAttribute("data-characterId"));
         request.send(data);
     }
 
     //armor class
     if(target.id == "modifiedACInput") {
+        let characterAncestor = target.closest(".character");
         let request = new XMLHttpRequest();
         request.onload = function() { updateCharactersList(); };
         request.open("post", `indexActions.php`);
@@ -233,12 +244,13 @@ listOfCharacters.addEventListener("change", (e) => {
         let data = new FormData();
         data.append("action", "changeAC")
         data.append("AC", target.value)
-        data.append("characterId", target.parentNode.parentNode.getAttribute("data-characterId"))
+        data.append("characterId", characterAncestor.getAttribute("data-characterId"))
         request.send(data);
     }
 
     //max health
     if(target.id == "newMaxHealthInput") {
+        let characterAncestor = target.closest(".character");
         let request = new XMLHttpRequest();
         request.onload = function() { updateCharactersList(); };
         request.open("post", `indexActions.php`);
@@ -246,7 +258,7 @@ listOfCharacters.addEventListener("change", (e) => {
         let data = new FormData();
         data.append("action", "changeMaxHealth")
         data.append("maxHealth", target.value)
-        data.append("characterId", target.parentNode.parentNode.getAttribute("data-characterId"))
+        data.append("characterId", characterAncestor.getAttribute("data-characterId"))
         request.send(data);
     }
 });
@@ -256,7 +268,7 @@ listOfCharacters.addEventListener("dblclick", (e) => {
     const target = e.target
 
     if(target.classList.contains("character")) {
-        setCurrentCharacter(e.target);
+        setCurrentCharacter(e.target, false);
     }
 
     if(target.classList.contains("characterName")) {
@@ -371,8 +383,8 @@ document.getElementById("longRestBtn").addEventListener("click", () => {
 //Next turn on space click or previous turn on shift + space
 window.addEventListener("keydown", function(e) {
     if(e.key == " ") {
-        if(!e.shiftKey) setCurrentCharacter(getNextCharacter());
-        else setCurrentCharacter(getPreviousCharacter());
+        if(!e.shiftKey) setCurrentCharacter(getNextCharacter(), true);
+        else setCurrentCharacter(getPreviousCharacter(), false);
     }
 });
 
@@ -412,4 +424,6 @@ enemyOptions.addEventListener("click", (e) => {
     }
 });
 
-updateCharactersList();
+updateCharactersList().then(() => {    
+    setCurrentCharacter(null, false);
+});

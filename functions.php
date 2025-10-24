@@ -69,12 +69,23 @@ function longRest($conn) {
     passTime($conn, 8);
 }
 
-function setCurrent($conn, $characterId = null) {
+function setCurrent($conn, $characterId, $nextTurn) {
+    if($nextTurn == "true") {
+        $result = mysqli_query($conn, "SELECT character_conditions.id, turns_left FROM character_conditions, current_fight WHERE current_fight.current = 1 AND character_conditions.character_id = current_fight.id;");
+        while($row = mysqli_fetch_array($result)) {
+            if($row['turns_left'] <= 1) {
+                mysqli_query($conn, "DELETE FROM character_conditions WHERE id=$row[id]");
+            } else {
+                $newTurnsLeft = $row['turns_left'] - 1;
+                mysqli_query($conn, "UPDATE character_conditions SET turns_left = $newTurnsLeft WHERE id=$row[id]");
+            }
+        }
+    }
     mysqli_query($conn, "UPDATE current_fight SET current = 0");
     if($characterId != null) {
         mysqli_query($conn, "UPDATE current_fight SET current = 1 WHERE id = ".$characterId);
     } else {
-        mysqli_query($conn, "UPDATE current_fight SET current = 1 WHERE initiative = (SELECT characterId FROM current_fight WHERE initiative = (SELECT MAX(initiative) FROM current_fight) LIMIT 1)");
+        mysqli_query($conn, "UPDATE current_fight SET current = 1 WHERE id = (SELECT id FROM current_fight WHERE initiative = (SELECT MAX(initiative) FROM current_fight) LIMIT 1)");
     }
 }
 

@@ -426,6 +426,7 @@ textarea,
     display: flex;
     flex-direction: row;
     gap: 10px;
+    font-style: italic;
 }
 
 .vl {

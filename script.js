@@ -12,7 +12,7 @@ const enemyOptions = document.getElementById("enemyList");
 const enemyQuantity = document.getElementById("enemyQuantity");
 
 let arrOfCharacterElements = Array.from(document.querySelectorAll(".character"));
-let currentCharacter;
+let currentCharacter, isEditing = false;
 
 async function updateCharactersList() {
     await new Promise((resolve) => {
@@ -289,6 +289,7 @@ listOfCharacters.addEventListener("dblclick", (e) => {
     }
 
     if(target.classList.contains("characterName")) {
+        isEditing = true;
         let inputNewNameElement = document.createElement("textarea"), oldName = target.innerText;
         inputNewNameElement.value = target.innerText;
         inputNewNameElement.classList.add("newCharacterName");
@@ -300,7 +301,10 @@ listOfCharacters.addEventListener("dblclick", (e) => {
                 data.append("characterId", target.parentNode.getAttribute("data-characterId"))
 
                 let request = new XMLHttpRequest();
-                request.onload = function() { updateCharactersList(); };
+                request.onload = function() { 
+                    updateCharactersList();
+                    isEditing = false;
+                };
                 request.open("post", "indexActions.php", true);
                 request.send(data);
             } else {
@@ -399,7 +403,7 @@ document.getElementById("longRestBtn").addEventListener("click", () => {
 
 //Next turn on space click or previous turn on shift + space
 window.addEventListener("keydown", function(e) {
-    if(e.key == " ") {
+    if(e.key == " " && !isEditing) {
         if(!e.shiftKey) setCurrentCharacter(getNextCharacter(), true);
         else setCurrentCharacter(getPreviousCharacter(), false);
     }

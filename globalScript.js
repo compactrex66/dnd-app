@@ -261,7 +261,7 @@ async function generateHtml(monster) {
             
             replacements[spell] = `
             <span class="spell" data-tooltip="
-            <span class='big-text'>${json.name.replace(/\b[a-z]/g, match => match.toUpperCase())}</span>
+            <span class='big-text'><b>${json.name.replace(/\b[a-z]/g, match => match.toUpperCase())}</b></span>
             <span class='hint-header'>
                 <span>Level: ${json.level}</span>
                 <span>Range: ${json.range_text}</span>

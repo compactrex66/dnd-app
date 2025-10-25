@@ -48,6 +48,7 @@ button {
 
 ul {
     padding-left: 0;
+    margin: 0;
 }
 
 li {
@@ -175,11 +176,22 @@ a * {
     padding: 15px 5px 15px 10px;
     background-color: var(--secondary);
     box-sizing: border-box;
+    height: 12vh;
 }
 
 .characterName {
     width: 12.5%;
     font-size: small;
+}
+
+.conditions {
+    display: grid;
+    grid-template-columns: auto auto;
+    width: 12%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    gap: 20px 10px;
+    padding-right: 5px;
 }
 
 .newCharacterName {
@@ -189,11 +201,6 @@ a * {
     border: 1px solid white;
     word-wrap: normal;
     box-sizing: border-box;
-}
-
-.icon {
-    height: 24px;
-    aspect-ratio: 1;
 }
 
 .inline-row {
@@ -218,7 +225,7 @@ a * {
 .bottom-text {
     font-size: small;
     position: absolute;
-    bottom: -75%;
+    top: 24px;
 }
 
 .h-100 {
@@ -257,6 +264,14 @@ textarea,
 
 .characterHealth {
     padding: 0;
+}
+
+.icon {
+    height: 24px;
+    aspect-ratio: 1;
+    background-color: transparent;
+    padding: 0;
+    color: white;
 }
 
 .redBtn {

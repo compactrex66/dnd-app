@@ -95,6 +95,8 @@ function setCurrentCharacter(character, isNextTurn) {
 //Handle character clicks
 listOfCharacters.addEventListener("click", (e) => {
     let target = e.target;
+    console.log(target);
+    
 
     // Delete button
     if (target.classList.contains("deleteBtn")) {
@@ -154,6 +156,7 @@ listOfCharacters.addEventListener("click", (e) => {
         })
     }
     
+    //show character conditions to add
     if(target.classList.contains("addConditionBtn")) {        
         const options = target.nextSibling;
         if(options.style.display != "grid") {
@@ -176,6 +179,7 @@ listOfCharacters.addEventListener("click", (e) => {
         }
     }
 
+    //add selected character condition
     if(target.classList.contains("option")) {
         let conditionId = target.getAttribute("data-id");
         let request = new XMLHttpRequest();
@@ -191,7 +195,20 @@ listOfCharacters.addEventListener("click", (e) => {
         formData.append("characterId", target.closest(".character").getAttribute("data-characterId"));
         formData.append("turnsLeft", turnsLeft);
         request.send(formData);
-    }    
+    }
+
+    //delete clicked condition
+    if(target.classList.contains("condition")) {
+        let characterConditionId = target.getAttribute("data-character-condition-id");
+        let formData = new FormData();
+        formData.append("action", "deleteCondition");
+        formData.append("characterId", target.closest(".character").getAttribute("data-characterId"));
+        formData.append("characterConditionId", characterConditionId);
+        let request = new XMLHttpRequest();
+        request.onload = updateCharactersList;
+        request.open("post", "indexActions.php");
+        request.send(formData);
+    }
 });
 
 //Handle clicks outside elements

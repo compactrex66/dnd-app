@@ -361,9 +361,9 @@ let spellToolTipAnimOptions = {
     easing: "cubic-bezier(0,.73,.17,1.11)",
 }
 //handle mouseover spell to show spell hint
-document.addEventListener("mouseover", e => {
+document.addEventListener("mousemove", e => {
     let target = e.target;
-    if (target.classList.contains("spell") && !isTooltipFreezed) {
+    if ((target.classList.contains("spell") || target.classList.contains("condition"))&& !isTooltipFreezed) {
         let spellRect = target.getBoundingClientRect();
         let tooltipHtml = target.getAttribute("data-tooltip");
         spellTooltip.animate(
@@ -374,10 +374,17 @@ document.addEventListener("mouseover", e => {
         )
         spellTooltip.innerHTML = tooltipHtml;
         let spellTooltipRect = spellTooltip.getBoundingClientRect();
+
         if (window.innerHeight - spellRect.bottom + spellRect.height + 10 + spellTooltipRect.height < window.innerHeight)
             spellTooltip.style.bottom = `${window.innerHeight - spellRect.bottom + spellRect.height + 10}px`;
         else
             spellTooltip.style.bottom = `${window.innerHeight - spellRect.bottom - spellTooltipRect.height - 10}px`;
+        
+        if (spellRect.left < spellTooltipRect.width)
+            spellTooltip.style.left = `${e.clientX + 10}px`;
+        else
+            spellTooltip.style.left = `${e.clientX - 10 - spellTooltip.getBoundingClientRect().width}px`;
+
     } else if (!isTooltipFreezed) {
         spellTooltip.animate(
             [
@@ -387,10 +394,7 @@ document.addEventListener("mouseover", e => {
         )
     }
 })
-document.addEventListener('mousemove', e => {
-    if (!isTooltipFreezed)
-        spellTooltip.style.left = `${e.clientX - 10 - spellTooltip.getBoundingClientRect().width}px`;
-});
+
 window.addEventListener("keydown", function (e) {
     if (e.key == "T" || e.key == "t") {
         isTooltipFreezed = !isTooltipFreezed;

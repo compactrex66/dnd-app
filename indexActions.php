@@ -23,10 +23,22 @@ if (isset($_POST['action'])) {
         } elseif ($action == 'addCondition') {
             $conditionId = $_POST['conditionId'];
             $turnsLeft = $_POST['turnsLeft'];
+            $result = mysqli_query($conn, "SELECT * FROM character_conditions WHERE character_id=$characterId");
+            while($row = mysqli_fetch_array($result)) {
+                if($row['condition_id'] == $conditionId) {
+                    $turnsLeft += $row['turns_left'];
+                    mysqli_query($conn, "UPDATE character_conditions SET turns_left=$turnsLeft WHERE condition_id=$conditionId AND character_id=$characterId");
+                    return;
+                }
+            }
             $stmt = $conn->prepare("INSERT INTO character_conditions values(null, ?, ?, ?)");
             $stmt->bind_param("iii", $conditionId, $characterId, $turnsLeft);
             $stmt->execute();
             $stmt->close();
+        } elseif ($action == 'deleteCondition') {
+            $conditionId = $_POST['characterConditionId'];
+            echo "DELETE FROM character_conditions WHERE id=$conditionId";
+            mysqli_query($conn, "DELETE FROM character_conditions WHERE id=$conditionId");
         } elseif ($action == 'setCurrent') {
             $nextTurn = $_POST['nextTurn'];
             setCurrent($conn, $characterId, $nextTurn);
@@ -52,17 +64,25 @@ if (isset($_POST['action'])) {
             }
             echo "
             <span class='inline-row characterName'>$row[name]</span>
-            <span class='inline-row'>";
-                $conditions = mysqli_query($conn, "SELECT current_fight.name, turns_left, conditions.name, conditions.description, icon_filename FROM character_conditions, conditions, current_fight WHERE current_fight.id = character_conditions.character_id AND character_conditions.condition_id = conditions.id AND current_fight.id = $row[id]");
+            <span class='conditions'>";
+                $conditions = mysqli_query($conn, "SELECT current_fight.name, turns_left, conditions.name, conditions.description, icon_filename, character_conditions.id FROM character_conditions, conditions, current_fight WHERE current_fight.id = character_conditions.character_id AND character_conditions.condition_id = conditions.id AND current_fight.id = $row[id]");
                 if(mysqli_num_rows($conditions) > 0) {
                     while($condition = mysqli_fetch_array($conditions)) {
-                        echo "<span class='inline-column'>
-                                <img class='icon' src='media/$condition[icon_filename]' alt='$condition[name]'>
-                                <span class='bottom-text'>$condition[turns_left]</span>
-                            </span>";
+                        $name = htmlspecialchars($condition['name'], ENT_QUOTES);
+                        $desc = htmlspecialchars($condition['description'], ENT_QUOTES);
+
+                        echo "
+                        <span class='inline-column'>
+                        <img class='icon condition'
+                            src='media/{$condition['icon_filename']}'
+                            alt='$name'
+                            data-tooltip=\"<span class='big-text'>$name</span>$desc\"
+                            data-character-condition-id=\"$condition[id]\">
+                        <span class='bottom-text'>{$condition['turns_left']}</span>
+                        </span>";
                     }
                 }
-            echo "<img src='media/addIcon.svg' class='select fit addConditionBtn'>";
+            echo "<img src='media/addIcon.svg' class='select fit addConditionBtn icon'>";
                 $conditions = mysqli_query($conn, "SELECT * FROM conditions");
                 if(mysqli_num_rows($conditions) > 0) {
                     echo "<div class='options' id='conditionOptions'>";

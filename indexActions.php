@@ -72,11 +72,11 @@ if (isset($_POST['action'])) {
                         $desc = htmlspecialchars($condition['description'], ENT_QUOTES);
 
                         echo "
-                        <span class='inline-column'>
+                        <span class='inline-column fit'>
                         <img class='icon condition'
                             src='media/{$condition['icon_filename']}'
                             alt='$name'
-                            data-tooltip=\"<span class='big-text'>$name</span>$desc\"
+                            data-tooltip=\"<span class='big-text bold'>$name</span>$desc\"
                             data-character-condition-id=\"$condition[id]\">
                         <span class='bottom-text'>{$condition['turns_left']}</span>
                         </span>";
@@ -93,7 +93,7 @@ if (isset($_POST['action'])) {
                 }
             echo "
             </span>
-            <span class='inline-row'>
+            <span class='inline-row stats'>
                 <span class='inline-row characterHealth'>
                     <img class='icon' src='media/healthIcon.svg'>
                     $row[health] /<input class='no-spinner' type='number' value='$row[max_health]' id='newMaxHealthInput' style='font-size: 100%;'></input>

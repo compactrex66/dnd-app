@@ -121,23 +121,23 @@ async function generateHtml(monster) {
                 ${monster.challenge_rating_text} (XP ${monster.experience_points}; PB +${monster.proficiency_bonus ?? 0})
             </li>
         </ul>`;
-    let spellFindRegex = /((?<=can cast ).+(?=the))|[\*\n][^:\n]*?: (.+)|(?<=\-[^:\n]+: )([\w ,]*?(?=(?:[-"]|$)))|(?<=_)[\w ]*?(?=_)/g;    
+    let spellFindRegex = /((?<=can cast ).+(?=the))|[\*\n][^:\n]*?: (.+)|(?<=\-[^:\n]+: )([\w ,]*?(?=(?:[-"]|$)))|(?<=_)[\w ]*?(?=_)/g;
     if (!isEmpty(monster.traits)) {
         let traits = monster.traits;
         traits.forEach(trait => {
             console.log(trait['desc']);
-            
+
             let matches = [...trait['desc'].matchAll(spellFindRegex)];
             if (!isEmpty(matches)) {
                 let firstGroup = matches[0][0].replaceAll(/(and|at|will|has|level|\d|without|expending|a|spell|slot|\.|they|have)(?=[ .])/gi, "").trim().split(/ {2,}/);
                 console.log(firstGroup);
-                
-                
-                if(firstGroup[0].match(/cantrips|Cantrips/g))
+
+
+                if (firstGroup[0].match(/cantrips|Cantrips/g))
                     firstGroup = [];
-                
+
                 matches = matches.map(m => m[2] || m[3]).filter(Boolean);
-                
+
                 matches = matches.map(spells => spells.replaceAll('*', '').split(','));
                 matches.forEach(match => {
                     match = match.map(match => match.trim());
@@ -152,12 +152,12 @@ async function generateHtml(monster) {
         actions.forEach(action => {
             action['desc'] = action['desc'].replaceAll("<br>", "<br><br>");
             let matches = [...action['desc'].matchAll(spellFindRegex)];
-            
+
             if (!isEmpty(matches)) {
                 matches = matches.map(m => m[0]).filter(Boolean);
                 matches = matches.map(spells => spells.replaceAll('*', '').split(','));
                 console.log(matches);
-                
+
                 matches.forEach(match => {
                     match = match.map(match => match.trim());
                     spells = spells.concat(match);
@@ -182,8 +182,8 @@ async function generateHtml(monster) {
         ${monster.actions.filter(action => action.action_type == "LEGENDARY_ACTION").map(action => `<p><strong><em>${action.name}. </em></strong>${action.desc.replaceAll(/\n{2}|\n| - /gm, "<br><br>")}</p>`).join('')}
         <br>
     </blockquote>
-    `    
-    if (!isEmpty(spells)) {        
+    `
+    if (!isEmpty(spells)) {
         const fetches = spells.map(async (spell) => {
             let spellDocKey = `a5e-ag_${spell.replaceAll(' ', '-').toLowerCase()}`;
             let formData = new FormData();
@@ -200,7 +200,7 @@ async function generateHtml(monster) {
                         // const desc = await new Promise ((resolve) => {
                         //     let parseMarkdownRequest = new XMLHttpRequest();
                         //     parseMarkdownRequest.open("post", "../indexActions.php", true)
-    
+
                         //     let markdownData = new FormData();
                         //     markdownData.append("action", "parseMarkdown");
                         //     markdownData.append("markdown", data.desc);
@@ -220,15 +220,15 @@ async function generateHtml(monster) {
                         spellData.append("target_type", data.target_type);
                         spellData.append("range_text", data.range_text);
                         spellData.append("range_num", data.range);
-                        spellData.append("ritual", data.ritual);
+                        spellData.append("ritual", data.ritual ? 1 : 0);
                         spellData.append("casting_time", data.casting_time);
-                        spellData.append("verbal", data.verbal);
-                        spellData.append("somatic", data.somatic);
-                        spellData.append("material", data.material);
+                        spellData.append("verbal", data.verbal ? 1 : 0);
+                        spellData.append("somatic", data.somatic ? 1 : 0);
+                        spellData.append("material", data.material ? 1 : 0);
                         spellData.append("target_count", data.target_count);
-                        spellData.append("attack_roll", data.attack_roll);
+                        spellData.append("attack_roll", data.attack_roll ? 1 : 0);
                         spellData.append("duration", data.duration);
-                        spellData.append("concentration", data.concentration);
+                        spellData.append("concentration", data.concentration ? 1 : 0);
                         spellData.append("document_key", data.key);
                         data = {
                             name: spell,
@@ -239,15 +239,15 @@ async function generateHtml(monster) {
                             target_type: data.target_type || '',
                             range_text: data.range_text || '',
                             range_num: data.range || 0,
-                            ritual: data.ritual ? 1 : 0,
+                            ritual: data.ritual,
                             casting_time: data.casting_time || '',
-                            verbal: data.verbal ? 1 : 0,
-                            somatic: data.somatic ? 1 : 0,
-                            material: data.material ? 1 : 0,
+                            verbal: data.verbal,
+                            somatic: data.somatic,
+                            material: data.material,
                             target_count: data.target_count || 0,
-                            attack_roll: data.attack_roll ? 1 : 0,
+                            attack_roll: data.attack_roll,
                             duration: data.duration || '',
-                            concentration: data.concentration ? 1 : 0,
+                            concentration: data.concentration,
                             document_key: data.key || ''
                         };
                         let addSpellRequest = new XMLHttpRequest();
@@ -258,17 +258,26 @@ async function generateHtml(monster) {
                 };
                 request.send(formData);
             });
-            
+
+            console.log(json);
+
             replacements[spell] = `
             <span class="spell" data-tooltip="
-            <span class='big-text'><b>${json.name.replace(/\b[a-z]/g, match => match.toUpperCase())}</b></span>
+            <span class='big-text bold'>${json.name.replace(/\b[a-z]/g, match => match.toUpperCase())}</span>
             <span class='hint-header'>
-                <span>Level: ${json.level}</span>
+                <span>Level: ${json.level == 0 ? 'Cantrip' : `${json.level}`}</span>
                 <span>Range: ${json.range_text}</span>
                 <span>Cast Time: ${json.casting_time}</span>
+                <span>Components: ${json.verbal ? 'V' : ''} ${json.somatic ? 'S' : ''} ${json.material ? 'M' : ''}</span>
+                <span>Duration: ${json.duration}</span>
+                ${json.concentration || json.ritual || json.attack_roll ? '<br>':''}
+                ${json.concentration ? '<span>Concentration</span>' : ''}
+                ${json.ritual ? '<span>Ritual</span>' : ''}
+                ${json.attack_roll ? '<span>Attack Roll</span>' : ''}
             </span><br>
             ${json.description.replaceAll("\n", '<br>')}
-            ${json.higher_level ? `<br><br>${json.higher_level}` : ''}
+            
+            ${json.higher_level ? `<br><br><span class='bold'>At Higher Level</span>${json.higher_level}` : ''}
             ">
             ${spell}
             </span>`;
@@ -294,8 +303,8 @@ async function generateHtml(monster) {
 async function getMonsterInfo(monster) {
     postMonsterName = monster.name;
     if (monster.hit_dice != null) {
-        minHealth = monster.hit_dice.match(/\d+/) * 1 + monster.hit_dice.match(/(?<=[\+ ])\d+/) * 1;        
-        maxHealth = monster.hit_dice.match(/\d+/) * monster.hit_dice.match(/(?<=d)\d+/) * 1 + monster.hit_dice.match(/(?<=[\+ ])\d+/) * 1;        
+        minHealth = monster.hit_dice.match(/\d+/) * 1 + monster.hit_dice.match(/(?<=[\+ ])\d+/) * 1;
+        maxHealth = monster.hit_dice.match(/\d+/) * monster.hit_dice.match(/(?<=d)\d+/) * 1 + monster.hit_dice.match(/(?<=[\+ ])\d+/) * 1;
     } else {
         minHealth = monster.hit_points;
         maxHealth = minHealth;
@@ -329,11 +338,16 @@ function cleanUp(text) {
     return text.replaceAll(/_(.*?)_/g, (_, g1) => g1);
 }
 
+function escapeRegExp(str) {
+    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 let menuSidePanelAnimOptions = {
     duration: 300,
     fill: "forwards",
     easing: "cubic-bezier(0,.73,.17,1.11)",
 }
+
 function hideSidePanelMenu() {
     menuSidePanel.animate(
         [
@@ -342,6 +356,7 @@ function hideSidePanelMenu() {
         menuSidePanelAnimOptions
     )
 }
+
 function showSidePanelMenu() {
     menuSidePanel.animate(
         [
@@ -350,9 +365,6 @@ function showSidePanelMenu() {
         menuSidePanelAnimOptions
     )
 }
-function escapeRegExp(str) {
-    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
 
 let isTooltipFreezed = false;
 let spellToolTipAnimOptions = {
@@ -360,10 +372,11 @@ let spellToolTipAnimOptions = {
     fill: "forwards",
     easing: "cubic-bezier(0,.73,.17,1.11)",
 }
+
 //handle mouseover spell to show spell hint
 document.addEventListener("mousemove", e => {
     let target = e.target;
-    if ((target.classList.contains("spell") || target.classList.contains("condition"))&& !isTooltipFreezed) {
+    if ((target.classList.contains("spell") || target.classList.contains("condition")) && !isTooltipFreezed) {
         let spellRect = target.getBoundingClientRect();
         let tooltipHtml = target.getAttribute("data-tooltip");
         spellTooltip.animate(
@@ -379,14 +392,15 @@ document.addEventListener("mousemove", e => {
             spellTooltip.style.bottom = `${window.innerHeight - spellRect.bottom + spellRect.height + 10}px`;
         else
             spellTooltip.style.bottom = `${window.innerHeight - spellRect.bottom - spellTooltipRect.height - 10}px`;
-        
+
         if (spellRect.left < spellTooltipRect.width)
             spellTooltip.style.left = `${e.clientX + 10}px`;
         else
             spellTooltip.style.left = `${e.clientX - 10 - spellTooltip.getBoundingClientRect().width}px`;
 
     } else if (!isTooltipFreezed) {
-        spellTooltip.animate(
+        spellTooltip.style.left = `${e.clientX - 10 - spellTooltip.getBoundingClientRect().width}px`;
+        let anim = spellTooltip.animate(
             [
                 { opacity: 0 }
             ],

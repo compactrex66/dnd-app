@@ -10,6 +10,8 @@ const enemySelect = document.getElementById("enemySelect");
 const selectedEnemy = document.getElementById("selectedEnemy");
 const enemyOptions = document.getElementById("enemyList");
 const enemyQuantity = document.getElementById("enemyQuantity");
+const resetTurnCounterBtn = document.getElementById("resetTurnCounter");
+const turnCounter = document.getElementById("turnCounter");
 
 let arrOfCharacterElements = Array.from(document.querySelectorAll(".character"));
 let currentCharacter, isEditing = false;
@@ -41,12 +43,12 @@ function updateTime() {
 }
 function getCurrentCharacter() {
     const arrOfCharacterElements = Array.from(document.querySelectorAll(".character"))
-    for(const character of arrOfCharacterElements) {
-        if(character.getAttribute("data-current") == 1) {
+    for(const character of arrOfCharacterElements) {        
+        if(character.getAttribute("data-current") == 1) {            
             return character;
         }
     }
-    return null;
+    return arrOfCharacterElements[0];
 }
 function getNextCharacter() {
     console.log(arrOfCharacterElements);
@@ -90,6 +92,32 @@ function setCurrentCharacter(character, isNextTurn) {
     data.append("nextTurn", isNextTurn);
     request.send(data);
     currentCharacter = character;
+}
+function updateTurnCounter() {
+    let request = new XMLHttpRequest();
+    request.open("post", "indexActions.php");
+    request.onload = () => {
+        turnCounter.innerHTML = request.responseText;
+    }
+    let data = new FormData();
+    data.append("action", "getTurnCounter");
+    request.send(data);
+}
+function incrementTurnCounter() {
+    let request = new XMLHttpRequest();
+    request.open("post", "indexActions.php");
+    request.onload = updateTurnCounter;
+    let data = new FormData();
+    data.append("action", "incrementTurnCounter");
+    request.send(data);
+}
+function decrementTurnCounter() {
+    let request = new XMLHttpRequest();
+    request.open("post", "indexActions.php");
+    request.onload = updateTurnCounter;
+    let data = new FormData();
+    data.append("action", "decrementTurnCounter");
+    request.send(data);
 }
 
 //Handle character clicks
@@ -318,6 +346,16 @@ listOfCharacters.addEventListener("dblclick", (e) => {
     }
 })
 
+resetTurnCounterBtn.addEventListener("click", (e) => {
+    let request = new XMLHttpRequest();
+    request.open("post", "indexActions.php");
+    request.onload = updateTurnCounter;
+    let data = new FormData();
+    data.append("action", "resetTurnCounter");
+    request.send(data);
+    resetTurnCounterBtn.blur();
+});
+
 //Delete all enemies
 deleteEnemiesBtn.addEventListener("click", () => {
     if(confirm('Are you sure you want delete all enemies ?')) {
@@ -404,8 +442,14 @@ document.getElementById("longRestBtn").addEventListener("click", () => {
 //Next turn on space click or previous turn on shift + space
 window.addEventListener("keydown", function(e) {
     if(e.key == " " && !isEditing) {
-        if(!e.shiftKey) setCurrentCharacter(getNextCharacter(), true);
-        else setCurrentCharacter(getPreviousCharacter(), false);
+        if(!e.shiftKey)  {
+            setCurrentCharacter(getNextCharacter(), true);
+            incrementTurnCounter();
+        }
+        else {
+            setCurrentCharacter(getPreviousCharacter(), false)
+            decrementTurnCounter();
+        };
     }
 });
 
@@ -447,4 +491,5 @@ enemyOptions.addEventListener("click", (e) => {
 
 updateCharactersList().then(() => {    
     setCurrentCharacter(null, false);
+    updateTurnCounter();
 });

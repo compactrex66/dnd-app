@@ -242,6 +242,38 @@ if (isset($_POST['action'])) {
         $parsedown = new ParsedownExtra();
         $parsedMakrdown = $parsedown->text($markdown);
         echo $parsedMakrdown;
+    } elseif ($action == 'resetTurnCounter') {
+        mysqli_query($conn, "UPDATE turn_counter SET turn_count = 1, round_count = 1");
+    } elseif ($action == 'incrementTurnCounter') {
+        $result = mysqli_fetch_array(mysqli_query($conn, "SELECT * FROM turn_counter LIMIT 1"));
+        $currentCharacters = mysqli_query($conn, "SELECT * FROM current_fight");
+        $amountOfCharacters = mysqli_num_rows($currentCharacters);
+        if($result['turn_count'] + 1 > $amountOfCharacters) {
+            $roundCount = $result['round_count'] + 1;
+            mysqli_query($conn, "UPDATE turn_counter SET round_count = $roundCount, turn_count = 1");
+        } else {
+            $turnCount = $result['turn_count'] + 1;
+            mysqli_query($conn, "UPDATE turn_counter SET turn_count = $turnCount");
+        }
+    } elseif ($action == 'decrementTurnCounter') {
+        $result = mysqli_fetch_array(mysqli_query($conn, "SELECT * FROM turn_counter LIMIT 1"));
+        $currentCharacters = mysqli_query($conn, "SELECT * FROM current_fight");
+        $amountOfCharacters = mysqli_num_rows($currentCharacters);
+        if($result['turn_count'] - 1 < 1) {
+            $roundCount = $result['round_count'] - 1;
+            if($roundCount > 0) {
+                mysqli_query($conn, "UPDATE turn_counter SET round_count = $roundCount, turn_count = $amountOfCharacters");
+            }
+        } else {
+            $turnCount = $result['turn_count'] - 1;
+            mysqli_query($conn, "UPDATE turn_counter SET turn_count = $turnCount");
+        }
+    } elseif ($action == 'getTurnCounter') {
+        $result = mysqli_fetch_array(mysqli_query($conn, "SELECT * FROM turn_counter LIMIT 1"));
+        echo "
+        <span class='bold'>Round $result[round_count]</span><br>
+        <span class=''>Turn $result[turn_count]</span>
+        ";
     }
 }
 mysqli_close($conn);

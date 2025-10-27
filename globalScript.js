@@ -263,17 +263,20 @@ async function generateHtml(monster) {
 
             replacements[spell] = `
             <span class="spell" data-tooltip="
-            <span class='big-text bold'>${json.name.replace(/\b[a-z]/g, match => match.toUpperCase())}</span>
+            <span class='big-text bold'>
+                ${json.name.replace(/\b[a-z]/g, match => match.toUpperCase())}
+            </span>
             <span class='hint-header'>
-                <span>Level: ${json.level == 0 ? 'Cantrip' : `${json.level}`}</span>
+                <span>${json.level == 0 ? `${json.school} cantrip` : `Level ${json.level} ${json.school}`}</span>
+                ${json.concentration ? `<span class='light-text'>Concentration</span>` : ''}
+                ${json.ritual ? `<span class='light-text'>Ritual</span>` : ''}
+                ${json.attack_roll ? `<span class='light-text'>Attack Roll</span>` : ''}
+            </span>
+            <span class='hint-header'>
                 <span>Range: ${json.range_text}</span>
                 <span>Cast Time: ${json.casting_time}</span>
                 <span>Components: ${json.verbal ? 'V' : ''} ${json.somatic ? 'S' : ''} ${json.material ? 'M' : ''}</span>
                 <span>Duration: ${json.duration}</span>
-                ${json.concentration || json.ritual || json.attack_roll ? '<br>':''}
-                ${json.concentration ? '<span>Concentration</span>' : ''}
-                ${json.ritual ? '<span>Ritual</span>' : ''}
-                ${json.attack_roll ? '<span>Attack Roll</span>' : ''}
             </span><br>
             ${json.description.replaceAll("\n", '<br>')}
             

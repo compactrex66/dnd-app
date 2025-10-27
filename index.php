@@ -17,6 +17,7 @@
         <a href="updateEnemyInfo/updateEnemyInfo.php"><button>Update enemy info</button></a>
     </div>
     <div class="spell-tooltip" id="spellTooltip"></div>
+    <div class="absolute-down-centered" id="turnCounter"></div>
     <header class="row-form">
             <div class="select secondary-btn" id="enemySelect" name="enemyType">
                 <div id="selectedEnemy">Enemy type</div>
@@ -37,6 +38,7 @@
             <input style="border: 0;" id="enemyQuantity" type="number" name="enemyQuantity" value="1" max="100">
             <button id="addEnemyBtn">Add Enemy</button>
             <button type="button" id="deleteEnemiesBtn">Delete all enemies</button>
+            <button id='resetTurnCounter'>Reset counter</button>
             <div class="vl"></div>
             <button type="button" id="shortRestBtn">Short Rest</button>
             <button type="button" id="longRestBtn">Long Rest</button>

@@ -52,11 +52,15 @@ async function searchMonster(monsterName) {
     if(response.ok) {
         let json = await response.json();
         matchList.innerHTML = "";
-        json['results'].forEach(monster => {
+        json['results'].forEach(monster => { 
+            console.log(monster);
+                       
             let monsterResult = document.createElement('div');
             monsterResult.setAttribute("class", "inline-row monster");
             monsterResult.innerHTML = `<span>${monster.name}</span><span>${monster.document.key}</span>`;
             monsterResult.addEventListener("click", async e => {
+                console.log(monster);
+                
                 let monsterInfo = await getMonsterInfo(monster)
                 postMonsterName = monsterInfo['name'];           
                 minHealth = monsterInfo['minHealth'];
@@ -74,4 +78,4 @@ async function searchMonster(monsterName) {
     }
 }
 
-searchMonster("mage");
+searchMonster("mage")

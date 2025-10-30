@@ -9,7 +9,7 @@ closeMenuBtn.addEventListener("click", hideSidePanelMenu);
 
 let spells = [];
 let replacements = {};
-async function generateHtml(monster) {
+async function generateHtml(monster) {    
     let html =
         `
     <blockquote>
@@ -125,13 +125,9 @@ async function generateHtml(monster) {
     if (!isEmpty(monster.traits)) {
         let traits = monster.traits;
         traits.forEach(trait => {
-            console.log(trait['desc']);
-
             let matches = [...trait['desc'].matchAll(spellFindRegex)];
             if (!isEmpty(matches)) {
                 let firstGroup = matches[0][0].replaceAll(/(and|at|will|has|level|\d|without|expending|a|spell|slot|\.|they|have)(?=[ .])/gi, "").trim().split(/ {2,}/);
-                console.log(firstGroup);
-
 
                 if (firstGroup[0].match(/cantrips|Cantrips/g))
                     firstGroup = [];
@@ -150,14 +146,12 @@ async function generateHtml(monster) {
     if (!isEmpty(monster.actions.filter(action => action.action_type == "ACTION"))) {
         let actions = monster.actions.filter(action => action.action_type == "ACTION");
         actions.forEach(action => {
-            action['desc'] = action['desc'].replaceAll("<br>", "<br><br>");
+            action['desc'] = action['desc'].replaceAll(/(?<!<br>)<br>(?!<br>)/g, "<br><br>");
             let matches = [...action['desc'].matchAll(spellFindRegex)];
 
             if (!isEmpty(matches)) {
                 matches = matches.map(m => m[0]).filter(Boolean);
                 matches = matches.map(spells => spells.replaceAll('*', '').split(','));
-                console.log(matches);
-
                 matches.forEach(match => {
                     match = match.map(match => match.trim());
                     spells = spells.concat(match);
@@ -211,45 +205,49 @@ async function generateHtml(monster) {
                         // })
                         desc = data.desc;
                         let spellData = new FormData();
-                        spellData.append("action", "addSpell");
-                        spellData.append("name", spell);
-                        spellData.append("desc", desc);
-                        spellData.append("level", data.level);
-                        spellData.append("school", data.school.name);
-                        spellData.append("higher_level", data.higher_level);
-                        spellData.append("target_type", data.target_type);
-                        spellData.append("range_text", data.range_text);
-                        spellData.append("range_num", data.range);
-                        spellData.append("ritual", data.ritual ? 1 : 0);
-                        spellData.append("casting_time", data.casting_time);
-                        spellData.append("verbal", data.verbal ? 1 : 0);
-                        spellData.append("somatic", data.somatic ? 1 : 0);
-                        spellData.append("material", data.material ? 1 : 0);
-                        spellData.append("target_count", data.target_count);
-                        spellData.append("attack_roll", data.attack_roll ? 1 : 0);
-                        spellData.append("duration", data.duration);
-                        spellData.append("concentration", data.concentration ? 1 : 0);
-                        spellData.append("document_key", data.key);
-                        data = {
-                            name: spell,
-                            description: desc,
-                            level: data.level,
-                            school: data.school?.name || '',
-                            higher_level: data.higher_level || '',
-                            target_type: data.target_type || '',
-                            range_text: data.range_text || '',
-                            range_num: data.range || 0,
-                            ritual: data.ritual,
-                            casting_time: data.casting_time || '',
-                            verbal: data.verbal,
-                            somatic: data.somatic,
-                            material: data.material,
-                            target_count: data.target_count || 0,
-                            attack_roll: data.attack_roll,
-                            duration: data.duration || '',
-                            concentration: data.concentration,
-                            document_key: data.key || ''
-                        };
+                        try {
+                            spellData.append("action", "addSpell");
+                            spellData.append("name", spell);
+                            spellData.append("desc", desc);
+                            spellData.append("level", data.level);
+                            spellData.append("school", data.school.name);
+                            spellData.append("higher_level", data.higher_level);
+                            spellData.append("target_type", data.target_type);
+                            spellData.append("range_text", data.range_text);
+                            spellData.append("range_num", data.range);
+                            spellData.append("ritual", data.ritual ? 1 : 0);
+                            spellData.append("casting_time", data.casting_time);
+                            spellData.append("verbal", data.verbal ? 1 : 0);
+                            spellData.append("somatic", data.somatic ? 1 : 0);
+                            spellData.append("material", data.material ? 1 : 0);
+                            spellData.append("target_count", data.target_count);
+                            spellData.append("attack_roll", data.attack_roll ? 1 : 0);
+                            spellData.append("duration", data.duration);
+                            spellData.append("concentration", data.concentration ? 1 : 0);
+                            spellData.append("document_key", data.key);
+                            data = {
+                                name: spell,
+                                description: desc,
+                                level: data.level,
+                                school: data.school?.name || '',
+                                higher_level: data.higher_level || '',
+                                target_type: data.target_type || '',
+                                range_text: data.range_text || '',
+                                range_num: data.range || 0,
+                                ritual: data.ritual,
+                                casting_time: data.casting_time || '',
+                                verbal: data.verbal,
+                                somatic: data.somatic,
+                                material: data.material,
+                                target_count: data.target_count || 0,
+                                attack_roll: data.attack_roll,
+                                duration: data.duration || '',
+                                concentration: data.concentration,
+                                document_key: data.key || ''
+                            };
+                        } catch(error) {
+                            resolve(null);
+                        }
                         let addSpellRequest = new XMLHttpRequest();
                         addSpellRequest.open("post", "../indexActions.php", true);
                         addSpellRequest.send(spellData);
@@ -259,31 +257,33 @@ async function generateHtml(monster) {
                 request.send(formData);
             });
 
-            console.log(json);
-
+            if(json != null) {
             replacements[spell] = `
-            <span class="spell" data-tooltip="
-            <span class='big-text bold'>
-                ${json.name.replace(/\b[a-z]/g, match => match.toUpperCase())}
-            </span>
-            <span class='hint-header'>
-                <span>${json.level == 0 ? `${json.school} cantrip` : `Level ${json.level} ${json.school}`}</span>
-                ${json.concentration ? `<span class='light-text'>Concentration</span>` : ''}
-                ${json.ritual ? `<span class='light-text'>Ritual</span>` : ''}
-                ${json.attack_roll ? `<span class='light-text'>Attack Roll</span>` : ''}
-            </span>
-            <span class='hint-header'>
-                <span>Range: ${json.range_text}</span>
-                <span>Cast Time: ${json.casting_time}</span>
-                <span>Components: ${json.verbal ? 'V' : ''} ${json.somatic ? 'S' : ''} ${json.material ? 'M' : ''}</span>
-                <span>Duration: ${json.duration}</span>
-            </span><br>
-            ${json.description.replaceAll("\n", '<br>')}
-            
-            ${json.higher_level ? `<br><br><span class='bold'>At Higher Level</span>${json.higher_level}` : ''}
-            ">
-            ${spell}
-            </span>`;
+                <span class="spell" data-tooltip="
+                <span class='big-text bold'>
+                    ${json.name.replace(/\b[a-z]/g, match => match.toUpperCase())}
+                </span>
+                <span class='hint-header'>
+                    <span>${json.level == 0 ? `${json.school} cantrip` : `Level ${json.level} ${json.school}`}</span>
+                    ${json.concentration ? `<span class='light-text'>Concentration</span>` : ''}
+                    ${json.ritual ? `<span class='light-text'>Ritual</span>` : ''}
+                    ${json.attack_roll ? `<span class='light-text'>Attack Roll</span>` : ''}
+                </span>
+                <span class='hint-header'>
+                    <span>Range: ${json.range_text}</span>
+                    <span>Cast Time: ${json.casting_time}</span>
+                    <span>Components: ${json.verbal ? 'V' : ''} ${json.somatic ? 'S' : ''} ${json.material ? 'M' : ''}</span>
+                    <span>Duration: ${json.duration}</span>
+                </span><br>
+                ${json.description.replaceAll("\n", '<br>')}
+                
+                ${json.higher_level ? `<br><br><span class='bold'>At Higher Level</span>${json.higher_level}` : ''}
+                ">
+                ${spell}
+                </span>`;
+            } else {
+                replacements[spell] = `<span class="spell" data-tooltip="<span class='big-text bold'>${spell}</span><br>Unable to get spell tooltip">${spell}</span>`;
+            }
         })
 
         await Promise.all(fetches);
@@ -316,7 +316,15 @@ async function getMonsterInfo(monster) {
     initiativeBonus = monster.initiative_bonus;
     documentKey = monster.key;
     moreInfo = await generateHtml(monster);
-    return { 'name': postMonsterName, 'minHealth': minHealth, 'maxHealth': maxHealth, 'armorClass': armorClass, 'initiativeBonus': initiativeBonus, 'documentKey': documentKey, 'moreInfo': moreInfo }
+    return { 
+        'name': postMonsterName, 
+        'minHealth': minHealth, 
+        'maxHealth': maxHealth, 
+        'armorClass': armorClass, 
+        'initiativeBonus': initiativeBonus, 
+        'documentKey': documentKey, 
+        'moreInfo': moreInfo 
+    }
 }
 
 function isEmpty(obj) {

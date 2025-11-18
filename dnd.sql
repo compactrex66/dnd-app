@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 26, 2025 at 07:51 AM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- Generation Time: Lis 18, 2025 at 02:15 AM
+-- Wersja serwera: 10.4.32-MariaDB
+-- Wersja PHP: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -24,7 +24,7 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Table structure for table `character_conditions`
+-- Struktura tabeli dla tabeli `character_conditions`
 --
 
 CREATE TABLE `character_conditions` (
@@ -44,7 +44,7 @@ INSERT INTO `character_conditions` (`id`, `condition_id`, `character_id`, `turns
 -- --------------------------------------------------------
 
 --
--- Table structure for table `conditions`
+-- Struktura tabeli dla tabeli `conditions`
 --
 
 CREATE TABLE `conditions` (
@@ -79,7 +79,7 @@ INSERT INTO `conditions` (`id`, `name`, `description`, `document_key`, `icon_fil
 -- --------------------------------------------------------
 
 --
--- Table structure for table `current_fight`
+-- Struktura tabeli dla tabeli `current_fight`
 --
 
 CREATE TABLE `current_fight` (
@@ -108,7 +108,7 @@ INSERT INTO `current_fight` (`id`, `name`, `health`, `max_health`, `AC`, `initia
 -- --------------------------------------------------------
 
 --
--- Table structure for table `enemies`
+-- Struktura tabeli dla tabeli `enemies`
 --
 
 CREATE TABLE `enemies` (
@@ -133,7 +133,7 @@ INSERT INTO `enemies` (`id`, `name`, `min_health`, `max_health`, `AC`, `initiati
 -- --------------------------------------------------------
 
 --
--- Table structure for table `spells`
+-- Struktura tabeli dla tabeli `spells`
 --
 
 CREATE TABLE `spells` (
@@ -205,7 +205,7 @@ INSERT INTO `spells` (`id`, `name`, `description`, `level`, `school`, `higher_le
 -- --------------------------------------------------------
 
 --
--- Table structure for table `time`
+-- Struktura tabeli dla tabeli `time`
 --
 
 CREATE TABLE `time` (
@@ -222,43 +222,61 @@ CREATE TABLE `time` (
 INSERT INTO `time` (`time_id`, `date`, `hour`, `minute`) VALUES
 (1, '1571-08-14', 23, 0);
 
+-- --------------------------------------------------------
+
 --
--- Indexes for dumped tables
+-- Struktura tabeli dla tabeli `turn_counter`
+--
+
+CREATE TABLE `turn_counter` (
+  `round_count` int(10) UNSIGNED NOT NULL,
+  `turn_count` int(10) UNSIGNED NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `turn_counter`
+--
+
+INSERT INTO `turn_counter` (`round_count`, `turn_count`) VALUES
+(1, 1);
+
+--
+-- Indeksy dla zrzutów tabel
 --
 
 --
--- Indexes for table `character_conditions`
+-- Indeksy dla tabeli `character_conditions`
 --
 ALTER TABLE `character_conditions`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `conditions`
+-- Indeksy dla tabeli `conditions`
 --
 ALTER TABLE `conditions`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `current_fight`
+-- Indeksy dla tabeli `current_fight`
 --
 ALTER TABLE `current_fight`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `enemies`
+-- Indeksy dla tabeli `enemies`
 --
 ALTER TABLE `enemies`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `spells`
+-- Indeksy dla tabeli `spells`
 --
 ALTER TABLE `spells`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `document_key` (`document_key`) USING HASH;
 
 --
--- Indexes for table `time`
+-- Indeksy dla tabeli `time`
 --
 ALTER TABLE `time`
   ADD PRIMARY KEY (`time_id`);
@@ -271,7 +289,7 @@ ALTER TABLE `time`
 -- AUTO_INCREMENT for table `character_conditions`
 --
 ALTER TABLE `character_conditions`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=64;
 
 --
 -- AUTO_INCREMENT for table `conditions`

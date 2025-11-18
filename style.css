@@ -278,6 +278,7 @@ textarea,
 
 .stats {
     justify-content: space-between;
+    flex-grow: 1;
 }
 
 .icon {

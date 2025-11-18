@@ -310,13 +310,10 @@ listOfCharacters.addEventListener("change", (e) => {
 
 //Handle character double clicks
 listOfCharacters.addEventListener("dblclick", (e) => {
-    const target = e.target
+    let target = e.target.closest(".character");
 
-    if(target.classList.contains("character")) {
-        setCurrentCharacter(e.target, false);
-    }
-
-    if(target.classList.contains("characterName")) {
+    if(e.target.classList.contains("characterName")) {
+        target = e.target;
         isEditing = true;
         let inputNewNameElement = document.createElement("textarea"), oldName = target.innerText;
         inputNewNameElement.value = target.innerText;
@@ -343,6 +340,11 @@ listOfCharacters.addEventListener("dblclick", (e) => {
         target.innerHTML = "";
         target.appendChild(inputNewNameElement);
         inputNewNameElement.focus();
+        return;
+    }
+    
+    if(target.classList.contains("character")) {
+        setCurrentCharacter(target, false);
     }
 })
 

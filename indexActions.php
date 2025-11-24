@@ -10,6 +10,8 @@ if (isset($_POST['action'])) {
         $characterId = $_POST['characterId'];
         if ($action == 'adjustHealth') {
             changeHealth($conn, $_POST['healthNumber'], $characterId);
+        } elseif ($action == 'changeHealth') {
+            setHealth($conn, $_POST['health'], $characterId);
         } elseif ($action == 'changeMaxHealth') {
             changeMaxHealth($conn, $_POST['maxHealth'], $characterId);
         } elseif ($action == 'changeInitiative') {
@@ -96,7 +98,8 @@ if (isset($_POST['action'])) {
             <span class='inline-row stats'>
                 <span class='inline-row characterHealth'>
                     <img class='icon' src='media/healthIcon.svg'>
-                    $row[health] /<input class='no-spinner' type='number' value='$row[max_health]' id='newMaxHealthInput' style='font-size: 100%;'></input>
+                    <input class='no-spinner' type='number' value='$row[health]' id='newHealthInput' style='font-size: 100%;'></input> /
+                    <input class='no-spinner' type='number' value='$row[max_health]' id='newMaxHealthInput' style='font-size: 100%;'></input>
                 </span>
                 <span class='inline-row'><img class='icon' src='media/initiativeBoltIcon.svg'>
                     <input class='no-spinner' type='number' value=" . $row['initiative'] . " id='modifiedInitiativeInput'></input>

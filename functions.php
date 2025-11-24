@@ -33,7 +33,11 @@ function changeHealth($conn, $healthChange, $characterId) {
         $healthChange = $maxHealth - $currentHealth;
     }
     $health = $currentHealth + $healthChange;
-    mysqli_query($conn, "UPDATE current_fight set health = $health WHERE id = $characterId");
+    mysqli_query($conn, "UPDATE current_fight SET health = $health WHERE id = $characterId");
+}
+
+function setHealth($conn, $health, $characterId) {
+    mysqli_query($conn, "UPDATE current_fight SET health = $health WHERE id = $characterId");
 }
 
 function changeMaxHealth($conn, $newMax, $characterId) {

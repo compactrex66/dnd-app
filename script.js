@@ -293,6 +293,22 @@ listOfCharacters.addEventListener("change", (e) => {
         request.send(data);
     }
 
+    //health
+    if(target.id = "newHealthInput") {
+        console.log(target.value);
+        
+        let characterAncestor = target.closest(".character");
+        let request = new XMLHttpRequest();
+        request.onload = function() { updateCharactersList(); };
+        request.open("post", `indexActions.php`);
+
+        let data = new FormData();
+        data.append("action", "changeHealth")
+        data.append("health", target.value)
+        data.append("characterId", characterAncestor.getAttribute("data-characterId"))
+        request.send(data);
+    }
+
     //max health
     if(target.id == "newMaxHealthInput") {
         let characterAncestor = target.closest(".character");

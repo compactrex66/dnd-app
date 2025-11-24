@@ -268,8 +268,7 @@ async function generateHtml(monster) {
                     ${json.concentration ? `<span class='light-text'>Concentration</span>` : ''}
                     ${json.ritual ? `<span class='light-text'>Ritual</span>` : ''}
                     ${json.attack_roll ? `<span class='light-text'>Attack Roll</span>` : ''}
-                </span>
-                <span class='hint-header'>
+                    <div class='flex-break'></div>
                     <span>Range: ${json.range_text}</span>
                     <span>Cast Time: ${json.casting_time}</span>
                     <span>Components: ${json.verbal ? 'V' : ''} ${json.somatic ? 'S' : ''} ${json.material ? 'M' : ''}</span>
@@ -277,7 +276,7 @@ async function generateHtml(monster) {
                 </span><br>
                 ${json.description.replaceAll("\n", '<br>')}
                 
-                ${json.higher_level ? `<br><br><span class='bold'>At Higher Level</span>${json.higher_level}` : ''}
+                ${json.higher_level ? `<div class='margin-top'><span class='bold'>At Higher Level</span><br>${json.higher_level}</div>` : ''}
                 ">
                 ${spell}
                 </span>`;
